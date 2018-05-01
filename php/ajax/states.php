@@ -34,4 +34,10 @@ elseif($_GET['type'] == 'kecamatan'){
     echo json_encode($stmt->fetchAll());
 
 }
+elseif($_GET['type'] == 'subCat'){
+    $stmt = $config->runQuery('SELECT * FROM categories WHERE category_id = :id');
+    $stmt->execute(array(':id' => $id));
+    header('Content-Type: application/json');
+    echo json_encode($stmt->fetchAll());
+}
 

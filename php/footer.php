@@ -11,6 +11,7 @@
     <script src="<?=URL?>assets/vendors/dll/offcanvas.js"></script>
     <script type="text/javascript" src="<?=URL?>assets/vendors/dataTables/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="<?=URL?>assets/vendors/dataTables/js/dataTables.bootstrap4.min.js"></script>
+    <script type="text/javascript" src="<?=URL?>assets/vendors/select2/select2.min.js"></script>
 
 
     <script src="<?=URL?>assets/js/custom.js"></script>
@@ -26,6 +27,15 @@
         <script src="<?=URL?>assets/js/modul/kurir.js"></script>
     <?php } if($menu == 'production'){?>
         <script src="<?=URL?>assets/js/modul/stocks.js"></script>
+    <?php } if($menu == 'bd'){ ?>
+
+        <script src="<?=URL?>assets/vendors/krajeee/js/fileinput.js" type="text/javascript"></script>
+        <script src="<?=URL?>assets/vendors/krajeee/js/locales/fr.js" type="text/javascript"></script>
+        <script src="<?=URL?>assets/vendors/krajeee/js/locales/es.js" type="text/javascript"></script>
+        <script src="<?=URL?>assets/vendors/krajeee/themes/explorer-fa/theme.js" type="text/javascript"></script>
+        <script src="<?=URL?>assets/vendors/krajeee/themes/fa/theme.js" type="text/javascript"></script>
+
+        <script src="<?=URL?>assets/js/modul/product.js"></script>
     <?php } ?>
 <script>
     $(document).ready(function(){

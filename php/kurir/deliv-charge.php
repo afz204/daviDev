@@ -1,6 +1,6 @@
 <?php 
-$charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, delivery_charges.created_at, delivery_charges.updated_at, villages.name as kelurahan, users.name', 'delivery_charges',
-'INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan INNER JOIN users ON users.id = delivery_charges.admin_id',
+$charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, delivery_charges.created_at, delivery_charges.updated_at, users.name, villages.name AS kelurahan, villages.district_id AS KecID, districts.name AS kecamatan', 'delivery_charges',
+'INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan INNER JOIN users ON users.id = delivery_charges.admin_id INNER JOIN districts ON districts.id = villages.district_id',
  "ORDER BY delivery_charges.created_at DESC");
 
  $provinsi = $config->Products('id, name', 'provinces');
@@ -12,7 +12,7 @@ $charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, de
         Delivery Charge
     </div>
     <div class="card-body">
-        <div id="formDelivCharge">
+        <div id="formDelivCharge" class="hidden">
             <div class="card border-dark mb-3">
                 <div class="card-header bg-transparent border-dark">Form Tambah delivery charge</div>
                 <div class="card-body">
@@ -59,7 +59,8 @@ $charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, de
             <table id="tableDelivCharge" class="table table-hover <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover">
             <thead class="thead-light">
                 <tr style="text-transform: lowercase;">
-                    <th scope="col">nama kelurahan</th>
+                    <th scope="col">kecamatan</th>
+                    <th scope="col">kelurahan</th>
                     <th scope="col">delivery charge</th>
                     <th scope="col">created_at</th>
                     <th scope="col">updated_at</th>
@@ -70,12 +71,14 @@ $charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, de
             <tbody>
                 <?php while($rows = $charge->fetch(PDO::FETCH_LAZY)){ ?>
                 <tr>
+                    <td><?=$rows['kecamatan']?></td>
                     <td><?=$rows['kelurahan']?></td>
                     <td style='text-align: right;'><?=number_format($rows['price'], 0, ',', '.')?></td>
                     <td><?=$rows['created_at']?></td>
                     <td><?=$rows['updated_at']?></td>
                     <td><?=$rows['name']?></td>
-                    <td>
+                    <td style="float:right;">
+                        <button <?=$access['update']?> class="btn btn-sm btn-warning updateCharge" data-kelurahan="<?=$rows['kelurahan']?>" data-price="<?=$rows['price']?>" data-id="<?=$rows['id']?>">update</button>
                         <button <?=$access['delete']?> class="btn btn-sm btn-danger deleteCharge" data-admin="<?=$admin['id']?>" data-id="<?=$rows['id']?>">delete</button>
                     </td>
                 </tr>
@@ -84,4 +87,30 @@ $charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, de
             </table>
         </div>
     </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalCharges" tabindex="-1" role="dialog" aria-labelledby="modalChargesLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalChargesLabel"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <form id="updateCharges-form" data-parsley-validate="">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="updateCharges" required>
+                    <input type="hidden" class="form-control" id="adminCharges" value="<?=$admin['id']?>">
+                    <input type="hidden" class="form-control" id="idCharges" >
+                </div>
+                <p>
+                    <button type="submit" class="btn btn-block btn-primary">update harga</button>
+                </p>
+            </form>
+      </div>
+    </div>
+  </div>
 </div>

@@ -52,3 +52,31 @@ INSERT INTO `staffs` (`id`, `id_menu`, `id_roles`) VALUES (NULL, '11', '3');
 INSERT INTO `staffs` (`id`, `id_menu`, `id_roles`) VALUES (NULL, '11', '4');
 
 UPDATE table MENUS, STAFFS, SUB_MENUS,
+
+//category sub category
+
+SELECT cat.id, cat.name, subcat.id AS SubID, subcat.name AS SubCategory, subcat.category_id as categoriesID FROM categories AS cat
+LEFT OUTER JOIN categories AS subcat
+ON cat.id = subcat.category_id
+WHERE cat.category_id=0
+ORDER BY cat.name, subcat.name
+
+//product available city
+
+SELECT products.id, products.name_product, GROUP_CONCAT(provinces.name ORDER BY provinces.id) AS provinsi FROM products
+
+LEFT JOIN provinces ON FIND_IN_SET(provinces.id, products.available_on) > 0
+
+GROUP BY 1, 2
+
+//PRODUCT ALL
+
+SELECT cat.id, cat.name AS category, subcat.category_id AS subID, subcat.name AS subcategory, prod.id AS idProduct, prod.name_product, prod.cost_price, prod.selling_price, prod.sort_desc, prod.full_desc, prod.note, prod.images, GROUP_CONCAT(prov.name ORDER BY prov.id) AS provinsi FROM categories cat
+LEFT JOIN categories subcat
+ON subcat.category_id = cat.id
+INNER JOIN products prod
+ON prod.subcategory_id = subcat.id
+LEFT JOIN provinces prov
+ON FIND_IN_SET(prov.id, prod.available_on) > 0
+
+GROUP BY 1, 2

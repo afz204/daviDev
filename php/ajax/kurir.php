@@ -90,4 +90,24 @@ if($_GET['type'] == 'delCharge'){
     }
 }
 
+if($_GET['type'] == 'updateCharges'){
+    $a  = $_POST['admin'];
+    $b  = $_POST['harga'];
+    $c  = $_POST['kelurahan'];
+
+    $sql = "UPDATE delivery_charges SET price = :harga, admin_id = :adminID WHERE id = :kode";
+    $stmt = $config->runQuery($sql);
+    $stmt->execute(array(
+        ':harga'  => $b,
+        ':adminID'=> $a,
+        ':kode'   => $c
+    ));
+
+    if($stmt){
+        echo $config->actionMsg('u', 'delivery_charges');
+    }else{
+        echo 'Failed!';
+    }
+}
+
 ?>

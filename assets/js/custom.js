@@ -62,5 +62,30 @@ $(document).ready(function() {
                 })
             }
         });
-    })
+    });
+    $('#categoryProduct').on('change', function(e) {
+        e.preventDefault();
+        var id = $(this).find("option:selected");
+        var value = id.val();
+        var text = id.text();
+
+        if(value != 4){
+            $.ajax({
+                url: '../php/ajax/states.php?type=subCat',
+                type: 'post',
+                data: 'id=' + value,
+
+                success: function(msg) {
+                    console.log(msg);
+                    $('#subCatProduct').empty();
+
+                    $.each(msg, function(index, value) {
+                        $('#subCatProduct').append('<option value="' + value.id + '">' + value.name + '</option>');
+                    })
+                }
+            });
+        }else{
+            $('#subCatProduct').append('<option value="0">none</option>');
+        }
+    });
 })

@@ -3,7 +3,6 @@ $(document).ready(function() {
     $('#tableDelivCharge').DataTable();
 
     var msg = $('#messageKurir').hide();
-    var formCharge = $('#formDelivCharge').hide();
     var listCharge = $('#listDelivCharge').show();
 
     $('#newKurir').on('submit', function(e) {
@@ -35,7 +34,7 @@ $(document).ready(function() {
     });
     $('#listDelivCharge').on('click', '.addDeliveryCharge', function() {
         listCharge.hide();
-        formCharge.show();
+        $('#formDelivCharge').removeClass('hidden');
     });
     $('#delivCharge-form').on('submit', function(e) {
         e.preventDefault();
@@ -74,5 +73,36 @@ $(document).ready(function() {
             })
         }
 
+    });
+
+    listCharge.on('click', '.updateCharge', function() {
+        var id = $(this).data('id');
+        var kel = $(this).data('kelurahan');
+        var hrg = $(this).data('price');
+        $('#modalCharges').modal({
+            backdrop: 'static',
+            keyboard: false
+        });
+        $('#modalChargesLabel').html('update delivery-charges <span class="badge badge-xs badge-primary">' + kel + '</span>');
+        $('#updateCharges').attr("placeholder", hrg).val("").focus().blur();
+        $('#idCharges').val(id);
+    });
+
+    $('#updateCharges-form').on('submit', function(e) {
+        e.preventDefault();
+        var id = $('#idCharges').val();
+        var adm = $('#adminCharges').val();
+        var hrg = $('#updateCharges').val();
+
+        $.ajax({
+            url: '../php/ajax/kurir.php?type=updateCharges',
+            method: 'post',
+            data: { admin: adm, harga: hrg, kelurahan: id },
+
+            success: function(msg) {
+                location.reload();
+                alert(msg);
+            }
+        })
     });
 })

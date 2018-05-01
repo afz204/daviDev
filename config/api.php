@@ -277,6 +277,18 @@ class Admin
         );
         return $previllages;
     }
+    public function Province()
+    {
+        $stmt = $this->conn->prepare('SELECT id, name FROM provinces');
+        $stmt->execute();
+        return $stmt;
+    }
+    public function Category()
+    {
+        $stmt = $this->conn->prepare('SELECT id, name FROM categories WHERE category_id = 0 ');
+        $stmt->execute();
+        return $stmt;
+    }
     public function paging($query,$records_per_page)
 
     {

@@ -16,7 +16,12 @@
     <!-- Custom styles for this template -->
     <link href="<?=URL?>assets/css/offcanvas.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/dataTables/css/dataTables.bootstrap4.min.css"/>
-
+    <?php if($menu == 'bd'){ ?>
+        <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/select2/select2.min.css"/>
+        <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/select2/select2-bootstrap4.min.css"/>
+        <link href="<?=URL?>assets/vendors/krajeee/css/fileinput.css" media="all" rel="stylesheet" type="text/css"/>
+        <link href="<?=URL?>assets/vendors/krajeee/themes/explorer-fa/theme.css" media="all" rel="stylesheet" type="text/css"/>
+    <?php } ?>
     
 </head>
 
