@@ -5,6 +5,7 @@ $(document).ready(function () {
 
     var url = 'http://localhost/bungdav/php/ajax/uploadImagesProduct.php';
 
+    $('#tableProduct').DataTable();
 
     $('#simple-select2').select2({
         theme: 'bootstrap4',

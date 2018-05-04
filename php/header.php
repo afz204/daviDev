@@ -21,6 +21,8 @@
         <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/select2/select2-bootstrap4.min.css"/>
         <link href="<?=URL?>assets/vendors/krajeee/css/fileinput.css" media="all" rel="stylesheet" type="text/css"/>
         <link href="<?=URL?>assets/vendors/krajeee/themes/explorer-fa/theme.css" media="all" rel="stylesheet" type="text/css"/>
+        <link href="<?=URL?>assets/vendors/lightbox/ekko-lightbox.css" media="all" rel="stylesheet" type="text/css"/>
+        <link href="<?=URL?>assets/vendors/lightbox/ekko-main.css" media="all" rel="stylesheet" type="text/css"/>
     <?php } ?>
     
 </head>

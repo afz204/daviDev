@@ -10,6 +10,7 @@ define('CORPORATE', URL.'corporate/');
 define('ORDER', URL.'order/');
 define('MANAGEMENT', URL.'management/');
 define('PAYMENT', URL.'payment/');
+define('BD', URL.'bd/');
 
 
 require 'api.php';

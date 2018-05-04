@@ -1,27 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9766f3cf-e83b-43df-a629-d4cb71629c15" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/assets/js/modul/product.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/assets/vendors/select2/select2.min.css" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/assets/vendors/select2/select2.min.js" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/php/ajax/product.php" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/php/ajax/uploadImagesProduct.php" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/php/bd/list-product.php" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/php/bd/product.php" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change beforePath="$PROJECT_DIR$/assets/js/custom.js" afterPath="$PROJECT_DIR$/assets/js/custom.js" />
-      <change beforePath="$PROJECT_DIR$/assets/js/modul/kurir.js" afterPath="$PROJECT_DIR$/assets/js/modul/kurir.js" />
-      <change beforePath="$PROJECT_DIR$/config/api.php" afterPath="$PROJECT_DIR$/config/api.php" />
-      <change beforePath="$PROJECT_DIR$/config/config.php" afterPath="$PROJECT_DIR$/config/config.php" />
-      <change beforePath="$PROJECT_DIR$/note.txt" afterPath="$PROJECT_DIR$/note.txt" />
-      <change beforePath="$PROJECT_DIR$/php/ajax/kurir.php" afterPath="$PROJECT_DIR$/php/ajax/kurir.php" />
-      <change beforePath="$PROJECT_DIR$/php/ajax/states.php" afterPath="$PROJECT_DIR$/php/ajax/states.php" />
-      <change beforePath="$PROJECT_DIR$/php/footer.php" afterPath="$PROJECT_DIR$/php/footer.php" />
-      <change beforePath="$PROJECT_DIR$/php/header.php" afterPath="$PROJECT_DIR$/php/header.php" />
-      <change beforePath="$PROJECT_DIR$/php/kurir/deliv-charge.php" afterPath="$PROJECT_DIR$/php/kurir/deliv-charge.php" />
-    </list>
+    <list default="true" id="9766f3cf-e83b-43df-a629-d4cb71629c15" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -361,7 +341,7 @@
       <workItem from="1523646910793" duration="544000" />
       <workItem from="1523786976079" duration="58000" />
       <workItem from="1525102843973" duration="210000" />
-      <workItem from="1525133511997" duration="43226000" />
+      <workItem from="1525133511997" duration="43825000" />
     </task>
     <task id="LOCAL-00001" summary="new kas">
       <created>1523484393211</created>
@@ -388,7 +368,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="179014000" />
+    <option name="totallyTimeSpent" value="179613000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />

@@ -37,7 +37,7 @@
 
                     <div class="form-group">
                         <label for="categoryProduct">Category Product</label>
-                        <select class="form-control" name="categoryProduct" id="categoryProduct" required>
+                        <select class="form-control" name="categoryProduct" id="categoryProduct" >
                             <option value="">:: category ::</option>
                             <?php while ($row = $category->fetch(PDO::FETCH_LAZY)){ ?>
                                 <option value="<?=$row->id?>"><?=$row->name?></option>
@@ -47,30 +47,30 @@
 
                     <div class="form-group">
                         <label for="subCatProduct">Sub Category Product</label>
-                        <select class="form-control" name="subCatProduct" id="subCatProduct" required>
+                        <select class="form-control" name="subCatProduct" id="subCatProduct" >
                             <option value="">:: sub category ::</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label for="nameProduct">Nama Product</label>
-                        <input type="text" name="nameProduct" id="nameProduct" class="form-control" data-parsley-minLength="3" required>
+                        <input type="text" name="nameProduct" id="nameProduct" class="form-control" data-parsley-minLength="3" >
                         <input type="hidden" name="adminProduct" id="adminProduct" value="<?=$admin['id']?>">
                     </div>
 
                     <div class="form-group">
                         <label for="tagsProduct">Tags Product</label>
-                        <input type="text" name="tagsProduct" id="tagsProduct" placeholder="multiple: use 'koma'" class="form-control" data-parsley-minLength="3" required>
+                        <input type="text" name="tagsProduct" id="tagsProduct" placeholder="multiple: use 'koma'" class="form-control" data-parsley-minLength="3" >
                     </div>
 
                     <div class="form-group">
                         <label for="tagsProduct">Cost Price Product</label>
-                        <input type="text" name="costProduct" id="costProduct" data-parsley-type="number" class="form-control" data-parsley-minLength="3" required>
+                        <input type="text" name="costProduct" id="costProduct" data-parsley-type="number" class="form-control" data-parsley-minLength="3" >
                     </div>
 
                     <div class="form-group">
                         <label for="tagsProduct">Selling Price Product</label>
-                        <input type="text" name="sellProduct" id="sellProduct" data-parsley-type="number" class="form-control" data-parsley-minLength="3" required>
+                        <input type="text" name="sellProduct" id="sellProduct" data-parsley-type="number" class="form-control" data-parsley-minLength="3" >
                     </div>
 
                     <div class="form-group">
@@ -78,7 +78,6 @@
                         <select class="form-control" name="listLokasi" id="listLokasi">
                             <option value="1" selected>:: all province ::</option>
                             <option value="2">:: only province ::</option>
-                            <option value="3">:: exception province ::</option>
                         </select>
                     </div>
 
@@ -94,15 +93,15 @@
 
                     <div class="form-group">
                         <label for="shortDesc">Short Description</label>
-                        <textarea style="text-transform: capitalize;" data-parsley-minLength="5" data-parsley-maxLength="255" name="sort" id="shortDesc" class="form-control" rows="2" required></textarea>
+                        <textarea style="text-transform: capitalize;" data-parsley-minLength="5" data-parsley-maxLength="255" name="sort" id="shortDesc" class="form-control" rows="2" ></textarea>
                     </div>
                     <div class="form-group">
                         <label for="fullDesc">Full Description</label>
-                        <textarea style="text-transform: capitalize;" data-parsley-minLength="5" name="sort" id="fullDesc" class="form-control" rows="5" required></textarea>
+                        <textarea style="text-transform: capitalize;" data-parsley-minLength="5" name="sort" id="fullDesc" class="form-control" rows="5" ></textarea>
                     </div>
                     <div class="form-group">
                         <label for="fullDesc">Important Notes</label>
-                        <textarea style="text-transform: capitalize;" data-parsley-minLength="5" name="note" id="noteProduct" class="form-control" rows="5" required></textarea>
+                        <textarea style="text-transform: capitalize;" data-parsley-minLength="5" name="note" id="noteProduct" class="form-control" rows="5" ></textarea>
                     </div>
 
                     <button type="submit" class="btn btn-block btn-outline-primary" >submit</button>

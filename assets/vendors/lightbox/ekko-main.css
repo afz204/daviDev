@@ -1,0 +1,51 @@
+figure {
+                position: relative;
+            }
+
+            figure figcaption {
+                font-size: 22px;
+                color: #fff;
+                text-decoration: none;
+                bottom: 10px;
+                right: 20px;
+                position: absolute;
+                background-color: #000;
+            }
+			code[data-code], code.block-code {
+                display:block;
+                overflow:scroll;
+                font-size:12px;
+				white-space: pre;
+			}
+
+            table {
+                /*font-size:12px;*/
+            }
+            .footer {
+                text-align: center;
+            }
+            .footer span {
+                margin-top:100px;
+                font-size:12px;
+                background-color:#02709e;
+                color:white;
+                display:inline-block;
+                padding:6px;
+            }
+            .footer span a {
+                color:#ccc;
+                border-bottom:1px dotted white;
+            }
+            .footer span a:hover {
+                cursor:pointer;
+                color: white;
+                border-bottom:1px solid white;
+                text-decoration: none;
+            }
+            a.anchorjs-link {
+                color:black;
+            }
+            a.anchorjs-link:hover {
+                color:#02709e;
+                text-decoration: none;
+            }
