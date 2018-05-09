@@ -216,3 +216,60 @@ if($_GET['type'] == 'reportPayCharge')
     }
 
 }
+if($_GET['type'] == 'kasBesar')
+{
+   $a = $_POST['tipe'];
+   $b = $_POST['biaya'];
+   $c = $_POST['judul'];
+   $d = $_POST['keterangan'];
+   $e = $_POST['admin'];
+   $tgl = $config->getDate('Y-m-d H:m:s');
+
+    $sql = "INSERT INTO kas_besar (type, total, title, ket, admin_id) VALUES (:a, :b, :c, :d, :e)";
+    $stmt = $config->runQuery($sql);
+    $stmt->execute(array(
+        ':a'    => $a,
+        ':b'    => $b,
+        ':c'    => $c,
+        ':d'    => $d,
+        ':e'    => $e
+    ));
+
+    if($stmt){
+        if($a == 'kredit'){
+            $sql = "INSERT INTO kas_ins (title, total, ket, admin_id, created_at) VALUES (:c, :b, :d, :e, :tgl)";
+            $stmt = $config->runQuery($sql);
+            $stmt->execute(array(
+                ':c'    => $c,
+                ':b'    => $b,
+                ':d'    => $d,
+                ':e'    => $e,
+                ':tgl'  => $tgl
+            ));
+            if($stmt){
+                echo $config->actionMsg('c', 'kas_ins');
+            }else{
+                echo 'Failed!';
+            }
+        }
+        echo $config->actionMsg('c', 'kas_besar');
+        
+    }else{
+        echo 'Failed!';
+    }
+}
+
+if($_GET['type'] == 'delKasBesar')
+{
+    $a = $_POST['admin'];
+    $b = $_POST['keterangan'];
+    $tgl = $config->getDate('Y-m-d H:m:s');
+
+    $stmt = $config->delRecord('kas_besar', 'id', $b);
+
+    if($stmt){
+        echo $config->actionMsg('d', 'pay_kurirs');
+    }else{
+        echo 'Failed!';
+    }
+}

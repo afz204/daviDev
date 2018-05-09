@@ -82,5 +82,8 @@ foreach ($catt as $b){
    }
     
 }
-
-$access = $config->weightPages($weight);
+if(isset($weight)){
+    $access = $config->weightPages($weight);
+}else{
+    $access = $config->weightPages('0');
+}

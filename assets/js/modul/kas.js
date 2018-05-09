@@ -17,6 +17,30 @@ function delKasOut(id, admin) {
     }
 }
 
+function delKasBesar(id, admin) {
+    if (!confirm('Are you sure want to delete this?')) {
+        return false;
+    } else {
+        $.ajax({
+            url: '../php/ajax/payment.php?type=delKasBesar',
+            method: 'post',
+            data: { admin: admin, keterangan: id },
+
+            success: function(msg) {
+                location.reload();
+                alert(msg);
+            }
+        })
+    }
+}
+
+function addKasBesar(admin, type) {
+    $('#form_kas_Besar').removeClass('hidden');
+    $('#monitoringKasIn').addClass('hidden');
+
+    $('#typeKasB').val(type);
+}
+
 function addKasOut(admin) {
     $('#listKasKeluar').addClass('hidden');
     $('#form-kasKeluar').removeClass('hidden');
@@ -25,6 +49,7 @@ $(document).ready(function() {
     $('#tableKasOut').DataTable();
     $('#kasMasuk').DataTable();
     $('#tablePayKurir').DataTable();
+    $('#table_kas_out').DataTable();
     var listOutKas = $('#listKasKeluar').show();
     var listPayKurir = $('#listPayKurir').show();
     var listInKas = $('#listKasIn').hide();
@@ -37,7 +62,7 @@ $(document).ready(function() {
 
     $('#belanja-form').on('submit', function(e) {
         e.preventDefault();
-        
+
         console.log('form masuk');
 
         var admin = $('#adminBelanja').val();
@@ -219,5 +244,26 @@ $(document).ready(function() {
             });
 
         }
+    });
+
+    $('#kas_besar_form').on('submit', function(e) {
+        e.preventDefault();
+        var admin = $('#adminKasB').val();
+        var title = $('#nameKasB').val();
+        var ket = $('#ketKasB').val();
+        var total = $('#biayaKasB').val();
+        var type = $('#typeKasB').val();
+
+        $.ajax({
+            url: '../php/ajax/payment.php?type=kasBesar',
+            method: 'post',
+            data: { admin: admin, judul: title, keterangan: ket, biaya: total, tipe: type },
+
+            success: function(msg) {
+                alert(msg);
+
+                location.reload();
+            }
+        });
     });
 })

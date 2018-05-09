@@ -1,36 +1,15 @@
 <?php
-$outKas = $config->ProductsJoin('kas_ins.id, kas_ins.title, kas_ins.total, kas_ins.ket, kas_ins.admin_id, kas_ins.status, kas_ins.created_at, users.name', 'kas_ins',
-    'INNER JOIN users ON users.id = kas_ins.admin_id', "WHERE kas_ins.status ='' ");
-$totalKas   = $config->Products('created_at, SUM(total) as totalDana', "kas_ins WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND status = ''");
+$kas = $config->ProductsJoin('kas_besar.id, kas_besar.type, kas_besar.total, kas_besar.title, kas_besar.ket, kas_besar.admin_id, kas_besar.status, kas_besar.created_at, users.name', 'kas_besar',
+    'INNER JOIN users ON users.id = kas_besar.admin_id', "WHERE kas_besar.status = '' ORDER BY kas_besar.created_at DESC");
+$totalKas   = $config->Products('created_at, SUM(total) as totalDana', "kas_besar WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND type  LIKE 'debit'");
 $totalKas   = $totalKas->fetch(PDO::FETCH_LAZY);
 
-$kasOut     = $config->Products('SUM(qty * harga) as totalOut', "kas_outs WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND status = '1'");
-$kasOut     = $kasOut->fetch(PDO::FETCH_LAZY);
+$totalKeluar   = $config->Products('created_at, SUM(total) as totalDana', "kas_besar WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND type  LIKE 'kredit'");
+$totalKeluar   = $totalKeluar->fetch(PDO::FETCH_LAZY);
 
-$sql = "SELECT pay_kurirs.id, pay_kurirs.total FROM pay_kurirs WHERE pay_kurirs.total != '' AND MONTH(pay_kurirs.created_at) = MONTH(CURRENT_DATE()) AND YEAR(pay_kurirs.created_at) = YEAR(CURRENT_DATE())";
-$kurir   = $config->runQuery($sql);
-$kurir->execute();
-
-$payKurir = $kurir->fetch(PDO::FETCH_LAZY);
-
-    if(empty($totalKas['totalDana'])){
-        $danaKas = 0;
-    }else{
-        $danaKas = $totalKas['totalDana'];
-    }
-    if(empty($kasOut['totalOut'])){
-        $kasOut = 0;
-    }else{
-        $kasOut = $kasOut['totalOut'];
-    }
-
-    if(empty($payKurir['total'])){
-        $payKurir = 0;
-    }else{
-        $payKurir = $payKurir['total'];
-    }
-
-$total = $danaKas - ($kasOut + $payKurir);
+$kasMasuk = $totalKas['totalDana'];
+$kasKeluar = $totalKeluar['totalDana'];
+$total = $kasMasuk - $kasKeluar;
 $totalDanaKas = $config->formatPrice($total);
 
 if($total > 0 ){
@@ -44,29 +23,33 @@ if($total > 0 ){
         <div class="col-12 col-sm-12 col-lg-12" id="listPemasukanKas">
             <div class="card">
                 <div class="card-header">
-                    List Pemasukkan <div class="pull-right">
-                        <!-- <button class="btn btn-sm btn-primary addInKas" <?=$access['create']?> type="button"><span class="fa fa-fw fa-plus"></span> pemasukan</button> -->
+                    Kas Besar <div class="pull-right">
+                        <button <?=$access['create']?> class="btn btn-sm btn-success" onclick="addKasBesar(<?=$admin[0]['user_id']?>, 'debit')"  type="button"><span class="fa fa-fw fa-plus"></span> debit</button>
+                        <button <?=$access['create']?> class="btn btn-sm btn-danger" onclick="addKasBesar(<?=$admin[0]['user_id']?>, 'kredit')" type="button"><span class="fa fa-fw fa-plus"></span> kredit</button>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div id="form-kasIn" class="hidden">
+                    <div id="form_kas_Besar" class="hidden">
                         <div class="card border-dark mb-3">
                             <div class="card-header bg-transparent border-dark">Form Tambah Dana Kas</div>
                             <div class="card-body">
-                                <form id="kasIn-form" method="post" data-parsley-validate="" autocomplete="off">
+                                <form id="kas_besar_form" method="post" data-parsley-validate="" autocomplete="off">
                                     <div class="form-group">
-                                        <input type="hidden" value="<?=$admin[0]['user_id']?>" id="adminIn">
+                                        <input type="hidden" value="<?=$admin[0]['user_id']?>" id="adminKasB">
                                         <input type="text"
                                                data-parsley-minLength="3" data-parsley-maxLength="255"
-                                               class="form-control" placeholder="nama dana kas" id="nameIn" required>
+                                               class="form-control" placeholder="nama dana kas" id="nameKasB" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" id="typeKasB" class="form-control" readonly>
                                     </div>
                                     <div class="form-group">
                                         <input type="text"
                                                data-parsley-type="number"
-                                               class="form-control" placeholder="total biaya" id="biayaIn" required>
+                                               class="form-control" placeholder="total biaya" id="biayaKasB" required>
                                     </div>
                                     <div class="form-group">
-                                        <textarea class="form-control" rows="5" id="ketIn" required placeholder="keterangan kas masuk"></textarea>
+                                        <textarea class="form-control" rows="5" id="ketKasB" required placeholder="keterangan kas masuk"></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-sm btn-block btn-primary">submit pemasukan</button>
                                 </form>
@@ -93,7 +76,8 @@ if($total > 0 ){
                             <thead class="thead-light">
                             <tr style="text-transform: lowercase;">
                                 <th scope="col">#</th>
-                                <th scope="col">Nama Pengeluaran</th>
+                                <th scope="col">Nama Kegiatan</th>
+                                <th scope="col">Type</th>
                                 <th scope="col">Total Biaya</th>
                                 <th scope="col">Keterangan</th>
                                 <th scope="col">Admin id</th>
@@ -102,26 +86,31 @@ if($total > 0 ){
                             </tr>
                             </thead>
                             <tbody>
-                            <?php $i = 1; while ($row = $outKas->fetch(PDO::FETCH_LAZY)){ ?>
+                            <?php $i = 1; while ($row = $kas->fetch(PDO::FETCH_LAZY)){ 
+                                if($row['type'] == 'debit'){
+                                    $types = '<label class="badge badge-success">debit</label>';
+                                }else{
+                                    $types = '<label class="badge badge-warning">kredit</label>';
+                                }
+                                ?>
                                 <tr style="text-transform: lowercase;">
                                     <td><?=$i++?></td>
                                     <td><?=$row['title']?></td>
+                                    <td><?=$types?></td>
                                     <td style="text-align: right;"><?=number_format($row['total'], '2', ',', '.')?></td>
                                     <td><?=$row['ket']?></td>
                                     <td><?=$row['name']?></td>
                                     <td><i class="small"><?=$row['created_at']?></i></td>
                                     <td>
-                                        <!--                                        <a href="--><?//=PAYMENT?><!--?p=koDetail&id=--><?//=$row['id']?><!--" --><?//=$access['read']?><!-->
-                                        <!--                                            <button class="btn btn-sm btn-primary" style="text-transform: uppercase; font-size: 10px; font-weight: 500;">details</button>-->
-                                        <!--                                        </a>-->
-                                        <button class="btn btn-sm btn-danger delKasIn" style="text-transform: uppercase; font-size: 10px; font-weight: 500;"  <?=$access['delete']?> data-id="<?=$row['id']?>" data-admin="<?=$admin[0]['user_id']?>" >delete</button>
+                                       
+                                        <button class="btn btn-sm btn-danger" onclick="delKasBesar(<?=$row['id']?>, <?=$admin[0]['user_id']?>)" style="text-transform: uppercase; font-size: 10px; font-weight: 500;"  <?=$access['delete']?> data-id="<?=$row['id']?>" data-admin="<?=$admin[0]['user_id']?>" >delete</button>
 
                                     </td>
                                 </tr>
                             <?php } ?>
                             </tbody>
                         </table>
-                        <button class="btn btn-sm btn-success reportKasIn" <?=$access['update']?> data-admin="<?=$admin[0]['user_id']?>">report</button>
+                        
                     </div>
                 </div>
             </div>

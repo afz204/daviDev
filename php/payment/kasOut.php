@@ -91,7 +91,7 @@
                         <p>
                             <button class="btn btn-sm btn-primary" onclick='addKasOut(<?=$admin[0]['user_id']?>)' <?=$access['create']?> type="button"><span class="fa fa-fw fa-plus"></span> pengeluaran</button>
                         </p>
-                        <table id="tableKasOut" class="table table-bordered  <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
+                        <table id="table_kas_out" class="table table-bordered  <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
                             <thead class="thead-light">
                                 <tr style="text-transform: lowercase;">
                                     <th scope="col">Category</th>

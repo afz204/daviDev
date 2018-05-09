@@ -65,4 +65,4 @@ $device = $config->systemInfo();
 // $listMenu = $config->ProductsJoin('menus.id, menus.menu, menus.links, staffs.id_roles', 'menus', 'INNER JOIN staffs ON staffs.id_menu = menus.id', 'WHERE staffs.id_roles = '. $admin['role_id']);
 // $subMenus = $config->ProductsJoin('sub_menus.submenu, sub_menus.link, menus.menu, menus.links, previllages.id_admin, previllages.weight', 'sub_menus', 'INNER JOIN menus ON menus.id = sub_menus.id_menu
 // INNER JOIN previllages ON previllages.id_submenu = sub_menus.id', "WHERE previllages.id_admin = ".$admin[0]['user_id'] ." AND menus.links LIKE '%". $menu ."%'" );
-// $listAdmin = $config->Products('id, name, email, jabatan, role_id, status', 'users');
+$listAdmin = $config->Products('id, name, email, jabatan, role_id, status', 'users');
