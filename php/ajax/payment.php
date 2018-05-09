@@ -11,24 +11,34 @@ $config = new Admin();
 if($_GET['type'] == 'kasOut')
 {
 
-    $a = $_POST['admin'];
-    $b = $_POST['title'];
-    $c = $_POST['biaya'];
-    $d = $_POST['keterangan'];
-    $date = $config->getDate('Y-m-d H:m:s');
+    $a = $_POST['category'];
+    $b = !empty($_POST['subcategory']) ? $_POST['subcategory'] : '0';
+    $c = $_POST['title'];
+    $d = $_POST['quantity'];
+    $e = $_POST['harga'];
+    $f = $_POST['satuan'];
+    $g = $_POST['keterangan'];
+    $h = $config->getDate('Y-m-d H:m:s');
+    $i = $_POST['admin'];
 
-    $sql = "INSERT INTO kas_outs (nama, total, ket, created_at, admin_id) VALUES (:b, :c, :d, :dated, :a)";
+    
+
+    $sql = "INSERT INTO kas_outs (type, sub_type, nama, qty, harga, satuan, ket, created_at, admin_id) VALUES (:a, :b, :c, :d, :e, :f, :g, :h, :i)";
     $stmt = $config->runQuery($sql);
     $stmt->execute(array(
+        ':a'    => $a,
         ':b'    => $b,
         ':c'    => $c,
         ':d'    => $d,
-        ':dated'=> $date,
-        ':a'    => $a
+        ':e'    => $e,
+        ':f'    => $f,
+        ':g'    => $g,
+        ':h'    => $h,
+        ':i'    => $i
     ));
     if($stmt)
     {
-        echo "Kas_out Berhasil masuk ke database!";
+        echo $config->actionMsg('c', 'kas_outs');
     }else{
         echo "Failed";
     }
@@ -56,7 +66,7 @@ if($_GET['type'] == 'reportKasOut')
 
     $tanggal = $config->getDate('Y-m-d H:m:s');
 
-    $sql = "SELECT SUM(total) as total FROM kas_outs WHERE admin_id = :admin AND status = '' ";
+    $sql = "SELECT SUM(qty * harga) as total FROM kas_outs WHERE admin_id = :admin AND status = '' ";
     $total = $config->runQuery($sql);
     $total->execute(array(
         ':admin' => $b
@@ -66,12 +76,13 @@ if($_GET['type'] == 'reportKasOut')
 
         $total = $info['total'];
 
-        $stmt = $config->runQuery("UPDATE kas_outs SET status = '1' WHERE admin_id = :admin AND status = '' ");
+        $stmt = $config->runQuery("UPDATE kas_outs SET report_at = :tanggal,  status = '1' WHERE admin_id = :adm AND status = '' ");
         $stmt->execute(array(
-            ':admin' => $b
+            ':tanggal' => $tanggal,
+            ':adm' => $b
         ));
         if($stmt){
-            $query = "INSERT INTO kas_outs (nama, total, ket, created_at, admin_id, status) VALUES (:a, :b, :c, :d, :e, :f)";
+            $query = "INSERT INTO kas_outs (nama, harga, ket, created_at, admin_id, status) VALUES (:a, :b, :c, :d, :e, :f)";
             $input = $config->runQuery($query);
             $input->execute(array(
                 ':a'    => $b,
@@ -124,11 +135,13 @@ if($_GET['type'] == 'addPayCharge')
     $a = $_POST['admin'];
     $b = $_POST['namaKurir'];
     $c = $_POST['kelurahan'];
+    $d = $_POST['trx'];
     $tgl = $config->getDate('Y-m-d H:m:s');
 
-    $sql = "INSERT INTO pay_kurirs (kurir_id, charge_id, created_at, admin_id) VALUES (:a, :b, :c, :d)";
+    $sql = "INSERT INTO pay_kurirs (no_trx, kurir_id, charge_id, created_at, admin_id) VALUES (:trx, :a, :b, :c, :d)";
     $stmt = $config->runQuery($sql);
     $stmt->execute(array(
+        ':trx'  => $d,
         ':a'    => $b,
         ':b'    => $c,
         ':c'    => $tgl,

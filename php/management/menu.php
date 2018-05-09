@@ -7,7 +7,7 @@
 
                     <form id="form-submenu" method="post" data-parsley-validate="" autocomplete="off">
                         <div class="form-group">
-                            <input type="hidden" value="<?=$admin['id']?>" id="adminSub">
+                            <input type="hidden" value="<?=$admin[0]['user_id']?>" id="adminSub">
                             <input type="hidden" value="" id="menuID">
                             <input type="text"
                                    data-parsley-minLength="3" data-parsley-maxLength="255"

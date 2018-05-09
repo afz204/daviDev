@@ -1,6 +1,6 @@
 <?php 
-$charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, delivery_charges.created_at, delivery_charges.updated_at, users.name, villages.name AS kelurahan, villages.district_id AS KecID, districts.name AS kecamatan', 'delivery_charges',
-'INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan INNER JOIN users ON users.id = delivery_charges.admin_id INNER JOIN districts ON districts.id = villages.district_id',
+$charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, delivery_charges.created_at, delivery_charges.updated_at, users.name, villages.name AS kelurahan, villages.district_id AS KecID, districts.name AS kecamatan, regencies.name AS kota', 'delivery_charges',
+'INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan INNER JOIN users ON users.id = delivery_charges.admin_id INNER JOIN districts ON districts.id = villages.district_id INNER JOIN regencies ON regencies.id = districts.regency_id',
  "ORDER BY delivery_charges.created_at DESC");
 
  $provinsi = $config->Products('id, name', 'provinces');
@@ -41,7 +41,7 @@ $charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, de
                             </select>
                         </div>
                         <div class="form-group">
-                            <input type="hidden" value="<?=$admin['id']?>" id="adminCharge">
+                            <input type="hidden" value="<?=$admin[0]['user_id']?>" id="adminCharge">
                             <input type="text"
                                 data-parsley-minLength="3" data-parsley-maxLength="255" data-parsley-type="number"
                                 class="form-control" placeholder="delivery charge" id="priceCharge" required>
@@ -59,6 +59,7 @@ $charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, de
             <table id="tableDelivCharge" class="table table-hover <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover">
             <thead class="thead-light">
                 <tr style="text-transform: lowercase;">
+                    <th scope="col">kota</th>
                     <th scope="col">kecamatan</th>
                     <th scope="col">kelurahan</th>
                     <th scope="col">delivery charge</th>
@@ -71,6 +72,7 @@ $charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, de
             <tbody>
                 <?php while($rows = $charge->fetch(PDO::FETCH_LAZY)){ ?>
                 <tr>
+                    <td><?=$rows['kota']?></td>
                     <td><?=$rows['kecamatan']?></td>
                     <td><?=$rows['kelurahan']?></td>
                     <td style='text-align: right;'><?=number_format($rows['price'], 0, ',', '.')?></td>
@@ -79,7 +81,7 @@ $charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, de
                     <td><?=$rows['name']?></td>
                     <td style="float:right;">
                         <button <?=$access['update']?> class="btn btn-sm btn-warning updateCharge" data-kelurahan="<?=$rows['kelurahan']?>" data-price="<?=$rows['price']?>" data-id="<?=$rows['id']?>">update</button>
-                        <button <?=$access['delete']?> class="btn btn-sm btn-danger deleteCharge" data-admin="<?=$admin['id']?>" data-id="<?=$rows['id']?>">delete</button>
+                        <button <?=$access['delete']?> class="btn btn-sm btn-danger deleteCharge" data-admin="<?=$admin[0]['user_id']?>" data-id="<?=$rows['id']?>">delete</button>
                     </td>
                 </tr>
                 <?php } ?>
@@ -103,7 +105,7 @@ $charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, de
             <form id="updateCharges-form" data-parsley-validate="">
                 <div class="form-group">
                     <input type="text" class="form-control" id="updateCharges" required>
-                    <input type="hidden" class="form-control" id="adminCharges" value="<?=$admin['id']?>">
+                    <input type="hidden" class="form-control" id="adminCharges" value="<?=$admin[0]['user_id']?>">
                     <input type="hidden" class="form-control" id="idCharges" >
                 </div>
                 <p>

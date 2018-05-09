@@ -61,7 +61,7 @@ $roles = $config->ProductsJoin('menus.id, menus.menu, menus.links, staffs.id_rol
 
                                     <form id="form-previllage" method="post" data-parsley-validate="" autocomplete="off">
                                         <div class="form-group">
-                                            <input type="hidden" value="<?=$admin['id']?>" id="adminPrevillage">
+                                            <input type="hidden" value="<?=$admin[0]['user_id']?>" id="adminPrevillage">
                                             <input type="hidden" value="<?=$info['id']?>" id="userPrevillage">
                                             <select class="form-control" name="listMenuPrev" id="listMenuPrev" required>
                                                 <option value="">:: menu ::</option>
@@ -119,7 +119,7 @@ INNER JOIN previllages ON previllages.id_submenu = sub_menus.id', 'WHERE menus.i
                                             $weg = $config->weightPages($cols['weight']);
                                             $weight = $weg['weight'];
                                             ?>
-                                            <li class="list-group-item"><a href="#" onclick="delPrevillage(<?=$cols['id']?>, <?=$admin['id']?>, <?=$admin_id?>)"><?=$cols['submenu']?></a> <button class="badge badge-pill badge-primary align-text-bottom updatePrevillages" type="button" data-id="<?=$cols['id']?>" data-toggle="modal" data-target="#updatePrevillage"><?=$weight?></button></li>
+                                            <li class="list-group-item"><a href="#" onclick="delPrevillage(<?=$cols['id']?>, <?=$admin[0]['user_id']?>, <?=$admin_id?>)"><?=$cols['submenu']?></a> <button class="badge badge-pill badge-primary align-text-bottom updatePrevillages" type="button" data-id="<?=$cols['id']?>" data-toggle="modal" data-target="#updatePrevillage"><?=$weight?></button></li>
                                         <?php } ?>
                                     </ul>
                                 </div>
@@ -140,7 +140,7 @@ INNER JOIN previllages ON previllages.id_submenu = sub_menus.id', 'WHERE menus.i
                     <div class="card card-body">
                         <form id="form-updatePrevillage" method="post" data-parsley-validate="" autocomplete="off">
                             <div class="form-group">
-                                <input type="hidden" value="<?=$admin['id']?>" id="adminUpdatePrevillage">
+                                <input type="hidden" value="<?=$admin[0]['user_id']?>" id="adminUpdatePrevillage">
                                 <input type="hidden" value="" id="idUpdatePrevillage">
 
                             </div>

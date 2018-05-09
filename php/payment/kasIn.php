@@ -1,10 +1,10 @@
 <?php
 $outKas = $config->ProductsJoin('kas_ins.id, kas_ins.title, kas_ins.total, kas_ins.ket, kas_ins.admin_id, kas_ins.status, kas_ins.created_at, users.name', 'kas_ins',
-    'INNER JOIN users ON users.id = kas_ins.admin_id', "WHERE DATE(kas_ins.created_at)= CURDATE() AND kas_ins.status ='' ");
+    'INNER JOIN users ON users.id = kas_ins.admin_id', "WHERE kas_ins.status ='' ");
 $totalKas   = $config->Products('created_at, SUM(total) as totalDana', "kas_ins WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND status = ''");
 $totalKas   = $totalKas->fetch(PDO::FETCH_LAZY);
 
-$kasOut     = $config->Products('SUM(total) as totalOut', "kas_outs WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND status = '1'");
+$kasOut     = $config->Products('SUM(qty * harga) as totalOut', "kas_outs WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND status = '1'");
 $kasOut     = $kasOut->fetch(PDO::FETCH_LAZY);
 
 $sql = "SELECT pay_kurirs.id, pay_kurirs.total FROM pay_kurirs WHERE pay_kurirs.total != '' AND MONTH(pay_kurirs.created_at) = MONTH(CURRENT_DATE()) AND YEAR(pay_kurirs.created_at) = YEAR(CURRENT_DATE())";
@@ -55,7 +55,7 @@ if($totalKas > 0 ){
                             <div class="card-body">
                                 <form id="kasIn-form" method="post" data-parsley-validate="" autocomplete="off">
                                     <div class="form-group">
-                                        <input type="hidden" value="<?=$admin['id']?>" id="adminIn">
+                                        <input type="hidden" value="<?=$admin[0]['user_id']?>" id="adminIn">
                                         <input type="text"
                                                data-parsley-minLength="3" data-parsley-maxLength="255"
                                                class="form-control" placeholder="nama dana kas" id="nameIn" required>
@@ -114,14 +114,14 @@ if($totalKas > 0 ){
                                         <!--                                        <a href="--><?//=PAYMENT?><!--?p=koDetail&id=--><?//=$row['id']?><!--" --><?//=$access['read']?><!-->
                                         <!--                                            <button class="btn btn-sm btn-primary" style="text-transform: uppercase; font-size: 10px; font-weight: 500;">details</button>-->
                                         <!--                                        </a>-->
-                                        <button class="btn btn-sm btn-danger delKasIn" style="text-transform: uppercase; font-size: 10px; font-weight: 500;"  <?=$access['delete']?> data-id="<?=$row['id']?>" data-admin="<?=$admin['id']?>" >delete</button>
+                                        <button class="btn btn-sm btn-danger delKasIn" style="text-transform: uppercase; font-size: 10px; font-weight: 500;"  <?=$access['delete']?> data-id="<?=$row['id']?>" data-admin="<?=$admin[0]['user_id']?>" >delete</button>
 
                                     </td>
                                 </tr>
                             <?php } ?>
                             </tbody>
                         </table>
-                        <button class="btn btn-sm btn-success reportKasIn" <?=$access['update']?> data-admin="<?=$admin['id']?>">report</button>
+                        <button class="btn btn-sm btn-success reportKasIn" <?=$access['update']?> data-admin="<?=$admin[0]['user_id']?>">report</button>
                     </div>
                 </div>
             </div>

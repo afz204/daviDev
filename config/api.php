@@ -207,7 +207,7 @@ class Admin
                 $create = 'style=""""';
                 $read = 'style=""""';
                 $update = 'style=""""';
-                $delete = 'style=""""';
+                $delete = 'style="display: none;"';
                 break;
             case '10':
                 $weight = 'cd';

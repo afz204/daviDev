@@ -33,36 +33,36 @@ if(empty($menu)){
     $menu = 'index';
 }else{
     $menu = $menu;
-}
+}   
 if (isset($url[3])){
     $root = explode('&', $url[3]);
     if($root == true){
         $root = explode('=', $root[0]);
-        
-        if(isset($root[1])){
-            $footer = $root[1];
-        }else{
-            $footer = "";
-        }
+        $footer = $root[1];
     }else{
         $footer = $url[1];
     }
 }else{
     $footer = "";
 }
-//
-$admin = $config->runQuery('SELECT id, name, email, jabatan, role_id FROM users WHERE id = :id');
-$admin->execute(array(':id' => $session_id));
-$admin = $admin->fetch(PDO::FETCH_LAZY);
-$device = $config->systemInfo();
-//info weight pages
-$previllages = $config->ProductsJoin('sub_menus.link, previllages.weight', 'sub_menus', 'INNER JOIN previllages ON previllages.id_submenu = sub_menus.id',
-    "WHERE previllages.id_admin = ". $admin['id'] ." AND sub_menus.link LIKE '%". $footer ."%' GROUP BY sub_menus.link");
-$previllages = $previllages->fetch(PDO::FETCH_LAZY);
-$access = $config->weightPages($previllages['weight']);
 
-//end of info
-$listMenu = $config->ProductsJoin('menus.id, menus.menu, menus.links, staffs.id_roles', 'menus', 'INNER JOIN staffs ON staffs.id_menu = menus.id', 'WHERE staffs.id_roles = '. $admin['role_id']);
-$subMenus = $config->ProductsJoin('sub_menus.submenu, sub_menus.link, menus.menu, menus.links, previllages.id_admin, previllages.weight', 'sub_menus', 'INNER JOIN menus ON menus.id = sub_menus.id_menu
-INNER JOIN previllages ON previllages.id_submenu = sub_menus.id', "WHERE previllages.id_admin = ".$admin['id'] ." AND menus.links LIKE '%". $menu ."%'" );
-$listAdmin = $config->Products('id, name, email, jabatan, role_id, status', 'users');
+require 'model.php';
+$device = $config->systemInfo();
+
+
+//
+// $admin = $config->runQuery('SELECT id, name, email, jabatan, role_id FROM users WHERE id = :id');
+// $admin->execute(array(':id' => $session_id));
+// $admin = $admin->fetch(PDO::FETCH_LAZY);
+
+// //info weight pages
+// $previllages = $config->ProductsJoin('sub_menus.link, previllages.weight', 'sub_menus', 'INNER JOIN previllages ON previllages.id_submenu = sub_menus.id',
+//     "WHERE previllages.id_admin = ". $admin[0]['user_id'] ." AND sub_menus.link LIKE '%". $footer ."%' GROUP BY sub_menus.link");
+// $previllages = $previllages->fetch(PDO::FETCH_LAZY);
+
+
+// //end of info
+// $listMenu = $config->ProductsJoin('menus.id, menus.menu, menus.links, staffs.id_roles', 'menus', 'INNER JOIN staffs ON staffs.id_menu = menus.id', 'WHERE staffs.id_roles = '. $admin['role_id']);
+// $subMenus = $config->ProductsJoin('sub_menus.submenu, sub_menus.link, menus.menu, menus.links, previllages.id_admin, previllages.weight', 'sub_menus', 'INNER JOIN menus ON menus.id = sub_menus.id_menu
+// INNER JOIN previllages ON previllages.id_submenu = sub_menus.id', "WHERE previllages.id_admin = ".$admin[0]['user_id'] ." AND menus.links LIKE '%". $menu ."%'" );
+// $listAdmin = $config->Products('id, name, email, jabatan, role_id, status', 'users');

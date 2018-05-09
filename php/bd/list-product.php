@@ -55,7 +55,7 @@
                     <div class="form-group">
                         <label for="nameProduct">Nama Product</label>
                         <input type="text" name="nameProduct" id="nameProduct" class="form-control" data-parsley-minLength="3" >
-                        <input type="hidden" name="adminProduct" id="adminProduct" value="<?=$admin['id']?>">
+                        <input type="hidden" name="adminProduct" id="adminProduct" value="<?=$admin[0]['user_id']?>">
                     </div>
 
                     <div class="form-group">

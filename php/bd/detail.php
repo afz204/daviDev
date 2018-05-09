@@ -61,7 +61,7 @@ $d = $_GET['id'];
                     <div class="form-group">
                         <label for="nameProduct">Nama Product</label>
                         <input type="text" name="nameProduct" id="nameProduct" class="form-control" value="<?=str_replace('_', ' ', $product->name_product)?>" data-parsley-minLength="3" readonly>
-                        <input type="hidden" name="adminProduct" id="adminProduct" value="<?=$admin['id']?>">
+                        <input type="hidden" name="adminProduct" id="adminProduct" value="<?=$admin[0]['user_id']?>">
                     </div>
 
                     <div class="form-group">

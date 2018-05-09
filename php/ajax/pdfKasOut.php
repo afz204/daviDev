@@ -24,7 +24,9 @@ $user = $user['name'];
 
 $tanggal = $config->getDate('d M Y');
 
-$stmt = $config->runQuery("SELECT nama, total, ket, created_at, admin_id FROM kas_outs WHERE admin_id = :admin AND status = '1'");
+$stmt = $config->runQuery("SELECT kas.id, kas.nama, kas.qty, kas.harga, kas.satuan, kas.ket, kas.created_at, kas.report_at, kas.status, users.name, cat.content as category, subcat.category as subCategory FROM kas_outs AS kas INNER JOIN users ON users.id = kas.admin_id
+LEFT OUTER JOIN satuans AS cat ON cat.id = kas.type
+LEFT OUTER JOIN satuans AS subcat ON subcat.id = kas.sub_type WHERE kas.admin_id = :admin AND kas.status = '1' AND DATE(kas.report_at)= CURDATE()");
 $stmt->execute(array(
     ':admin' => $u
 ));
@@ -63,9 +65,11 @@ $pdf->SetFont('Times', 'B', 14);
 $pdf->SetFillColor(200, 200, 200);
 
 $pdf->Cell(15, $h, 'NO', 1, 0, 'C', true);
-$pdf->Cell(80, $h, 'Nama Pengeluaran', 1, 0, 'C', true);
-$pdf->Cell(42, $h, 'Total', 1, 0, 'C', true);
-$pdf->Cell(110, $h, 'Keterangan', 1, 0, 'C', true);
+$pdf->Cell(75, $h, 'Nama Pengeluaran', 1, 0, 'C', true);
+$pdf->Cell(15, $h, 'Qty', 1, 0, 'C', true);
+$pdf->Cell(30, $h, 'Harga', 1, 0, 'C', true);
+$pdf->Cell(32, $h, 'Total', 1, 0, 'C', true);
+$pdf->Cell(80, $h, 'Keterangan', 1, 0, 'C', true);
 $pdf->Cell(30, $h, 'Action', 1, 0, 'C', true);
 $pdf->Ln();
 
@@ -76,8 +80,8 @@ $fontSize = 12;
 
 $i = 1;
 while ($row = $stmt->fetch(PDO::FETCH_LAZY)) {
-    $jumlah = number_format($row['total'], 0, ',', '.');
-    $cellWidth = 110;
+    $jumlah = number_format($row['qty'] * $row['harga'], 0, ',', '.');
+    $cellWidth = 80;
     $cellHeight = 10;
     if ($pdf->GetStringWidth($row['ket']) > $cellWidth) {
         $textLength = strlen($row['ket']);
@@ -109,8 +113,10 @@ while ($row = $stmt->fetch(PDO::FETCH_LAZY)) {
 
     $he = $line * $cellHeight;
     $pdf->Cell(15, $he, $i++, 1, 0, 'C', true);
-    $pdf->Cell(80, $he, ucfirst($row['nama']), 1, 0, 'L', true);
-    $pdf->Cell(42, $he, $jumlah, 1, 0, 'R', true);
+    $pdf->Cell(75, $he, ucfirst($row['nama']), 1, 0, 'L', true);
+    $pdf->Cell(15, $he, ucfirst($row['qty']), 1, 0, 'C', true);
+    $pdf->Cell(30, $he, ucfirst(number_format($row['harga'], '0', '.', '.')), 1, 0, 'R', true);
+    $pdf->Cell(32, $he, $jumlah, 1, 0, 'R', true);
 
     $xPos = $pdf->GetX();
     $yPos = $pdf->GetY();

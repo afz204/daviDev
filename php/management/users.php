@@ -13,7 +13,7 @@
 
                             <form id="admin-form" method="post" data-parsley-validate="" autocomplete="off">
                                 <div class="form-group">
-                                    <input type="hidden" value="<?=$admin['id']?>" id="adminID">
+                                    <input type="hidden" value="<?=$admin[0]['user_id']?>" id="adminID">
                                     <input type="text"
                                            data-parsley-minLength="3" data-parsley-maxLength="255"
                                            class="form-control" placeholder="nama admin" id="nameAdmin" required>

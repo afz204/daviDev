@@ -3,7 +3,7 @@ function resetForm() {
 }
 $(document).ready(function () {
 
-    var url = 'http://localhost/bungdav/php/ajax/uploadImagesProduct.php';
+    var url = 'http://localhost/dev/php/ajax/uploadImagesProduct.php';
 
     $('#tableProduct').DataTable();
 

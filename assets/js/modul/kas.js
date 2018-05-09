@@ -1,3 +1,26 @@
+function delKasOut(id, admin) {
+
+    //alert('id: '+id + 'admin: '+adm);
+    if (!confirm('Are you sure want to delete this?')) {
+        return false;
+    } else {
+        $.ajax({
+            url: '../php/ajax/payment.php?type=delKasOut',
+            method: 'post',
+            data: { admin: admin, keterangan: id },
+
+            success: function(msg) {
+                location.reload();
+                alert(msg);
+            }
+        })
+    }
+}
+
+function addKasOut(admin) {
+    $('#listKasKeluar').addClass('hidden');
+    $('#form-kasKeluar').removeClass('hidden');
+}
 $(document).ready(function() {
     $('#tableKasOut').DataTable();
     $('#kasMasuk').DataTable();
@@ -12,47 +35,34 @@ $(document).ready(function() {
         listOutKas.hide();
     });
 
-    $('#form-kasKeluar').on('submit', function(e) {
+    $('#belanja-form').on('submit', function(e) {
         e.preventDefault();
+        
+        console.log('form masuk');
 
-        var admin = $('#adminOut').val();
-        var title = $('#nameOut').val();
-        var total = $('#biayaOut').val();
-        var ket = $('#ketOut').val();
+        var admin = $('#adminBelanja').val();
+        var cat = $('#specSatuan option:selected').val();
+        var subcat = $('#catSatuan option:selected').val();
+        // var subsubcat = $('#subCatSatuan option:selected').val();
+        var name = $('#nameBelanja').val();
+        var qty = $('#qtyBelanja').val();
+        var satuan = $('#satuanBelanja option:selected').val();
+        var price = $('#hargaBelanja').val();
+        var ket = $('#ketBelanja').val();
 
-        //alert(admin + title + total + ket);
+        // alert(cat + admin + subcat);
+
 
         $.ajax({
             url: '../php/ajax/payment.php?type=kasOut',
             method: 'post',
-            data: { admin: admin, title: title, biaya: total, keterangan: ket },
+            data: { admin: admin, category: cat, subcategory: subcat, title: name, quantity: qty, satuan: satuan, harga: price, keterangan: ket },
 
             success: function(msg) {
                 location.reload();
                 alert(msg);
             }
         })
-    });
-
-    listOutKas.on('click', '.delKasOut', function() {
-        var id = $(this).data('id');
-        var adm = $(this).data('admin');
-
-        //alert('id: '+id + 'admin: '+adm);
-        if (!confirm('Are you sure want to delete this?')) {
-            return false;
-        } else {
-            $.ajax({
-                url: '../php/ajax/payment.php?type=delKasOut',
-                method: 'post',
-                data: { admin: adm, keterangan: id },
-
-                success: function(msg) {
-                    location.reload();
-                    alert(msg);
-                }
-            })
-        }
     });
 
     $('#reportKasOutAdmin').on('submit', function(e) {
@@ -128,13 +138,14 @@ $(document).ready(function() {
         var adm = $('#adminPay').val();
         var kurir = $('#namaKurir option:selected').val();
         var kel = $('#kelurahanCharge option:selected').val();
+        var noTrx = $('#no_trxCharge').val();
 
         //alert(adm + kurir + kel);
 
         $.ajax({
             url: '../php/ajax/payment.php?type=addPayCharge',
             method: 'post',
-            data: { admin: adm, namaKurir: kurir, kelurahan: kel },
+            data: { admin: adm, namaKurir: kurir, kelurahan: kel, trx: noTrx },
 
             success: function(msg) {
                 alert(msg);

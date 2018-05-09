@@ -23,7 +23,7 @@ $kurir = $user['nama_kurir'];
 
 $tanggal = $config->getDate('d M Y');
 
-$stmt = $config->ProductsJoin('pay_kurirs.id, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.id_kelurahan, delivery_charges.price, villages.name', 
+$stmt = $config->ProductsJoin('pay_kurirs.id, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.id_kelurahan, delivery_charges.price, villages.name', 
 'pay_kurirs', 'INNER JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
 INNER JOIN delivery_charges ON delivery_charges.id = pay_kurirs.charge_id
 INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan', "WHERE pay_kurirs.kurir_id = " .$k. " AND DATE(pay_kurirs.report_at)= CURDATE()");
@@ -64,8 +64,8 @@ require_once("../../assets/vendors/fpdf17/fpdf.php");
     $pdf->Cell(15, $h, 'NO', 1, 0, 'C', true);
     $pdf->Cell(90, $h, 'Nama Kelurahan', 1, 0, 'C', true);
     $pdf->Cell(50, $h, 'Delivery Charge', 1, 0, 'C', true);
-    $pdf->Cell(92, $h, 'Tanggal Kirim', 1, 0, 'C', true);
-    $pdf->Cell(30, $h, 'Action', 1, 0, 'C', true);
+    $pdf->Cell(80, $h, 'Tanggal Kirim', 1, 0, 'C', true);
+    $pdf->Cell(44, $h, 'No. Invoice', 1, 0, 'C', true);
     $pdf->Ln();
     
     $pdf->SetFont('Arial', '', 12);
@@ -76,7 +76,7 @@ require_once("../../assets/vendors/fpdf17/fpdf.php");
     $i = 1;
     while ($row = $stmt->fetch(PDO::FETCH_LAZY)) {
         $jumlah = number_format($row['price'], 0, ',', '.');
-        $cellWidth = 92;
+        $cellWidth = 80;
         $cellHeight = 10;
         if ($pdf->GetStringWidth($row['created_at']) > $cellWidth) {
             $textLength = strlen($row['created_at']);
@@ -116,8 +116,8 @@ require_once("../../assets/vendors/fpdf17/fpdf.php");
         $pdf->MultiCell($cellWidth, $cellHeight, ucfirst($row['created_at']), 1, 'C');
         $pdf->SetXY($xPos + $cellHeight, $yPos);
     // $pdf->Cell(110, $h, $row['ket'], 1, 0, 'C',true);
-        $pdf->SetX(257);
-        $pdf->Cell(30, $he, '', 1, 0);
+        $pdf->SetX(245);
+        $pdf->Cell(44, $he, $row['no_trx'], 1, 0);
         $pdf->Ln();
     }
     $pdf->Ln(10);

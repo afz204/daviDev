@@ -22,7 +22,7 @@ $provinsi = $config->Products('id, name', 'provinces');
                 <form  method="post" id="newKurir" data-parsley-validate="" autocomplete="off">
                     <div class="form-group">
                         <input type="text" name="nameKurir" id="nameKurir" placeholder="nama kurir" class="form-control" data-parsley-minLength="3" required>
-                        <input type="hidden" name="adminKurir" id="adminKurir" value="<?=$admin['id']?>" class="form-control" data-parsley-minLength="3" required>
+                        <input type="hidden" name="adminKurir" id="adminKurir" value="<?=$admin[0]['user_id']?>" class="form-control" data-parsley-minLength="3" required>
                     </div>
                     
                     <div class="form-group">

@@ -69,7 +69,7 @@ $(document).ready(function() {
         var value = id.val();
         var text = id.text();
 
-        if(value != 4){
+        if (value != 4) {
             $.ajax({
                 url: '../php/ajax/states.php?type=subCat',
                 type: 'post',
@@ -84,8 +84,38 @@ $(document).ready(function() {
                     })
                 }
             });
-        }else{
+        } else {
             $('#subCatProduct').append('<option value="0">none</option>');
+        }
+    });
+
+    $('#specSatuan').on('change', function() {
+        var opt = $(this).find("option:selected");
+        var id = opt.val();
+        var text = opt.text();
+
+
+        var data = ["1", "2", "3"];
+        if (jQuery.inArray(id, data) != -1) {
+            $.ajax({
+                url: '../php/ajax/management.php?type=catSatuan',
+                method: 'post',
+                data: { data: id },
+
+                success: function(data) {
+                    $('#catSatuan').empty();
+                    $('#satuanCat').removeClass('hidden');
+
+                    $.each(data, function(index, value) {
+                        $('#catSatuan').append('<option value="' + value.id + '" data-type="' + value.content_id + '">' + value.category + '</option>');
+                    })
+                }
+            });
+            //console.log("is in array");
+        } else {
+            //console.log("is NOT in array");
+            $('#catSatuan').empty();
+            $('#satuanCat').addClass('hidden');
         }
     });
 })

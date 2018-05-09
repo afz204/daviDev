@@ -6,9 +6,9 @@
 
     <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
-            <?php while ($mn = $listMenu->fetch(PDO::FETCH_LAZY)){ ?>
-                <li class="nav-item <?=$menu == $mn['links'] ? 'active' : '' ?>">
-                    <a style="text-transform: capitalize;" class="nav-link" href="<?=URL?><?=$mn['links']?>"><?=$mn['menu']?> <span class="sr-only">(current)</span></a>
+            <?php foreach ($catt as $cat){ ?>
+                <li class="nav-item <?=$menu == $cat['cat_link'] ? 'active' : '' ?>">
+                    <a style="text-transform: capitalize;" class="nav-link" href="<?=URL?><?=$cat['cat_link']?>"><?=$cat['cat']?> <span class="sr-only">(current)</span></a>
                 </li>
             <?php } ?>
         </ul>
@@ -23,13 +23,21 @@
 <div class="nav-scroller bg-white box-shadow">
     <nav class="nav nav-underline">
         <?php
-        while ($cols = $subMenus->fetch(PDO::FETCH_LAZY)){
+        foreach ($catt as $parent_menu){
+            if(in_array($menu, array($parent_menu['cat']))){
+                foreach ($category as $subcat){
+                    if(in_array($subcat['cat'], array($parent_menu['cat']))){
             ?>
-            <a style="text-transform: capitalize;" class="nav-link <?=$footer == $cols['link'] ? 'active' : ''?>" href="<?=URL?><?=$cols['menu']?>/?p=<?=$cols['link']?>"><?=$cols['submenu']?>
-                <?php if(in_array($cols['link'], ['users'])){ ?>
+            <a style="text-transform: capitalize;" class="nav-link <?=$footer == $subcat['subcat_link'] ? 'active' : ''?>" href="<?=URL?><?=$subcat['cat']?>/?p=<?=$subcat['subcat_link']?>">
+                <?=$subcat['subcat']?>
+                <?php if(in_array($subcat['subcat_link'], ['users'])){ ?>
                     <span class="badge badge-pill bg-success align-text-bottom" style="color: #fff;"><?=$totalUser?></span>
-            <?php } ?>
+            <?php } 
+        } 
+        } 
+        }
+     } ?>
             </a>
-        <?php } ?>
+        <?php  ?>
     </nav>
 </div>

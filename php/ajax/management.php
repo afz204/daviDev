@@ -138,4 +138,73 @@ if($_GET['type'] == 'addAdmin') {
     }else{
         echo "Failed";
     }
+}elseif($_GET['type'] == 'catSatuan'){
+    $a = $_POST['data'];
+
+    $sql = "SELECT id, content_id, category FROM satuans WHERE content_id = :id AND category != ''";
+    $stmt = $config->runQuery($sql);
+    $stmt->execute(array(':id' => $a));
+
+    header('Content-Type: application/json');
+    echo json_encode($stmt->fetchAll());
+
+}elseif($_GET['type'] == 'subCatSatuan'){
+    $a = $_POST['data'];
+
+    $sql = "SELECT id, content_id, category_id,  subcategory FROM satuans WHERE category_id = :id  ";
+    $stmt = $config->runQuery($sql);
+    $stmt->execute(array(':id' => $a));
+
+    header('Content-Type: application/json');
+    echo json_encode($stmt->fetchAll());
+}elseif($_GET['type'] == 'addSatuan'){
+    $a = $_POST['admin'];
+    $b = $_POST['content'];
+    $c = $_POST['category'];
+    $d = $_POST['subcategory'];
+    $e = $_POST['isi'];
+
+    $z = array($a, $b, $c, $d, $e);
+
+    // echo '<pre>';
+    // print_r($z);
+    // echo '</pre>';
+
+    if(empty($c)){
+
+        //category
+        $sql = "INSERT INTO satuans (content_id, category, admin_at) VALUES (:content, :category, :admin_id)";
+        $stmt = $config->runQuery($sql);
+        $stmt->execute(array(
+            ':content'  => $b,
+            ':category' => $e,
+            ':admin_id' => $a
+        ));
+        
+        if($stmt){
+            echo $config->actionMsg('c', 'satuans');
+        }else{
+            echo 'Failed!';
+        }
+    }else{
+
+    //     echo '<pre>';
+    // print_r($z);
+    // echo '</pre>';
+    //     subcategory
+        $sql = "INSERT INTO satuans (content_id, category_id, subcategory, admin_at) VALUES (:con, :content, :category, :admin_id)";
+        $stmt = $config->runQuery($sql);
+        $stmt->execute(array(
+            ':con'      => $b,
+            ':content'  => $c,
+            ':category' => $e,
+            ':admin_id' => $a
+        ));
+        
+        if($stmt){
+            echo $config->actionMsg('c', 'satuans');
+        }else{
+            echo 'Failed!';
+        }     
+    }
 }
