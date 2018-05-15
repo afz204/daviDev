@@ -38,7 +38,7 @@
                                         <select class="form-control" name="kelurahanCharge" id="kelurahanCharge" required>
                                             <option value="">:: delivery charge ::</option>
                                             <?php while ($row = $charge->fetch(PDO::FETCH_LAZY)){ ?>
-                                            <option value="<?=$row->id?>"><?=$row->name?> <span class="badge badge-info"><?=$config->formatPrice($row->price)?></span></option>
+                                            <option value="<?=$row->id?>" data-prices="<?=$row->price?>"><?=$row->name?> <span class="badge badge-info"><?=$config->formatPrice($row->price)?></span></option>
                                             <?php } ?>
                                         </select>
                                     </div>

@@ -25,9 +25,9 @@ if($_GET['type'] == 'kasOut')
 
     $query = "SELECT total FROM kas_ins WHERE id = :kodeIDnya";
     $cek = $config->runQuery($query);
-    $cek->execute(array(':kodeIDnya' => '1'));
+    $cek->execute(array(':kodeIDnya' => '3'));
     $row = $cek->fetch(PDO::FETCH_LAZY);
-    $idKas = '1';
+    $idKas = '3';
     $totalAwal = $row['total'];
 
     if($totalAwal > 0){
@@ -60,6 +60,21 @@ if($_GET['type'] == 'kasOut')
             ));
             if($update){
                 echo $config->actionMsg('u', 'kas_ins');
+
+                    $sql3 = "INSERT INTO kas_ins (parent_id, types, title, total, ket, admin_id, status) VALUES (:parent, :tipe, :title, :total, :ket, :admin, :status)";
+                    $stmt3 = $config->runQuery($sql3);
+                    $stmt3->execute(array(
+                        ':parent'   => $idKas,
+                        ':tipe'     => 'kredit',
+                        ':title'    => $c,
+                        ':total'    => $totalBelanja,
+                        ':ket'      => $g,
+                        ':admin'    => $i,
+                        ':status'   => '3'
+                    ));
+                    if($stmt3){
+                        echo $config->actionMsg('c', 'kas_ins');
+                    }
             }else{
 
                 echo 'failed';
@@ -165,13 +180,15 @@ if($_GET['type'] == 'addPayCharge')
     $b = $_POST['namaKurir'];
     $c = $_POST['kelurahan'];
     $d = $_POST['trx'];
+    $e = $_POST['price'];
+    $f = $_POST['ket'];
     $tgl = $config->getDate('Y-m-d H:m:s');
 
     $query = "SELECT total FROM kas_ins WHERE id = :kodeIDnya";
     $cek = $config->runQuery($query);
-    $cek->execute(array(':kodeIDnya' => '1'));
+    $cek->execute(array(':kodeIDnya' => '2'));
     $row = $cek->fetch(PDO::FETCH_LAZY);
-    $idKas = '1';
+    $idKas = '2';
     $totalAwal = $row['total'];
     if($totalAwal > 0){
         $sql = "INSERT INTO pay_kurirs (no_trx, kurir_id, charge_id, created_at, admin_id) VALUES (:trx, :a, :b, :c, :d)";
@@ -184,18 +201,33 @@ if($_GET['type'] == 'addPayCharge')
             ':d'    => $a
         ));
         if($stmt){
+            $totalKurir = $totalAwal - $e;
             echo $config->actionMsg('c', 'pay_kurirs');
 
-            $totalKurir = $totalAwal - $c;
-            $query = "UPDATE kas_ins SET total = :totalnya WHERE id = :idnya";
-            $up = $config->runQuery($query);
-            $up->execute(array(
-                ':totalnya' => $totalKurir,
-                ':idnya'    => $idKas
-            ));
-            if($up){
-                echo $config->actionMsg('u', 'kas_ins');
-            }
+                    $sql3 = "INSERT INTO kas_ins (parent_id, types, title, total, ket, admin_id, status) VALUES (:parent, :tipe, :title, :total, :ket, :admin, :status)";
+                    $stmt3 = $config->runQuery($sql3);
+                    $stmt3->execute(array(
+                        ':parent'   => $idKas,
+                        ':tipe'     => 'kredit',
+                        ':title'    => $d,
+                        ':total'    => $e,
+                        ':ket'      => $f,
+                        ':admin'    => $a,
+                        ':status'   => '2'
+                    ));
+                    if($stmt3){
+                        echo $config->actionMsg('c', 'kas_ins');
+                        
+                        $query = "UPDATE kas_ins SET total = :totalnya WHERE id = :idnya";
+                        $up = $config->runQuery($query);
+                        $up->execute(array(
+                            ':totalnya' => $totalKurir,
+                            ':idnya'    => $idKas
+                        ));
+                        if($up){
+                            echo $config->actionMsg('u', 'kas_ins');
+                        }
+                    }
         }else{
             echo 'Failed!';
         }
@@ -289,7 +321,7 @@ if($_GET['type'] == 'kasBesar')
         ':e'    => $e
     ));
     $cek = $config->runQuery("SELECT total FROM kas_ins WHERE id = :datas");
-    $cek->execute(array(':datas' => '1'));
+    $cek->execute(array(':datas' => $f));
     $cc = $cek->fetch(PDO::FETCH_LAZY);
     $kasAwal = $cc['total'];
 
@@ -309,10 +341,11 @@ if($_GET['type'] == 'kasBesar')
             if($stmt){
                 echo $config->actionMsg('c', 'kas_ins');
                 $kasAkhirTotal = $kasAwal + $b;
-                $query3 = "UPDATE kas_ins SET total = :total WHERE id = '1'";
+                $query3 = "UPDATE kas_ins SET total = :total WHERE id = :idnya";
                 $update2 = $config->runQuery($query3);
                 $update2->execute(array(
-                    ':total' => $kasAkhirTotal
+                    ':total' => $kasAkhirTotal,
+                    ':idnya' => $f
                 ));
                 if($update2){
                     echo $config->actionMsg('c', 'kas_ins');

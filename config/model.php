@@ -29,7 +29,7 @@ INNER JOIN roles ON roles.id = users.role_id
 WHERE users.id = :userID";
 $stmt = $config->runQuery($sql1);
 $stmt->execute(array(':userID' => $session_id));
-
+$admin = '';
 while ($row = $stmt->fetch(PDO::FETCH_LAZY))
 {
     $admin[] = array(

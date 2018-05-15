@@ -1,17 +1,54 @@
 <?php
-$outKas = $config->ProductsJoin('kas_ins.id, kas_ins.types, kas_ins.title, kas_ins.total, kas_ins.ket, kas_ins.admin_id, kas_ins.status, kas_ins.created_at, users.name', 'kas_ins',
-    'INNER JOIN users ON users.id = kas_ins.admin_id', "ORDER BY kas_ins.created_at DESC ");
+$stylePHP = 'hidden';
+if(isset($_GET['types'])){
+    if($_GET['types'] == '1'){
+        $outKas = $config->ProductsJoin('kas_ins.id, kas_ins.types, kas_ins.title, kas_ins.total, kas_ins.ket, kas_ins.admin_id, kas_ins.status, kas_ins.created_at, users.name', 'kas_ins',
+    'INNER JOIN users ON users.id = kas_ins.admin_id', " WHERE kas_ins.id NOT IN ('1', '2', '3') AND kas_ins.status = '1' ORDER BY kas_ins.created_at DESC ");
+    $stylePHP = 'showContent';
+    }elseif($_GET['types'] == '2'){
+        $outKas = $config->ProductsJoin('kas_ins.id, kas_ins.types, kas_ins.title, kas_ins.total, kas_ins.ket, kas_ins.admin_id, kas_ins.status, kas_ins.created_at, users.name', 'kas_ins',
+    'INNER JOIN users ON users.id = kas_ins.admin_id', " WHERE kas_ins.id NOT IN ('1', '2', '3') AND kas_ins.status = '2' ORDER BY kas_ins.created_at DESC ");
+    $stylePHP = 'showContent';
+    }else{
+        $outKas = $config->ProductsJoin('kas_ins.id, kas_ins.types, kas_ins.title, kas_ins.total, kas_ins.ket, kas_ins.admin_id, kas_ins.status, kas_ins.created_at, users.name', 'kas_ins',
+    'INNER JOIN users ON users.id = kas_ins.admin_id', " WHERE kas_ins.id NOT IN ('1', '2', '3') AND kas_ins.status = '3' ORDER BY kas_ins.created_at DESC ");
+    $stylePHP = 'showContent';
+    }
+}else{
+    $outKas = $config->ProductsJoin('kas_ins.id, kas_ins.types, kas_ins.title, kas_ins.total, kas_ins.ket, kas_ins.admin_id, kas_ins.status, kas_ins.created_at, users.name', 'kas_ins',
+    'INNER JOIN users ON users.id = kas_ins.admin_id', " WHERE kas_ins.id NOT IN ('1', '2', '3') ORDER BY kas_ins.created_at DESC ");
+}
 
+    $rec = $config->Products('MAX(id) as new, created_at', 'kas_ins');
+    $newRecord = $rec->fetch(PDO::FETCH_LAZY);
     
     $product = $config->Products('SUM(total) AS totalProduksi, created_at', "kas_ins WHERE id = '1'");
     $product = $product->fetch(PDO::FETCH_LAZY);
+
+    $kurir = $config->Products('SUM(total) AS totalProduksi, created_at', "kas_ins WHERE id = '2'");
+    $kurir = $kurir->fetch(PDO::FETCH_LAZY);
+
+    $dll = $config->Products('SUM(total) AS totalProduksi, created_at', "kas_ins WHERE id = '3'");
+    $dll = $dll->fetch(PDO::FETCH_LAZY);
     
 
-$totalProd = $config->formatPrice($product['totalProduksi']);
-if($product['totalProduksi'] > 0 ){
-        $styleProd = 'success';
+$prod = $config->formatPrice($product['totalProduksi']);
+$kur = $config->formatPrice($kurir['totalProduksi']);
+$dl = $config->formatPrice($dll['totalProduksi']);
+    if($product['totalProduksi'] > 0 ){
+        $styleProd = 'info';
     }else{
         $styleProd = 'danger';
+    }
+    if($kurir['totalProduksi'] > 0 ){
+        $styleKur = 'success';
+    }else{
+        $styleKur = 'danger';
+    }
+    if($dll['totalProduksi'] > 0 ){
+        $styleDl = 'warning';
+    }else{
+        $styleDl = 'danger';
     }
     
 ?>
@@ -52,21 +89,38 @@ if($product['totalProduksi'] > 0 ){
                     <div id="monitoringKasIn">
                         <div class="card text-center border-success mb-3">
                             <div class="card-body">
-                            <h3 class="card-title">Your Kas Balance</h3>
-                            <p class="card-text">Update every time.</p>
-                                        <button class="btn btn-lg btn-<?=$styleProd?>" onclick="showListKasIn(1)">
-                                <?=$totalProd?>
-                                        </button>
+                            <h3 class="card-title" style="margin-bottom: 2%; border-bottom: 2px dashed #cdcdcd;">Your Kas Balance</h3>
+                            
+                            <div class="row">
+                                <div class="col-12 col-md-6 col-lg-4">
+                                    <p class="card-text text-<?=$styleProd?>" style="font-weight: 600;">PRODUKSI</p>
+                                            <button class="btn btn-xs btn-<?=$styleProd?>" onclick="showListKasIn(1)">
+                                    <?=$prod?>
+                                            </button>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-4">
+                                    <p class="card-text text-<?=$styleKur?>" style="font-weight: 600;">KURIR</p>
+                                            <button class="btn btn-xs btn-<?=$styleKur?>" onclick="showListKasIn(2)">
+                                    <?=$kur?>
+                                            </button>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-4">
+                                    <p class="card-text text-<?=$styleDl?>" style="font-weight: 600;">DLL</p>
+                                            <button class="btn btn-xs btn-<?=$styleDl?>" onclick="showListKasIn(3)">
+                                    <?=$dl?>
+                                            </button>
+                                </div>
+                            </div>
                                         
                             </div>
                             <div class="card-footer text-muted">
                             <p>
-                                             Updated at: <span class="badge badge-danger"><?=$config->timeAgo($product['created_at'])?></span>
+                                             Updated at: <span class="badge badge-danger"><?=$config->timeAgo($newRecord['created_at'])?></span>
                                         </p>
                             </div>
                         </div>
                     </div>
-                    <div id="listKasIn" class="hidden">
+                    <div id="listKasIn" class="hidden <?=$stylePHP?>">
 
                         <table id="kasMasuk" class="table table-bordered  <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
                             <thead class="thead-light">

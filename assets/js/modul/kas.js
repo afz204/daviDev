@@ -1,5 +1,6 @@
 function showListKasIn(id) {
-    $('#listKasIn').removeClass('hidden');
+    // $('#listKasIn').removeClass('hidden');
+    window.location.href = '?p=kasIn&types=' + id;
 }
 
 function showKasBesar() {
@@ -177,14 +178,16 @@ $(document).ready(function() {
         var adm = $('#adminPay').val();
         var kurir = $('#namaKurir option:selected').val();
         var kel = $('#kelurahanCharge option:selected').val();
+        var kelText = $('#kelurahanCharge option:selected').text();
+        var prices = $('#kelurahanCharge option:selected').data('prices');
         var noTrx = $('#no_trxCharge').val();
 
-        //alert(adm + kurir + kel);
+        //alert(adm + kurir + kel); 
 
         $.ajax({
             url: '../php/ajax/payment.php?type=addPayCharge',
             method: 'post',
-            data: { admin: adm, namaKurir: kurir, kelurahan: kel, trx: noTrx },
+            data: { admin: adm, namaKurir: kurir, kelurahan: kel, trx: noTrx, price: prices, ket: kelText },
 
             success: function(msg) {
                 alert(msg);

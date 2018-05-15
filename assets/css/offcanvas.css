@@ -196,3 +196,7 @@ body::-webkit-scrollbar-thumb {
 .hidden {
     display: none;
 }
+
+.showContent {
+    display: block;
+}

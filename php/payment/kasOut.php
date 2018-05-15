@@ -2,7 +2,7 @@
       $KasOut = $config->ProductsJoin('kas.id, kas.nama, kas.qty, kas.harga, kas.satuan, kas.ket, kas.created_at, kas.status, users.name, cat.content as category, subcat.category as subCategory', 'kas_outs AS kas',
       'INNER JOIN users ON users.id = kas.admin_id
       LEFT OUTER JOIN satuans AS cat ON cat.id = kas.type
-      LEFT OUTER JOIN satuans AS subcat ON subcat.id = kas.sub_type', "WHERE kas.status ='' ");
+      LEFT OUTER JOIN satuans AS subcat ON subcat.id = kas.sub_type', "WHERE kas.status ='' ORDER BY kas.created_at ASC ");
   $data = $config->Products('id, content', 'satuans WHERE content_id = 0');
 ?>
 <div id="listKas">
