@@ -1,6 +1,6 @@
 <?php
-$kas = $config->ProductsJoin('kas_besar.id, kas_besar.type, kas_besar.total, kas_besar.title, kas_besar.ket, kas_besar.admin_id, kas_besar.status, kas_besar.created_at, users.name', 'kas_besar',
-    'INNER JOIN users ON users.id = kas_besar.admin_id', "WHERE kas_besar.status = '' ORDER BY kas_besar.created_at DESC");
+$kas = $config->ProductsJoin('kas_besar.id, kas_besar.type, kas_besar.total, kas_besar.title, kas_besar.ket, kas_besar.status, kas_besar.admin_id, kas_besar.status, kas_besar.created_at, users.name', 'kas_besar',
+    'INNER JOIN users ON users.id = kas_besar.admin_id', "ORDER BY kas_besar.created_at DESC");
 $totalKas   = $config->Products('created_at, SUM(total) as totalDana', "kas_besar WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND type  LIKE 'debit'");
 $totalKas   = $totalKas->fetch(PDO::FETCH_LAZY);
 
@@ -34,6 +34,14 @@ if($total > 0 ){
                             <div class="card-header bg-transparent border-dark">Form Tambah Dana Kas</div>
                             <div class="card-body">
                                 <form id="kas_besar_form" method="post" data-parsley-validate="" autocomplete="off">
+                                    <div class="form-group hidden" id="kasStatus">
+                                        <select name="statusKas" id="statusKas" class="form-control">
+                                            <option value="">:: type kredit ::</option>
+                                            <option value="1">produksi</option>
+                                            <option value="2">kurir</option>
+                                            <option value="3">dll</option>
+                                        </select>
+                                    </div>
                                     <div class="form-group">
                                         <input type="hidden" value="<?=$admin[0]['user_id']?>" id="adminKasB">
                                         <input type="text"
@@ -61,7 +69,7 @@ if($total > 0 ){
                             <div class="card-body">
                                 <h3 class="card-title">Your Kas Balance</h3>
                                 <p class="card-text">Update every time.</p>
-                                <button class="btn btn-lg btn-<?=$style?> showListKasIn">
+                                <button class="btn btn-lg btn-<?=$style?> " onclick="showKasBesar()">
                         <?=$totalDanaKas?>
                                 </button>
                             </div>
@@ -70,12 +78,13 @@ if($total > 0 ){
                             </div>
                         </div>
                     </div>
-                    <div id="listKasIn">
+                    <div id="listKasBesar" class="hidden">
 
                         <table id="kasMasuk" class="table table-bordered  <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
                             <thead class="thead-light">
                             <tr style="text-transform: lowercase;">
                                 <th scope="col">#</th>
+                                <th scope="col">status</th>
                                 <th scope="col">Nama Kegiatan</th>
                                 <th scope="col">Type</th>
                                 <th scope="col">Total Biaya</th>
@@ -92,9 +101,20 @@ if($total > 0 ){
                                 }else{
                                     $types = '<label class="badge badge-warning">kredit</label>';
                                 }
+                               if($row['status'] == '1'){
+                                   $st12 = 'produksi';
+                               }elseif($row['status'] == '2'){
+                                   $st12 = 'kurir';
+                               }elseif($row['status'] == '3'){
+                                   $st12 = 'dll';
+                               }else{
+                                   $st12 = '';
+                               }
+                               
                                 ?>
                                 <tr style="text-transform: lowercase;">
                                     <td><?=$i++?></td>
+                                    <td><?=$st12?></td>
                                     <td><?=$row['title']?></td>
                                     <td><?=$types?></td>
                                     <td style="text-align: right;"><?=number_format($row['total'], '2', ',', '.')?></td>

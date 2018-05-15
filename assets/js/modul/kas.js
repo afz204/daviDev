@@ -1,3 +1,11 @@
+function showListKasIn(id) {
+    $('#listKasIn').removeClass('hidden');
+}
+
+function showKasBesar() {
+    $('#listKasBesar').removeClass('hidden');
+}
+
 function delKasOut(id, admin) {
 
     //alert('id: '+id + 'admin: '+adm);
@@ -39,6 +47,13 @@ function addKasBesar(admin, type) {
     $('#monitoringKasIn').addClass('hidden');
 
     $('#typeKasB').val(type);
+    if (type == 'kredit') {
+        $('#kasStatus').removeClass('hidden');
+        $('#statusKas').prop('required', true);
+    } else {
+        $('#kasStatus').addClass('hidden');
+        $('#statusKas').prop('required', false);
+    }
 }
 
 function addKasOut(admin) {
@@ -46,13 +61,15 @@ function addKasOut(admin) {
     $('#form-kasKeluar').removeClass('hidden');
 }
 $(document).ready(function() {
+    $('#starDateReport').datetimepicker();
+    $('#endDateReport').datetimepicker();
     $('#tableKasOut').DataTable();
     $('#kasMasuk').DataTable();
     $('#tablePayKurir').DataTable();
     $('#table_kas_out').DataTable();
     var listOutKas = $('#listKasKeluar').show();
     var listPayKurir = $('#listPayKurir').show();
-    var listInKas = $('#listKasIn').hide();
+
     var monitoringKas = $('#monitoringKasIn').show();
 
     $('#listPengeluaranKas').on('click', '.addOutKas', function() {
@@ -134,9 +151,6 @@ $(document).ready(function() {
         $('#form-kasIn').removeClass('hidden');
     });
 
-    monitoringKas.on('click', '.showListKasIn', function() {
-        listInKas.show();
-    });
 
     $('#kasIn-form').on('submit', function(e) {
         e.preventDefault();
@@ -253,11 +267,12 @@ $(document).ready(function() {
         var ket = $('#ketKasB').val();
         var total = $('#biayaKasB').val();
         var type = $('#typeKasB').val();
+        var status = $('#statusKas option:selected').val();
 
         $.ajax({
             url: '../php/ajax/payment.php?type=kasBesar',
             method: 'post',
-            data: { admin: admin, judul: title, keterangan: ket, biaya: total, tipe: type },
+            data: { admin: admin, judul: title, keterangan: ket, biaya: total, tipe: type, status: status },
 
             success: function(msg) {
                 alert(msg);
@@ -266,4 +281,96 @@ $(document).ready(function() {
             }
         });
     });
+
+    $('#selectAdminR').on('change', function() {
+        var id = $('#typeReport option:selected').val();
+
+        if ($(this).is(":checked")) {
+            if (id == '4') {
+                $('#pilihKurirReport').removeClass('hidden');
+                $('#kurirReport').prop('required', true);
+            } else {
+                $('#pilihAdminReport').removeClass('hidden');
+                $('#adminReport').prop('required', true);
+            }
+
+        } else {
+            $('#pilihAdminReport').addClass('hidden');
+        }
+    });
+    $('#typeReport').on('change', function() {
+
+    });
+
+    $('#form-report').on('submit', function(e) {
+        e.preventDefault();
+
+        var types = $('#typeReport option:selected').val();
+        var tgl = $('#hidde_date_field').val();
+        var listAdm = $('#adminReport option:selected').val();
+        var kurir = $('#kurirReport option:selected').val();
+
+        if (listAdm == '') {
+            optional = kurir;
+        }
+        if (kurir == '') {
+            optional = listAdm;
+        }
+
+        switch (types) {
+            case '1':
+                urlLik = 'kasBesar';
+                break;
+            case '2':
+                urlLik = 'kasIn';
+                break;
+            case '3':
+                urlLik = 'kasOut';
+                break;
+            case '4':
+                urlLik = 'kurir';
+                break;
+        }
+        //alert(tgl + types + listAdm);
+
+        window.location.href = '?p=report-payment&type=' + urlLik + '&range=' + tgl + '&admin=' + optional;
+        // $('#listReport').hide().load('payment/?p=table-report&type=kasBesar').fadeIn();
+        // $.ajax({
+        //     url: '../php/payment/table-report.php?type=' + urlLik,
+        //     method: 'post',
+        //     data: { tipe: types, tanggal: tgl, admin: listAdm },
+
+        //     success: function(data) {
+        //         $('#tablePayKurir').append(data);
+        //     }
+        // });
+    });
 })
+
+
+$(function() {
+
+    var start = moment().subtract(29, 'days');
+    var end = moment();
+
+    function cb(start, end) {
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        $('#hidde_date_field').val(start.format('YYYY-MM-DD') + '_' + end.format('YYYY-MM-DD'));
+    }
+
+    $('#reportrange').daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+
+    cb(start, end);
+
+});

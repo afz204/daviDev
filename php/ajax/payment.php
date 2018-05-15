@@ -20,28 +20,57 @@ if($_GET['type'] == 'kasOut')
     $g = $_POST['keterangan'];
     $h = $config->getDate('Y-m-d H:m:s');
     $i = $_POST['admin'];
+    $tipe = 'kredit';
+    $status = '3';
 
-    
+    $query = "SELECT total FROM kas_ins WHERE id = :kodeIDnya";
+    $cek = $config->runQuery($query);
+    $cek->execute(array(':kodeIDnya' => '1'));
+    $row = $cek->fetch(PDO::FETCH_LAZY);
+    $idKas = '1';
+    $totalAwal = $row['total'];
 
-    $sql = "INSERT INTO kas_outs (type, sub_type, nama, qty, harga, satuan, ket, created_at, admin_id) VALUES (:a, :b, :c, :d, :e, :f, :g, :h, :i)";
-    $stmt = $config->runQuery($sql);
-    $stmt->execute(array(
-        ':a'    => $a,
-        ':b'    => $b,
-        ':c'    => $c,
-        ':d'    => $d,
-        ':e'    => $e,
-        ':f'    => $f,
-        ':g'    => $g,
-        ':h'    => $h,
-        ':i'    => $i
-    ));
-    if($stmt)
-    {
-        echo $config->actionMsg('c', 'kas_outs');
+    if($totalAwal > 0){
+        $totalBelanja = $d * $e;
+
+        
+        $sql = "INSERT INTO kas_outs (id_kas_ins, type, sub_type, nama, qty, harga, satuan, ket, created_at, admin_id) VALUES (:idKas, :a, :b, :c, :d, :e, :f, :g, :h, :i)";
+        $stmt = $config->runQuery($sql);
+        $stmt->execute(array(
+            ':idKas'=> $idKas,
+            ':a'    => $a,
+            ':b'    => $b,
+            ':c'    => $c,
+            ':d'    => $d,
+            ':e'    => $e,
+            ':f'    => $f,
+            ':g'    => $g,
+            ':h'    => $h,
+            ':i'    => $i
+        ));
+        if($stmt)
+        {
+            echo $config->actionMsg('c', 'kas_outs');
+            $totalSaldoAkhir = $totalAwal - $totalBelanja;
+            $query2 = "UPDATE kas_ins SET total = :totalAkhir WHERE id = :id";
+            $update = $config->runQuery($query2);
+            $update->execute(array(
+                ':totalAkhir'   => $totalSaldoAkhir,
+                ':id'           => $idKas
+            ));
+            if($update){
+                echo $config->actionMsg('u', 'kas_ins');
+            }else{
+
+                echo 'failed';
+            }
+        }else{
+            echo "Failed";
+        }
     }else{
-        echo "Failed";
+        echo 'Maaf Saldo Anda tidak memadai. Silahkan isi Saldo DLL terlebih dahulu!';
     }
+
 
 //    $f = array($a, $b, $c, $d);
 //    print_r($f);
@@ -138,20 +167,43 @@ if($_GET['type'] == 'addPayCharge')
     $d = $_POST['trx'];
     $tgl = $config->getDate('Y-m-d H:m:s');
 
-    $sql = "INSERT INTO pay_kurirs (no_trx, kurir_id, charge_id, created_at, admin_id) VALUES (:trx, :a, :b, :c, :d)";
-    $stmt = $config->runQuery($sql);
-    $stmt->execute(array(
-        ':trx'  => $d,
-        ':a'    => $b,
-        ':b'    => $c,
-        ':c'    => $tgl,
-        ':d'    => $a
-    ));
-    if($stmt){
-        echo $config->actionMsg('c', 'pay_kurirs');
+    $query = "SELECT total FROM kas_ins WHERE id = :kodeIDnya";
+    $cek = $config->runQuery($query);
+    $cek->execute(array(':kodeIDnya' => '1'));
+    $row = $cek->fetch(PDO::FETCH_LAZY);
+    $idKas = '1';
+    $totalAwal = $row['total'];
+    if($totalAwal > 0){
+        $sql = "INSERT INTO pay_kurirs (no_trx, kurir_id, charge_id, created_at, admin_id) VALUES (:trx, :a, :b, :c, :d)";
+        $stmt = $config->runQuery($sql);
+        $stmt->execute(array(
+            ':trx'  => $d,
+            ':a'    => $b,
+            ':b'    => $c,
+            ':c'    => $tgl,
+            ':d'    => $a
+        ));
+        if($stmt){
+            echo $config->actionMsg('c', 'pay_kurirs');
+
+            $totalKurir = $totalAwal - $c;
+            $query = "UPDATE kas_ins SET total = :totalnya WHERE id = :idnya";
+            $up = $config->runQuery($query);
+            $up->execute(array(
+                ':totalnya' => $totalKurir,
+                ':idnya'    => $idKas
+            ));
+            if($up){
+                echo $config->actionMsg('u', 'kas_ins');
+            }
+        }else{
+            echo 'Failed!';
+        }
     }else{
-        echo 'Failed!';
+        echo 'Maaf Saldo Kurir Anda tidak memadai. Silahkan isi Saldo KURIR terlebih dahulu!';
     }
+
+    
 }
 
 if($_GET['type'] == 'delPayCharge')
@@ -223,31 +275,48 @@ if($_GET['type'] == 'kasBesar')
    $c = $_POST['judul'];
    $d = $_POST['keterangan'];
    $e = $_POST['admin'];
+   $f = $_POST['status'];
    $tgl = $config->getDate('Y-m-d H:m:s');
 
-    $sql = "INSERT INTO kas_besar (type, total, title, ket, admin_id) VALUES (:a, :b, :c, :d, :e)";
+    $sql = "INSERT INTO kas_besar (type, total, title, ket, status, admin_id) VALUES (:a, :b, :c, :d, :f, :e)";
     $stmt = $config->runQuery($sql);
     $stmt->execute(array(
         ':a'    => $a,
         ':b'    => $b,
         ':c'    => $c,
         ':d'    => $d,
+        ':f'    => $f,
         ':e'    => $e
     ));
+    $cek = $config->runQuery("SELECT total FROM kas_ins WHERE id = :datas");
+    $cek->execute(array(':datas' => '1'));
+    $cc = $cek->fetch(PDO::FETCH_LAZY);
+    $kasAwal = $cc['total'];
 
     if($stmt){
         if($a == 'kredit'){
-            $sql = "INSERT INTO kas_ins (title, total, ket, admin_id, created_at) VALUES (:c, :b, :d, :e, :tgl)";
+            $sql = "INSERT INTO kas_ins (types, title, total, ket, admin_id, status, created_at) VALUES (:a, :c, :b, :d, :e, :f, :tgl)";
             $stmt = $config->runQuery($sql);
             $stmt->execute(array(
+                ':a'    => 'debit',
                 ':c'    => $c,
                 ':b'    => $b,
                 ':d'    => $d,
                 ':e'    => $e,
+                ':f'    => $f,
                 ':tgl'  => $tgl
             ));
             if($stmt){
                 echo $config->actionMsg('c', 'kas_ins');
+                $kasAkhirTotal = $kasAwal + $b;
+                $query3 = "UPDATE kas_ins SET total = :total WHERE id = '1'";
+                $update2 = $config->runQuery($query3);
+                $update2->execute(array(
+                    ':total' => $kasAkhirTotal
+                ));
+                if($update2){
+                    echo $config->actionMsg('c', 'kas_ins');
+                }
             }else{
                 echo 'Failed!';
             }

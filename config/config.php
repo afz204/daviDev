@@ -38,7 +38,11 @@ if (isset($url[3])){
     $root = explode('&', $url[3]);
     if($root == true){
         $root = explode('=', $root[0]);
-        $footer = $root[1];
+        if(isset($root[1])){
+            $footer = $root[1];
+        }else{
+            $footer = '';
+        }
     }else{
         $footer = $url[1];
     }

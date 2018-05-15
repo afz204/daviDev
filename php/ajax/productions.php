@@ -138,28 +138,115 @@ if($_GET['type'] == 'addBelanja')
     $g = $_POST['keterangan'];
     $h = $config->getDate('Y-m-d H:m:s');
     $i = $_POST['admin'];
-
+    $stok = $_POST['stok'];
     
 
-    $sql = "INSERT INTO kas_outs (type, sub_type, nama, qty, harga, satuan, ket, created_at, admin_id) VALUES (:a, :b, :c, :d, :e, :f, :g, :h, :i)";
-    $stmt = $config->runQuery($sql);
-    $stmt->execute(array(
-        ':a'    => $a,
-        ':b'    => $b,
-        ':c'    => $c,
-        ':d'    => $d,
-        ':e'    => $e,
-        ':f'    => $f,
-        ':g'    => $g,
-        ':h'    => $h,
-        ':i'    => $i
-    ));
-    if($stmt)
-    {
-        echo $config->actionMsg('c', 'kas_outs');
+    $query = "SELECT total FROM kas_ins WHERE id = :kodeID";
+    $cek = $config->runQuery($query);
+    $cek->execute(array(':kodeID' => '1'));
+    $row = $cek->fetch(PDO::FETCH_LAZY);
+    $idKas = '1';
+    $saldoAwal = $row['total'];
+
+    if($saldoAwal > 0 ){
+        //get id kas_ins
+        $totalBelanja = $d * $e;
+        
+
+        $sql = "INSERT INTO kas_outs (id_kas_ins, type, sub_type, nama, qty, harga, satuan, ket, created_at, admin_id) VALUES (:idKas, :a, :b, :c, :d, :e, :f, :g, :h, :i)";
+        $stmt = $config->runQuery($sql);
+        $stmt->execute(array(
+            ':idKas'=> $idKas,
+            ':a'    => $a,
+            ':b'    => $b,
+            ':c'    => $c,
+            ':d'    => $d,
+            ':e'    => $e,
+            ':f'    => $f,
+            ':g'    => $g,
+            ':h'    => $h,
+            ':i'    => $i
+        ));
+        if($stmt)
+        {
+            echo $config->actionMsg('c', 'kas_outs');
+
+            if($stok == '1'){
+                $sql2 = "INSERT INTO stocks (cat, sub_cat, nama_barang, qty, satuan, harga, ket, admin_id) VALUES (:a, :b, :c, :d, :e, :f, :g, :h)";
+                $stmt2 = $config->runQuery($sql2);
+                $stmt2->execute(array(
+                    ':a'    => $a,
+                    ':b'    => $b,
+                    ':c'    => $c,
+                    ':d'    => $d,
+                    ':e'    => $f,
+                    ':f'    => $e,
+                    ':g'    => $g,
+                    ':h'    => $i
+                ));
+                if($stmt2){
+                    echo $config->actionMsg('c', 'stocks');
+
+                    $sql3 = "INSERT INTO kas_ins (parent_id, types, title, total, ket, admin_id, status) VALUES (:parent, :tipe, :title, :total, :ket, :admin, :status)";
+                    $stmt3 = $config->runQuery($sql3);
+                    $stmt3->execute(array(
+                        ':parent'   => $idKas,
+                        ':tipe'     => 'kredit',
+                        ':title'    => $c,
+                        ':total'    => $totalBelanja,
+                        ':ket'      => $g,
+                        ':admin'    => $i,
+                        ':status'   => '1'
+                    ));
+                    if($stmt3){
+                        $totalSaldoAkhir = $saldoAwal - $totalBelanja;
+                        $query10 = "UPDATE kas_ins SET total = :totalAkhir WHERE id = :id";
+                        $update = $config->runQuery($query10);
+                        $update->execute(array(
+                            ':totalAkhir'   => $totalSaldoAkhir,
+                            ':id'           => $idKas
+                        ));
+                        if($update){
+                            echo $config->actionMsg('u', 'kas_ins');
+                        }
+                    }
+                }else{
+                    echo 'failed';
+                }
+
+            }else{
+                $sql3 = "INSERT INTO kas_ins (parent_id, types, title, total, ket, admin_id, status) VALUES (:parent, :tipe, :title, :total, :ket, :admin, :status)";
+                    $stmt3 = $config->runQuery($sql3);
+                    $stmt3->execute(array(
+                        ':parent'   => $idKas,
+                        ':tipe'     => 'kredit',
+                        ':title'    => $c,
+                        ':total'    => $totalBelanja,
+                        ':ket'      => $g,
+                        ':admin'    => $i,
+                        ':status'   => '1'
+                    ));
+                    if($stmt3){
+                        $totalSaldoAkhir = $saldoAwal - $totalBelanja;
+                        $query10 = "UPDATE kas_ins SET total = :totalAkhir WHERE id = :id";
+                        $update = $config->runQuery($query10);
+                        $update->execute(array(
+                            ':totalAkhir'   => $totalSaldoAkhir,
+                            ':id'           => $idKas
+                        ));
+                        if($update){
+                            echo $config->actionMsg('u', 'kas_ins');
+                        }
+                    }
+            }
+        }else{
+            echo "Failed";
+        }
     }else{
-        echo "Failed";
+        echo 'Maaf Saldo Belanja Anda tidak memadai. Silahkan isi Saldo PRODUKSI terlebih dahulu!';
     }
+
+    
 
 //    $f = array($a, $b, $c, $d);
 //    print_r($f);

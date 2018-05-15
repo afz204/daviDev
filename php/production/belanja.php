@@ -82,6 +82,10 @@
                                     <div class="form-group">
                                         <textarea class="form-control" rows="5" id="ketBelanja" required placeholder="keterangan pengeluaran"></textarea>
                                     </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="CheckStok" value="1">
+                                        <label class="form-check-label" for="CheckStok">Masukan ke stok barang</label>
+                                    </div>
                                     <button id="btn_prod_belanja" type="submit" class="btn btn-sm btn-block btn-primary">submit belanjaan</button>
                                 </form>
                             </div>

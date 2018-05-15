@@ -42,8 +42,8 @@ function editStock(id) {
 }
 
 function viewStock(id) {
-    
-    
+
+
     $.ajax({
         url: '../php/ajax/productions.php?type=listStoks&id=' + id,
         data: "",
@@ -62,7 +62,7 @@ function viewStock(id) {
                 dt += '<td>' + value.created + '</td>';
                 dt += '</tr>';
             });
-            
+
             $('#listTmp').removeClass('hidden');
             $('#listTmpTable').append(dt);
             $('#listTmpTable').DataTable();
@@ -128,7 +128,7 @@ $(document).ready(function() {
 
     $('#belanjaForm').on('submit', function(e) {
         e.preventDefault();
-        
+
         var admin = $('#adminBelanja').val();
         var cat = $('#specSatuan option:selected').val();
         var subcat = $('#catSatuan option:selected').val();
@@ -138,19 +138,24 @@ $(document).ready(function() {
         var satuan = $('#satuanBelanja option:selected').val();
         var price = $('#hargaBelanja').val();
         var ket = $('#ketBelanja').val();
-
+        if ($('#CheckStok').is(':checked')) {
+            check = '1';
+        } else {
+            check = '';
+        }
+        //alert(check);
         //alert(admin + title + total + ket);
         $('#btn_prod_belanja').addClass('hidden');
         $.ajax({
             url: '../php/ajax/productions.php?type=addBelanja',
             method: 'post',
-            data: { admin: admin, category: cat, subcategory: subcat, title: name, quantity: qty, satuan: satuan, harga: price, keterangan: ket },
+            data: { admin: admin, category: cat, subcategory: subcat, title: name, quantity: qty, satuan: satuan, harga: price, keterangan: ket, stok: check },
 
             success: function(msg) {
                 location.reload();
                 alert(msg);
             }
-        })
+        });
     });
 
 

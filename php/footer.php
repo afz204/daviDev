@@ -4,6 +4,7 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="<?=URL?>assets/vendors/dll/jquery.min.js"></script>
+    <script type="text/javascript" src="<?=URL?>assets/vendors/datetime-picker4/js/moment_2_9_0.js"></script>
     <script src="<?=URL?>assets/vendors/parsley/parsley.min.js"></script>
     <script src="<?=URL?>assets/vendors/dll/popper.min.js"></script>
     <script src="<?=URL?>assets/js/bootstrap.min.js"></script>
@@ -12,6 +13,9 @@
     <script type="text/javascript" src="<?=URL?>assets/vendors/dataTables/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="<?=URL?>assets/vendors/dataTables/js/dataTables.bootstrap4.min.js"></script>
     <script type="text/javascript" src="<?=URL?>assets/vendors/select2/select2.min.js"></script>
+    
+    <script type="text/javascript" src="<?=URL?>assets/vendors/datetime-picker4/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="<?=URL?>assets/vendors/daterangepicker/daterangepicker.js"></script>
 
 
     <script src="<?=URL?>assets/js/custom.js"></script>

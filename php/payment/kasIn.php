@@ -1,43 +1,19 @@
 <?php
-$outKas = $config->ProductsJoin('kas_ins.id, kas_ins.title, kas_ins.total, kas_ins.ket, kas_ins.admin_id, kas_ins.status, kas_ins.created_at, users.name', 'kas_ins',
-    'INNER JOIN users ON users.id = kas_ins.admin_id', "WHERE kas_ins.status ='' ");
-$totalKas   = $config->Products('created_at, SUM(total) as totalDana', "kas_ins WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND status = ''");
-$totalKas   = $totalKas->fetch(PDO::FETCH_LAZY);
+$outKas = $config->ProductsJoin('kas_ins.id, kas_ins.types, kas_ins.title, kas_ins.total, kas_ins.ket, kas_ins.admin_id, kas_ins.status, kas_ins.created_at, users.name', 'kas_ins',
+    'INNER JOIN users ON users.id = kas_ins.admin_id', "ORDER BY kas_ins.created_at DESC ");
 
-$kasOut     = $config->Products('SUM(qty * harga) as totalOut', "kas_outs WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND status = '1'");
-$kasOut     = $kasOut->fetch(PDO::FETCH_LAZY);
+    
+    $product = $config->Products('SUM(total) AS totalProduksi, created_at', "kas_ins WHERE id = '1'");
+    $product = $product->fetch(PDO::FETCH_LAZY);
+    
 
-$sql = "SELECT pay_kurirs.id, pay_kurirs.total FROM pay_kurirs WHERE pay_kurirs.total != '' AND MONTH(pay_kurirs.created_at) = MONTH(CURRENT_DATE()) AND YEAR(pay_kurirs.created_at) = YEAR(CURRENT_DATE())";
-$kurir   = $config->runQuery($sql);
-$kurir->execute();
-
-$payKurir = $kurir->fetch(PDO::FETCH_LAZY);
-
-    if(empty($totalKas['totalDana'])){
-        $danaKas = 0;
+$totalProd = $config->formatPrice($product['totalProduksi']);
+if($product['totalProduksi'] > 0 ){
+        $styleProd = 'success';
     }else{
-        $danaKas = $totalKas['totalDana'];
+        $styleProd = 'danger';
     }
-    if(empty($kasOut['totalOut'])){
-        $kasOut = 0;
-    }else{
-        $kasOut = $kasOut['totalOut'];
-    }
-
-    if(empty($payKurir['total'])){
-        $payKurir = 0;
-    }else{
-        $payKurir = $payKurir['total'];
-    }
-
-$total = $danaKas - ($kasOut + $payKurir);
-$totalDanaKas = $config->formatPrice($total);
-
-if($total > 0 ){
-        $style = 'success';
-    }else{
-        $style = 'danger';
-    }
+    
 ?>
 <div id="listKasInHeader" <?=$access['read']?>>
     <div class="row">
@@ -76,23 +52,27 @@ if($total > 0 ){
                     <div id="monitoringKasIn">
                         <div class="card text-center border-success mb-3">
                             <div class="card-body">
-                                <h3 class="card-title">Your Kas Balance</h3>
-                                <p class="card-text">Update every time.</p>
-                                <button class="btn btn-lg btn-<?=$style?> showListKasIn">
-                        <?=$totalDanaKas?>
-                                </button>
+                            <h3 class="card-title">Your Kas Balance</h3>
+                            <p class="card-text">Update every time.</p>
+                                        <button class="btn btn-lg btn-<?=$styleProd?>" onclick="showListKasIn(1)">
+                                <?=$totalProd?>
+                                        </button>
+                                        
                             </div>
                             <div class="card-footer text-muted">
-                                Updated at: <span class="badge badge-danger"><?=$config->timeAgo($totalKas['created_at'])?></span>
+                            <p>
+                                             Updated at: <span class="badge badge-danger"><?=$config->timeAgo($product['created_at'])?></span>
+                                        </p>
                             </div>
                         </div>
                     </div>
-                    <div id="listKasIn">
+                    <div id="listKasIn" class="hidden">
 
                         <table id="kasMasuk" class="table table-bordered  <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
                             <thead class="thead-light">
                             <tr style="text-transform: lowercase;">
                                 <th scope="col">#</th>
+                                <th scope="col">Type</th>
                                 <th scope="col">Nama Pengeluaran</th>
                                 <th scope="col">Total Biaya</th>
                                 <th scope="col">Keterangan</th>
@@ -102,9 +82,16 @@ if($total > 0 ){
                             </tr>
                             </thead>
                             <tbody>
-                            <?php $i = 1; while ($row = $outKas->fetch(PDO::FETCH_LAZY)){ ?>
+                            <?php $i = 1; while ($row = $outKas->fetch(PDO::FETCH_LAZY)){ 
+                                if($row['types'] == 'debit'){
+                                    $types = '<label class="badge badge-success">debit</label>';
+                                }else{
+                                    $types = '<label class="badge badge-warning">kredit</label>';
+                                }
+                                ?>
                                 <tr style="text-transform: lowercase;">
                                     <td><?=$i++?></td>
+                                    <td><?=$types?></td>
                                     <td><?=$row['title']?></td>
                                     <td style="text-align: right;"><?=number_format($row['total'], '2', ',', '.')?></td>
                                     <td><?=$row['ket']?></td>
