@@ -30,6 +30,9 @@ LEFT OUTER JOIN satuans AS subcat ON subcat.id = kas.sub_type WHERE kas.admin_id
 $stmt->execute(array(
     ':admin' => $u
 ));
+$total = $config->runQuery("SELECT SUM(qty * harga) AS total FROM kas_outs WHERE admin_id = :adm AND status = '1' AND DATE(report_at) = CURDATE()");
+$total->execute(array(':adm' => $u));
+$total = $total->fetch(PDO::FETCH_LAZY);
 
 
 require_once("../../assets/vendors/fpdf17/fpdf.php");
@@ -55,6 +58,10 @@ $pdf->Ln();
 $pdf->Cell(35, 7, 'Report By', 0, 0, 'L');
 $pdf->Cell(10, 7, ':', 0, 0, 'L');
 $pdf->Cell(30, 7, ucfirst($admin), 0, 0, 'L');
+$pdf->Ln();
+$pdf->Cell(35, 7, 'Total Transaksi', 0, 0, 'L');
+$pdf->Cell(10, 7, ':', 0, 0, 'L');
+$pdf->Cell(30, 7, ucfirst('Rp. '.number_format($total['total'], '0', '.', '.')), 0, 0, 'L');
 $pdf->Ln(15);
 
 $h = 10;
@@ -70,7 +77,7 @@ $pdf->Cell(15, $h, 'Qty', 1, 0, 'C', true);
 $pdf->Cell(30, $h, 'Harga', 1, 0, 'C', true);
 $pdf->Cell(32, $h, 'Total', 1, 0, 'C', true);
 $pdf->Cell(80, $h, 'Keterangan', 1, 0, 'C', true);
-$pdf->Cell(30, $h, 'Action', 1, 0, 'C', true);
+$pdf->Cell(30, $h, 'Tanggal', 1, 0, 'C', true);
 $pdf->Ln();
 
 $pdf->SetFont('Arial', '', 12);
@@ -82,7 +89,7 @@ $i = 1;
 while ($row = $stmt->fetch(PDO::FETCH_LAZY)) {
     $jumlah = number_format($row['qty'] * $row['harga'], 0, ',', '.');
     $cellWidth = 80;
-    $cellHeight = 10;
+    $cellHeight = 8;
     if ($pdf->GetStringWidth($row['ket']) > $cellWidth) {
         $textLength = strlen($row['ket']);
         $errMargin = 10;
@@ -120,11 +127,10 @@ while ($row = $stmt->fetch(PDO::FETCH_LAZY)) {
 
     $xPos = $pdf->GetX();
     $yPos = $pdf->GetY();
-    $pdf->MultiCell($cellWidth, $cellHeight, ucfirst($row['ket']), 1);
+    $pdf->MultiCell($cellWidth, $cellHeight, ucfirst(str_replace('/\n/','',$row['ket'])), 1);
     $pdf->SetXY($xPos + $cellHeight, $yPos);
-// $pdf->Cell(110, $h, $row['ket'], 1, 0, 'C',true);
     $pdf->SetX(257);
-    $pdf->Cell(30, $he, '', 1, 0);
+    $pdf->Cell(30, $he, date('d-m-Y', strtotime($row['created_at'])), 1, 0);
     $pdf->Ln();
 }
 // $pdf->Ln(10);

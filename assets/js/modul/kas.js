@@ -1,3 +1,45 @@
+function delKasIns(id, typesID, types, total, admin) {
+    if (types == '1') {
+        tipe = 'PRODUKSI';
+    } else if (types == '2') {
+        tipe = 'KURIR';
+    } else {
+        tipe = 'DLL'
+    }
+    if (!confirm('Are you sure want to delete and return to Kas ' + tipe + ' as Debit?')) {
+        return false;
+    } else {
+        $.ajax({
+            url: '../php/ajax/payment.php?type=delKasIns',
+            method: 'post',
+            data: { dataID: id, typesID: typesID, kategori: types, totalReturn: total, admin: admin },
+
+            success: function(msg) {
+                location.reload();
+                alert(msg);
+            }
+        })
+    }
+}
+
+function returnKas(id, nilai, admin) {
+
+    if (!confirm('Are you sure want to return to Kas Besar as Debit?')) {
+        return false;
+    } else {
+        $.ajax({
+            url: '../php/ajax/payment.php?type=returnKas',
+            method: 'post',
+            data: { id: id, total: nilai, adm: admin },
+
+            success: function(msg) {
+                location.reload();
+                alert(msg);
+            }
+        })
+    }
+}
+
 function showListKasIn(id) {
     // $('#listKasIn').removeClass('hidden');
     window.location.href = '?p=kasIn&types=' + id;
@@ -26,14 +68,14 @@ function delKasOut(id, admin) {
     }
 }
 
-function delKasBesar(id, admin) {
+function delKasBesar(id, types, total, admin) {
     if (!confirm('Are you sure want to delete this?')) {
         return false;
     } else {
         $.ajax({
             url: '../php/ajax/payment.php?type=delKasBesar',
             method: 'post',
-            data: { admin: admin, keterangan: id },
+            data: { admin: admin, tipe: types, total, keterangan: id },
 
             success: function(msg) {
                 location.reload();
@@ -119,8 +161,6 @@ $(document).ready(function() {
         var link = url + 'php/ajax/pdfKasOut.php?user=' + user + '&admin=' + admin;
         //window.open(url, '_blank');
 
-
-
         if (!confirm('Are you sure want to report this?')) {
             return false;
         } else {
@@ -131,14 +171,13 @@ $(document).ready(function() {
                 data: { admin: admin, users: user },
 
                 success: function(msg) {
-                    if (msg == '0') {
-                        alert('Failed');
-                    } else if (msg == '1') {
-                        window.open(link, '', 'Report Pengeluaran Kas', 'width=400, height=600, screenX=100');
+                    if (msg == '1') {
+
                         alert('Berhasil report data!');
+                        window.open(link, "ReportKasKeluar", "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes").focus();
 
                     } else {
-                        alert('Record belum ada!');
+                        alert('Record Belum Ada');
                     }
                     location.reload();
                 }
@@ -265,6 +304,7 @@ $(document).ready(function() {
 
     $('#kas_besar_form').on('submit', function(e) {
         e.preventDefault();
+        $('#btnKas_besar').addClass('hidden');
         var admin = $('#adminKasB').val();
         var title = $('#nameKasB').val();
         var ket = $('#ketKasB').val();
@@ -336,7 +376,7 @@ $(document).ready(function() {
         }
         //alert(tgl + types + listAdm);
 
-        window.location.href = '?p=report-payment&type=' + urlLik + '&range=' + tgl + '&admin=' + optional;
+        window.location.href = '?p=reportPayment&type=' + urlLik + '&range=' + tgl + '&admin=' + optional;
         // $('#listReport').hide().load('payment/?p=table-report&type=kasBesar').fadeIn();
         // $.ajax({
         //     url: '../php/payment/table-report.php?type=' + urlLik,
@@ -348,6 +388,8 @@ $(document).ready(function() {
         //     }
         // });
     });
+
+    var reportKasBesar = $('#tableReporKasBesar').DataTable();
 })
 
 

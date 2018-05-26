@@ -1,18 +1,22 @@
 <?php
 $stylePHP = 'hidden';
+$tipes = '';
 if(isset($_GET['types'])){
     if($_GET['types'] == '1'){
         $outKas = $config->ProductsJoin('kas_ins.id, kas_ins.types, kas_ins.title, kas_ins.total, kas_ins.ket, kas_ins.admin_id, kas_ins.status, kas_ins.created_at, users.name', 'kas_ins',
     'INNER JOIN users ON users.id = kas_ins.admin_id', " WHERE kas_ins.id NOT IN ('1', '2', '3') AND kas_ins.status = '1' ORDER BY kas_ins.created_at DESC ");
     $stylePHP = 'showContent';
+    $tipes = "1";
     }elseif($_GET['types'] == '2'){
         $outKas = $config->ProductsJoin('kas_ins.id, kas_ins.types, kas_ins.title, kas_ins.total, kas_ins.ket, kas_ins.admin_id, kas_ins.status, kas_ins.created_at, users.name', 'kas_ins',
     'INNER JOIN users ON users.id = kas_ins.admin_id', " WHERE kas_ins.id NOT IN ('1', '2', '3') AND kas_ins.status = '2' ORDER BY kas_ins.created_at DESC ");
     $stylePHP = 'showContent';
+    $tipes = "2";
     }else{
         $outKas = $config->ProductsJoin('kas_ins.id, kas_ins.types, kas_ins.title, kas_ins.total, kas_ins.ket, kas_ins.admin_id, kas_ins.status, kas_ins.created_at, users.name', 'kas_ins',
     'INNER JOIN users ON users.id = kas_ins.admin_id', " WHERE kas_ins.id NOT IN ('1', '2', '3') AND kas_ins.status = '3' ORDER BY kas_ins.created_at DESC ");
     $stylePHP = 'showContent';
+    $tipes = "3";
     }
 }else{
     $outKas = $config->ProductsJoin('kas_ins.id, kas_ins.types, kas_ins.title, kas_ins.total, kas_ins.ket, kas_ins.admin_id, kas_ins.status, kas_ins.created_at, users.name', 'kas_ins',
@@ -93,19 +97,19 @@ $dl = $config->formatPrice($dll['totalProduksi']);
                             
                             <div class="row">
                                 <div class="col-12 col-md-6 col-lg-4">
-                                    <p class="card-text text-<?=$styleProd?>" style="font-weight: 600;">PRODUKSI</p>
+                                    <p class="card-text text-<?=$styleProd?>" style="font-weight: 600;"><a href="#" data-nilai="" onclick="returnKas(1, <?=$product['totalProduksi']?>, <?=$admin[0]['user_id']?>)">PRODUKSI</a></p>
                                             <button class="btn btn-xs btn-<?=$styleProd?>" onclick="showListKasIn(1)">
                                     <?=$prod?>
                                             </button>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-4">
-                                    <p class="card-text text-<?=$styleKur?>" style="font-weight: 600;">KURIR</p>
+                                    <p class="card-text text-<?=$styleKur?>" style="font-weight: 600;"><a href="#" data-nilai="" onclick="returnKas(2, <?=$kurir['totalProduksi']?>, <?=$admin[0]['user_id']?>)">KURIR</a></p>
                                             <button class="btn btn-xs btn-<?=$styleKur?>" onclick="showListKasIn(2)">
                                     <?=$kur?>
                                             </button>
                                 </div>
                                 <div class="col-12 col-md-6 col-lg-4">
-                                    <p class="card-text text-<?=$styleDl?>" style="font-weight: 600;">DLL</p>
+                                    <p class="card-text text-<?=$styleDl?>" style="font-weight: 600;"><a href="#" data-nilai="" onclick="returnKas(3, <?=$dll['totalProduksi']?>, <?=$admin[0]['user_id']?>)">DLL</a></p>
                                             <button class="btn btn-xs btn-<?=$styleDl?>" onclick="showListKasIn(3)">
                                     <?=$dl?>
                                             </button>
@@ -155,8 +159,10 @@ $dl = $config->formatPrice($dll['totalProduksi']);
                                         <!--                                        <a href="--><?//=PAYMENT?><!--?p=koDetail&id=--><?//=$row['id']?><!--" --><?//=$access['read']?><!-->
                                         <!--                                            <button class="btn btn-sm btn-primary" style="text-transform: uppercase; font-size: 10px; font-weight: 500;">details</button>-->
                                         <!--                                        </a>-->
-                                        <button class="btn btn-sm btn-danger delKasIn" style="text-transform: uppercase; font-size: 10px; font-weight: 500;"  <?=$access['delete']?> data-id="<?=$row['id']?>" data-admin="<?=$admin[0]['user_id']?>" >delete</button>
+                                        <?php if($row['types'] == 'kredit'){ ?>
+                                            <button class="btn btn-sm btn-danger" style="text-transform: uppercase; font-size: 10px; font-weight: 500;"  <?=$access['delete']?> onclick="delKasIns(<?=$row['id']?>, <?=$row['types']?>, <?=$tipes?>, <?=$row['total']?>, <?=$admin[0]['user_id']?>)" data-id="" data-admin="" >delete</button>
 
+                                        <?php } ?>
                                     </td>
                                 </tr>
                             <?php } ?>

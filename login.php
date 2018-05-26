@@ -8,6 +8,7 @@ $cekLogin = new Login();
 
 if($cekLogin->is_loggedin()!="")
 {
+    
     $cekLogin->redirect('index');
 }
 
@@ -44,7 +45,7 @@ $pass = password_verify('hello', 'makan');
 <div class="container">
     <div class="form-signin" autocomplete="off">
         <div class="text-center mb-4">
-            <img class="mb-4" src="https://getbootstrap.com/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
+            <img class="mb-4" src="<?=URL?>assets/images/roses-bouquet.png" alt="" width="90" height="90">
             <h1 class="h3 mb-3 font-weight-normal"><i class="fa fa-fw fa-tencent-weibo"> </i>BungaDavi</h1>
 
         </div>

@@ -109,16 +109,12 @@ if($_GET['type'] == 'reportKasOut')
     $b = $_POST['users'];
 
     $tanggal = $config->getDate('Y-m-d H:m:s');
-
-    $sql = "SELECT SUM(qty * harga) as total FROM kas_outs WHERE admin_id = :admin AND status = '' ";
+    $sql = "SELECT id FROM kas_outs WHERE admin_id = :admin AND status = '' ";
     $total = $config->runQuery($sql);
     $total->execute(array(
         ':admin' => $b
     ));
     if($total->rowCount() > 0){
-        $info = $total->fetch(PDO::FETCH_LAZY);
-
-        $total = $info['total'];
 
         $stmt = $config->runQuery("UPDATE kas_outs SET report_at = :tanggal,  status = '1' WHERE admin_id = :adm AND status = '' ");
         $stmt->execute(array(
@@ -126,27 +122,48 @@ if($_GET['type'] == 'reportKasOut')
             ':adm' => $b
         ));
         if($stmt){
-            $query = "INSERT INTO kas_outs (nama, harga, ket, created_at, admin_id, status) VALUES (:a, :b, :c, :d, :e, :f)";
-            $input = $config->runQuery($query);
-            $input->execute(array(
-                ':a'    => $b,
-                ':b'    => $total,
-                ':c'    => 'report',
-                ':d'    => $tanggal,
-                ':e'    => $a,
-                ':f'    => '0'
-            ));
-            if($input){
-                echo '1';
-            }else{
-                echo '0';
-            }
-        }else{
-            echo '0';
+            echo '1';
         }
     }else{
-        echo '2';
+        echo '0';
     }
+    // $sql = "SELECT SUM(qty * harga) as total FROM kas_outs WHERE admin_id = :admin AND status = '' ";
+    // $total = $config->runQuery($sql);
+    // $total->execute(array(
+    //     ':admin' => $b
+    // ));
+    // if($total->rowCount() > 0){
+    //     $info = $total->fetch(PDO::FETCH_LAZY);
+
+    //     $total = $info['total'];
+
+    //     $stmt = $config->runQuery("UPDATE kas_outs SET report_at = :tanggal,  status = '1' WHERE admin_id = :adm AND status = '' ");
+    //     $stmt->execute(array(
+    //         ':tanggal' => $tanggal,
+    //         ':adm' => $b
+    //     ));
+    //     if($stmt){
+    //         $query = "INSERT INTO kas_outs (nama, harga, ket, created_at, admin_id, status) VALUES (:a, :b, :c, :d, :e, :f)";
+    //         $input = $config->runQuery($query);
+    //         $input->execute(array(
+    //             ':a'    => $b,
+    //             ':b'    => $total,
+    //             ':c'    => 'report',
+    //             ':d'    => $tanggal,
+    //             ':e'    => $a,
+    //             ':f'    => '0'
+    //         ));
+    //         if($input){
+    //             echo '1';
+    //         }else{
+    //             echo '0';
+    //         }
+    //     }else{
+    //         echo '0';
+    //     }
+    // }else{
+    //     echo '2';
+    // }
 
 }
 
@@ -365,13 +382,115 @@ if($_GET['type'] == 'delKasBesar')
 {
     $a = $_POST['admin'];
     $b = $_POST['keterangan'];
+    $c = $_POST['total'];
+    $d = $_POST['tipe'];
     $tgl = $config->getDate('Y-m-d H:m:s');
 
-    $stmt = $config->delRecord('kas_besar', 'id', $b);
-
-    if($stmt){
-        echo $config->actionMsg('d', 'pay_kurirs');
+    if($d == '0'){
+        $stmt = $config->delRecord('kas_besar', 'id', $b);
+        if($stmt){
+            echo $config->actionMsg('d', 'kas_besar');
+        }
     }else{
-        echo 'Failed!';
+            $cek = $config->runQuery('SELECT total FROM kas_ins WHERE id = :id');
+            $cek->execute(array(':id'   => $d));
+            $data = $cek->fetch(PDO::FETCH_LAZY);
+                    
+            $danaAkhir = $data['total'] - $c;
+            if($danaAkhir >= 0){
+                    $updateKas = $config->runQuery('UPDATE kas_ins SET total = :total WHERE id = :idnya ');
+                    $updateKas->execute(array(
+                        ':total'    => $danaAkhir,
+                        ':idnya'   => $d
+                    ));
+
+                    if($updateKas){
+                        echo $config->actionMsg('u', 'kas_ins');
+
+                            $stmt = $config->delRecord('kas_besar', 'id', $b);
+
+                            if($stmt){
+                                echo $config->actionMsg('d', 'pay_kurirs');
+                                    $kurang = $config->runQuery("INSERT INTO kas_ins (parent_id, types, title, total, ket, admin_id, status) 
+                                    VALUES (:a, :b, :c, :d, :e, :f, :g)");
+                                    $kurang->execute(array(
+                                        ':a'    => $d,
+                                        ':b'    => 'kredit',
+                                        ':c'    => 'return kas masuk',
+                                        ':d'    => $c,
+                                        ':e'    => 'return kas to kas_besar',
+                                        ':f'    => $a,
+                                        ':g'    => $d
+                                    ));
+
+                                    if($kurang){
+                                        echo $config->actionMsg('c', 'kas_ins');
+                                        
+                                    }
+                            }else{
+                                echo 'Failed!';
+                            }
+                    }
+
+            }else{
+                echo 'Delete tidak bisa dijalankan, dikarenakan Dana kurang memadai.';
+            }
+    }
+
+    
+     
+}
+if($_GET['type'] == 'returnKas'){
+    $a = $_POST['id'];
+    $b = $_POST['total'];
+    $c = $_POST['adm'];
+
+    $types = 'DLL';
+    if($a == '1'){
+        $types = "PRODUKSI";
+    }elseif($a == '2'){
+        $types = "KURIR";
+    }
+    $stmt = $config->runQuery("UPDATE kas_ins SET total = 0 WHERE id = :id");
+    $stmt->execute(array(':id'  => $a));
+    if($stmt){
+        echo $config->actionMsg('u', 'kas_ins');
+
+        $input = $config->runQuery("INSERT INTO kas_besar (type, total, title, ket, admin_id) VALUES (:a, :b, :c, :d, :e)");
+        $input->execute(array(
+            ':a'    => 'debit',
+            ':b'    => $b,
+            ':c'    => 'return kas',
+            ':d'    => $types,
+            ':e'    => $c
+        ));
+        if($input){
+            echo $config->actionMsg('c', 'kas_besar');
+
+            $kurang = $config->runQuery("INSERT INTO kas_ins (parent_id, types, title, total, ket, admin_id, status) 
+            VALUES (:a, :b, :c, :d, :e, :f, :g)");
+            $kurang->execute(array(
+                ':a'    => $a,
+                ':b'    => 'kredit',
+                ':c'    => 'return kas',
+                ':d'    => $b,
+                ':e'    => 'return kas to kas_besar',
+                ':f'    => $c,
+                ':g'    => $a
+            ));
+
+            if($kurang){
+                echo $config->actionMsg('c', 'kas_ins');
+            }
+        }
     }
 }
+
+// if($_GET['type'] == 'returnKas'){
+    
+//     $a = $_POST['dataID'];
+//     $b = $_POST['typesID'];
+//     $c = $_POST['kategori'];
+//     $d = $_POST['totalReturn'];
+//     $e = $_POST['admin'];
+// }

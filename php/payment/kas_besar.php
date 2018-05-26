@@ -59,7 +59,7 @@ if($total > 0 ){
                                     <div class="form-group">
                                         <textarea class="form-control" rows="5" id="ketKasB" required placeholder="keterangan kas masuk"></textarea>
                                     </div>
-                                    <button type="submit" class="btn btn-sm btn-block btn-primary">submit pemasukan</button>
+                                    <button type="submit" id="btnKas_besar" class="btn btn-sm btn-block btn-primary">submit pemasukan</button>
                                 </form>
                             </div>
                         </div>
@@ -110,6 +110,10 @@ if($total > 0 ){
                                }else{
                                    $st12 = '';
                                }
+                               $tipe = $row['status'];
+                               if(empty($row['status'])){
+                                   $tipe = '0';
+                               }
                                
                                 ?>
                                 <tr style="text-transform: lowercase;">
@@ -123,7 +127,7 @@ if($total > 0 ){
                                     <td><i class="small"><?=$row['created_at']?></i></td>
                                     <td>
                                        
-                                        <button class="btn btn-sm btn-danger" onclick="delKasBesar(<?=$row['id']?>, <?=$admin[0]['user_id']?>)" style="text-transform: uppercase; font-size: 10px; font-weight: 500;"  <?=$access['delete']?> data-id="<?=$row['id']?>" data-admin="<?=$admin[0]['user_id']?>" >delete</button>
+                                        <button class="btn btn-sm btn-danger" onclick="delKasBesar(<?=$row['id']?>, <?=$tipe?>, <?=$row['total']?>, <?=$admin[0]['user_id']?>)" style="text-transform: uppercase; font-size: 10px; font-weight: 500;"  <?=$access['delete']?> data-id="<?=$row['id']?>" data-admin="<?=$admin[0]['user_id']?>" >delete</button>
 
                                     </td>
                                 </tr>

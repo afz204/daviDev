@@ -35,7 +35,7 @@ elseif($_GET['type'] == 'kecamatan'){
 
 }
 elseif($_GET['type'] == 'subCat'){
-    $stmt = $config->runQuery('SELECT * FROM categories WHERE category_id = :id');
+    $stmt = $config->runQuery('SELECT * FROM categories WHERE parent_id = :id');
     $stmt->execute(array(':id' => $id));
     header('Content-Type: application/json');
     echo json_encode($stmt->fetchAll());

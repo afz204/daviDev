@@ -84,11 +84,7 @@ if($_GET['type'] == 'updateStocks')
     // print_r($b);
     //cek stok
     $total = $x - $c; echo $total;
-    if($total <= 0 ){
-        echo "Stok melebih batas persedian";
-    }else{
-
-        $sql = "UPDATE stocks SET qty = :c WHERE id = :h";
+    $sql = "UPDATE stocks SET qty = :c WHERE id = :h";
         $stmt = $config->runQuery($sql);
         $stmt->execute(array(
             ':c'    => $total,
@@ -113,7 +109,13 @@ if($_GET['type'] == 'updateStocks')
         }else{
             echo 'Failed';
         }
-    }
+    // $total = $x - $c; echo $total;
+    // if($total <= 0 ){
+    //     echo "Stok melebih batas persedian";
+    // }else{
+
+        
+    // }
 }
 
 

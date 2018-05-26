@@ -1,7 +1,7 @@
 <?php 
 
     $stocks = $config->ProductsJoin('stocks.id AS idStocks, stocks.nama_barang, stocks.qty, stocks.satuan, stocks.harga, stocks.ket, stocks.created_at, stocks.admin_id, users.name, cat.content AS category, subcat.category AS subcategory ', 'stocks',
-    'INNER JOIN users ON users.id = stocks.admin_id LEFT OUTER JOIN satuans AS cat ON cat.id = stocks.cat LEFT OUTER JOIN satuans AS subcat ON subcat.id = stocks.sub_cat', 'ORDER BY stocks.created_at DESC');
+    'INNER JOIN users ON users.id = stocks.admin_id LEFT OUTER JOIN satuans AS cat ON cat.id = stocks.cat LEFT OUTER JOIN satuans AS subcat ON subcat.id = stocks.sub_cat', ' WHERE stocks.qty != 0 ORDER BY stocks.created_at DESC');
     $data = $config->Products('id, content', 'satuans WHERE content_id = 0');
 
 ?>

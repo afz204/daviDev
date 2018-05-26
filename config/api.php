@@ -285,7 +285,7 @@ class Admin
     }
     public function Category()
     {
-        $stmt = $this->conn->prepare('SELECT id, name FROM categories WHERE category_id = 0 ');
+        $stmt = $this->conn->prepare('SELECT id, name FROM categories WHERE parent_id = 0 ');
         $stmt->execute();
         return $stmt;
     }
