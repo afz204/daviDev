@@ -19,14 +19,15 @@ function delPrevillage(id, admin, user) {
         }
     })
 }
-function formSatuan()
-{
+
+function formSatuan() {
     $('#listSatuan').addClass('hidden');
     $('#form-satuan').removeClass('hidden');
 }
 $(document).ready(function() {
 
     $('#tbListSatuan').DataTable();
+    $('#tableLogs').DataTable();
 
     var listAdmin = $('#listAdmin').show();
     var listMenu = $('#listMenu').show();
@@ -197,9 +198,9 @@ $(document).ready(function() {
         });
     });
 
-    $('#satuanForm').on('submit', function(e){
+    $('#satuanForm').on('submit', function(e) {
         e.preventDefault();
-        
+
         var spec = $('#specSatuan option:selected').val();
         var cat = $('#catSatuan option:selected').val();
         var sub = $('#subCatSatuan option:selected').val();
@@ -209,63 +210,75 @@ $(document).ready(function() {
         $.ajax({
             url: '../php/ajax/management.php?type=addSatuan',
             method: 'post',
-            data: { admin: adm, content : spec, category : cat, subcategory : sub, isi : isi },
+            data: { admin: adm, content: spec, category: cat, subcategory: sub, isi: isi },
 
             success: function(msg) {
-                 location.reload();
+                location.reload();
                 alert(msg);
             }
         });
     });
-    $('#specSatuan').on('change', function(){
+    $('#specSatuan').on('change', function() {
         var opt = $(this).find("option:selected");
         var id = opt.val();
         var text = opt.text();
-       
-        
+
+
         var data = ["1", "2", "3"];
-        if(jQuery.inArray(id, data) != -1) {
+        if (jQuery.inArray(id, data) != -1) {
             $.ajax({
                 url: '../php/ajax/management.php?type=catSatuan',
                 method: 'post',
                 data: { data: id },
-    
+
                 success: function(data) {
                     $('#satuanCat').removeClass('hidden');
                     $.each(data, function(index, value) {
-                        $('#catSatuan').append('<option value="' + value.id + '" data-type="'+value.content_id+'">' + value.category + '</option>');
+                        $('#catSatuan').append('<option value="' + value.id + '" data-type="' + value.content_id + '">' + value.category + '</option>');
                     })
                 }
             });
             //console.log("is in array");
         } else {
             //console.log("is NOT in array");
-        } 
+        }
     });
-    // $('#satuanCat').on('change', function(){
-    //     var opt = $(this).find("option:selected");
-    //     var id = opt.val();
-    //     var text = opt.text();
-    //     var type = opt.attr("type");
-        
-    //     var data = ["1"];
-    //     if(jQuery.inArray(type, data) != -1) {
-    //         $.ajax({
-    //             url: '../php/ajax/management.php?type=subCatSatuan',
-    //             method: 'post',
-    //             data: { data: id },
-    
-    //             success: function(data) {
-    //                 $('#satuanSubCat').removeClass('hidden');
-    //                 $.each(data, function(index, value) {
-    //                     $('#subCatSatuan').append('<option value="' + value.id + '">' + value.category + '</option>');
-    //                 })
-    //             }
-    //         });
-    //         //console.log("is in array");
-    //     } else {
-    //         //console.log("is NOT in array");
-    //     } 
-    // });
+    $('#form-logs').on('submit', function(e) {
+        e.preventDefault();
+
+        var tgl = $('#hidde_date_field').val();
+        var listAdm = $('#adminLogs option:selected').val();
+
+
+        window.location.href = '?p=log_user&type=logs&range=' + tgl + '&admin=' + listAdm;
+
+    });
 
 })
+
+$(function() {
+
+    var start = moment().subtract(29, 'days');
+    var end = moment();
+
+    function cb(start, end) {
+        $('#logsRange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        $('#hidde_date_field').val(start.format('YYYY-MM-DD') + '_' + end.format('YYYY-MM-DD'));
+    }
+
+    $('#logsRange').daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+
+    cb(start, end);
+
+});

@@ -27,7 +27,7 @@ class Login
                 {
                     if($userRow['status'] == '1'){
                         $_SESSION['user_session'] = $userRow['id'];
-
+                        
                         return true;
                     }else{
 
@@ -98,12 +98,17 @@ class Admin
         $stmt = $this->conn->prepare($sql);
         return $stmt;
     }
+    public function lastInsertId(){
+        return $this->conn->lastInsertId();
+    }
 
     public function adminID()
     {
         $id = $_SESSION['user_session'];
-        $stmt = $this->conn->prepare("SELECT id, name, email, jabatan, role_id, status, created_at FROM users WHERE id = :user_id");
+        $stmt = $this->conn->prepare("SELECT id FROM users WHERE id = :user_id");
         $stmt->execute(array(':user_id' => $id));
+        $stmt = $stmt->fetch(PDO::FETCH_LAZY);
+        $stmt = $stmt['id'];
         return $stmt;
 
     }
@@ -300,6 +305,37 @@ class Admin
         }
         $query2=$query." limit $starting_position,$records_per_page";
         return $query2;
+    }
+
+    public function saveLogs($reff, $user, $method, $ket){
+        switch($method){
+            case 'c':
+                $types = 'create';
+            break;
+            case 'u':
+                $types = 'update';
+            break;
+            case 'd':
+                $types = 'delete';
+            break;
+            case 'f':
+                $types = 'function';
+            break;
+            default:
+                $types = 'none';
+            break;
+        }
+
+        $stmt = $this->conn->prepare('INSERT INTO logs_users (reff_id, user_id, methode, ket) 
+        VALUES (:a, :b, :c, :d)');
+        $stmt->execute(array(
+            ':a'    => $reff,
+            ':b'    => $user,
+            ':c'    => $types,
+            ':d'    => $ket
+        ));
+        return $stmt;
+
     }
 
     public function paginglink($total, $records_per_page)

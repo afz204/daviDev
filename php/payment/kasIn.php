@@ -160,7 +160,7 @@ $dl = $config->formatPrice($dll['totalProduksi']);
                                         <!--                                            <button class="btn btn-sm btn-primary" style="text-transform: uppercase; font-size: 10px; font-weight: 500;">details</button>-->
                                         <!--                                        </a>-->
                                         <?php if($row['types'] == 'kredit'){ ?>
-                                            <button class="btn btn-sm btn-danger" style="text-transform: uppercase; font-size: 10px; font-weight: 500;"  <?=$access['delete']?> onclick="delKasIns(<?=$row['id']?>, <?=$row['types']?>, <?=$tipes?>, <?=$row['total']?>, <?=$admin[0]['user_id']?>)" data-id="" data-admin="" >delete</button>
+                                            <button class="btn btn-sm btn-danger" style="text-transform: uppercase; font-size: 10px; font-weight: 500;"  <?=$access['delete']?> onclick="delKasIns(<?=$row['id']?>, '<?=$row['types']?>', <?=$tipes?>, <?=$row['total']?>, <?=$admin[0]['user_id']?>)" data-id="" data-admin="" >delete</button>
 
                                         <?php } ?>
                                     </td>

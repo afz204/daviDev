@@ -6,8 +6,10 @@
  * Time: 20.23
  */
 
+session_start();
 require '../../config/api.php';
 $config = new Admin();
+$admin = $config->adminID();
 
 
 if($_GET['type'] == 'addAdmin') {
@@ -31,7 +33,8 @@ if($_GET['type'] == 'addAdmin') {
         ':f'    => $f,
         ':g'    => $tgl
     ));
-
+    $reff = $config->lastInsertId();
+    $logs = $config->saveLogs($reff, $admin, 'c', 'new users');
     if($stmt){
         echo "Admin Berhasil masuk ke database!";
     }else{
@@ -51,6 +54,8 @@ if($_GET['type'] == 'addAdmin') {
         ':c'    => $d
     ));
 
+    $reff = $config->lastInsertId();
+    $logs = $config->saveLogs($reff, $admin, 'c', 'new submenus');
     if($stmt){
         echo 'Submenu Berhasil masuk ke Database!';
     }else{
@@ -87,6 +92,8 @@ if($_GET['type'] == 'addAdmin') {
             ':d'    => $tgl,
             ':e'    => $a
         ));
+        $reff = $config->lastInsertId();
+        $logs = $config->saveLogs($reff, $admin, 'c', 'new previllages');
 
         if($stmt){
             echo 'Previllages Berhasil masuk ke Database!';
@@ -107,6 +114,8 @@ if($_GET['type'] == 'addAdmin') {
         ':a'    => $a,
         ':b'    => $b
     ));
+   
+    $logs = $config->saveLogs($b, $admin, 'u', 'update previllages');
 
     if($stmt){
         echo 'Previllages Berhasil update!';
@@ -118,7 +127,7 @@ if($_GET['type'] == 'addAdmin') {
     $b  = $_POST['admin'];
 
     $stmt = $config->delRecord('sub_menus', 'id', $a);
-
+    $logs = $config->saveLogs($reff, $admin, 'd', 'hapus sub menu');
     if($stmt){
         echo "Record Sub Menu berhasil di hapus";
 
@@ -131,7 +140,7 @@ if($_GET['type'] == 'addAdmin') {
     $c  = $_POST['adminI'];
 
     $stmt = $config->delRecord('previllages', 'id', $a);
-
+    $logs = $config->saveLogs($a, $admin, 'd', 'hapus previllages');
     if($stmt){
         echo "Record Previllages berhasil di hapus";
 
@@ -180,7 +189,8 @@ if($_GET['type'] == 'addAdmin') {
             ':category' => $e,
             ':admin_id' => $a
         ));
-        
+        $reff = $config->lastInsertId();
+        $logs = $config->saveLogs($reff, $admin, 'c', 'tambah satuan');
         if($stmt){
             echo $config->actionMsg('c', 'satuans');
         }else{
@@ -200,7 +210,8 @@ if($_GET['type'] == 'addAdmin') {
             ':category' => $e,
             ':admin_id' => $a
         ));
-        
+        $reff = $config->lastInsertId();
+    $logs = $config->saveLogs($reff, $admin, 'c', 'tambah satuan');
         if($stmt){
             echo $config->actionMsg('c', 'satuans');
         }else{

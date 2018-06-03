@@ -5,6 +5,7 @@ session_start();
 require 'config/api.php';
 
 $cekLogin = new Login();
+$config = new Admin();
 
 if($cekLogin->is_loggedin()!="")
 {
@@ -21,6 +22,7 @@ if(isset($_POST['btn-login']))
         # code...
 //        echo 'has login';
        $cekLogin->redirect('index');
+       $logs = $config->saveLogs('0', $_SESSION['user_session'], 'f', 'login users');
     } else{
         $error = $_SESSION['error'];
     }

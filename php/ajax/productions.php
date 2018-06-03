@@ -6,8 +6,10 @@
  * Time: 17.27
  */
 
+session_start();
 require '../../config/api.php';
 $config = new Admin();
+$admin = $config->adminID();
 
 if($_GET['type'] == 'listStoks')
 {
@@ -169,6 +171,8 @@ if($_GET['type'] == 'addBelanja')
             ':h'    => $h,
             ':i'    => $i
         ));
+        $reff = $config->lastInsertId();
+            $logs = $config->saveLogs($reff, $admin, 'c', 'tambah belanja');
         if($stmt)
         {
             echo $config->actionMsg('c', 'kas_outs');
@@ -186,6 +190,8 @@ if($_GET['type'] == 'addBelanja')
                     ':g'    => $g,
                     ':h'    => $i
                 ));
+                $reff = $config->lastInsertId();
+            $logs = $config->saveLogs($reff, $admin, 'c', 'tambah stock barang');
                 if($stmt2){
                     echo $config->actionMsg('c', 'stocks');
 
@@ -200,6 +206,8 @@ if($_GET['type'] == 'addBelanja')
                         ':admin'    => $i,
                         ':status'   => '1'
                     ));
+                    $reff = $config->lastInsertId();
+            $logs = $config->saveLogs($reff, $admin, 'c', 'kredit kas produksi belanja');
                     if($stmt3){
                         $totalSaldoAkhir = $saldoAwal - $totalBelanja;
                         $query10 = "UPDATE kas_ins SET total = :totalAkhir WHERE id = :id";
@@ -228,6 +236,8 @@ if($_GET['type'] == 'addBelanja')
                         ':admin'    => $i,
                         ':status'   => '1'
                     ));
+                    $reff = $config->lastInsertId();
+            $logs = $config->saveLogs($reff, $admin, 'c', 'kredit kas produksi belanja');
                     if($stmt3){
                         $totalSaldoAkhir = $saldoAwal - $totalBelanja;
                         $query10 = "UPDATE kas_ins SET total = :totalAkhir WHERE id = :id";
@@ -260,6 +270,7 @@ if($_GET['type'] == 'delBelanja')
     $b = $_POST['keterangan'];
 
     $stmt = $config->delRecord('kas_outs', 'id', $b);
+            $logs = $config->saveLogs($b, $admin, 'd', 'hapus belanjaan');
     if($stmt){
         echo $config->actionMsg('d', 'kas_outs');
     }else{
@@ -273,6 +284,7 @@ if($_GET['type'] == 'delStock')
     $b = $_POST['keterangan'];
 
     $stmt = $config->delRecord('stocks', 'id', $b);
+            $logs = $config->saveLogs($b, $admin, 'c', 'hapus stock barang');
     if($stmt){
         echo $config->actionMsg('d', 'stocks');
     }else{

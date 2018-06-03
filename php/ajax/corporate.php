@@ -5,9 +5,12 @@
  * Date: 01/04/2018
  * Time: 17.27
  */
-
+session_start();
 require '../../config/api.php';
 $config = new Admin();
+
+$admin = $config->adminID();
+
 
 if($_GET['type'] == 'new'){
     $a = $_POST['nama'];
@@ -49,6 +52,8 @@ if($_GET['type'] == 'new'){
         ':m' => $m,
         ':date' => $date
     ));
+    $reff = $config->lastInsertId();
+    $logs = $config->saveLogs($reff, $admin, 'c', 'new corporate');
     if($stmt){
         echo '1';
     }else{

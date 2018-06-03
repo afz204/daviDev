@@ -6,8 +6,10 @@
  * Time: 01.16
  */
 
+session_start();
 require '../../config/api.php';
 $config = new Admin();
+$admin = $config->adminID();
 
 if($_GET['type'] == 'kasOut'){
     $outKas = $config->ProductsJoin('kas_outs.id, kas_outs.nama, kas_outs.total, kas_outs.ket, kas_outs.created_at, kas_outs.status, users.name', 'kas_outs',
@@ -25,6 +27,8 @@ if($_GET['type'] == 'kasOut'){
 
     $totalData = $outKas->fetchAll();
     $totalData = count($totalData);
+    
+    $logs = $config->saveLogs('0', $admin, 'f', 'get data kas_outs');
 
     $data = array();
 

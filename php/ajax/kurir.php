@@ -6,8 +6,11 @@
  * Time: 20.23
  */
 
+session_start();
 require '../../config/api.php';
 $config = new Admin();
+
+$admin = $config->adminID();
 
 if($_GET['type'] == 'newKurir'){
     $a  = $_POST['admin'];
@@ -39,7 +42,8 @@ if($_GET['type'] == 'newKurir'){
         ':j'    => $l,
         ':k'    => $k
     ));
-
+    $reff = $config->lastInsertId();
+    $logs = $config->saveLogs($reff, $admin, 'c', 'new kurirs');
     if($stmt){
         echo "Berhasil menambahkan Kurir baru!";
     }else{
@@ -67,6 +71,8 @@ if($_GET['type'] == 'addCharge'){
             ':c'    => $d,
             ':d'    => $a
         ));
+        $reff = $config->lastInsertId();
+        $logs = $config->saveLogs($reff, $admin, 'c', 'new kurirs');
 
         if($stmt){
             echo $config->actionMsg('c', 'delivery_charges');
@@ -85,6 +91,8 @@ if($_GET['type'] == 'delCharge'){
 
     if($stmt){
         echo 'Berhasil Delete Delivery Charge!';
+        
+        $logs = $config->saveLogs($b, $admin, 'd', 'delete delivery_charge');
     }else{
         echo 'Failed!';
     }
@@ -105,6 +113,8 @@ if($_GET['type'] == 'updateCharges'){
 
     if($stmt){
         echo $config->actionMsg('u', 'delivery_charges');
+        
+        $logs = $config->saveLogs($c, $admin, 'c', 'update delivery_charge');
     }else{
         echo 'Failed!';
     }

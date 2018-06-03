@@ -5,8 +5,10 @@
  * Date: 10/04/2018
  * Time: 14.09
  */
+session_start();
 require '../../config/api.php';
 $config = new Admin();
+$admin = $config->adminID();
 
 if($_GET['type'] == 'kasOut')
 {
@@ -48,6 +50,8 @@ if($_GET['type'] == 'kasOut')
             ':h'    => $h,
             ':i'    => $i
         ));
+        $reff = $config->lastInsertId();
+        $logs = $config->saveLogs($reff, $admin, 'c', 'kredit pengeluaran');
         if($stmt)
         {
             echo $config->actionMsg('c', 'kas_outs');
@@ -60,6 +64,8 @@ if($_GET['type'] == 'kasOut')
             ));
             if($update){
                 echo $config->actionMsg('u', 'kas_ins');
+                
+                $logs = $config->saveLogs($idKas, $admin, 'u', 'update kas besar');
 
                     $sql3 = "INSERT INTO kas_ins (parent_id, types, title, total, ket, admin_id, status) VALUES (:parent, :tipe, :title, :total, :ket, :admin, :status)";
                     $stmt3 = $config->runQuery($sql3);
@@ -72,6 +78,8 @@ if($_GET['type'] == 'kasOut')
                         ':admin'    => $i,
                         ':status'   => '3'
                     ));
+                    $reff = $config->lastInsertId();
+                    $logs = $config->saveLogs($reff, $admin, 'c', 'tambah kredit kas produksi');
                     if($stmt3){
                         echo $config->actionMsg('c', 'kas_ins');
                     }
@@ -98,6 +106,8 @@ if($_GET['type'] == 'delKasOut')
     $stmt = $config->delRecord('kas_outs', 'id', $b);
     if($stmt){
         echo 'Record Pengeluaran Berhasil di Hapus!';
+        
+        $logs = $config->saveLogs($b, $admin, 'd', 'hapus belanjaan');
     }else{
         echo 'Failed!';
     }
@@ -184,6 +194,8 @@ if($_GET['type'] == 'addKasIn')
         ':a'    => $a,
         ':tgl'  => $tgl
     ));
+    $reff = $config->lastInsertId();
+    $logs = $config->saveLogs($reff, $admin, 'c', 'menambah kas produksi');
     if($stmt){
         echo 'Tambah dana selesai di input!';
     }else{
@@ -217,6 +229,8 @@ if($_GET['type'] == 'addPayCharge')
             ':c'    => $tgl,
             ':d'    => $a
         ));
+        $reff = $config->lastInsertId();
+            $logs = $config->saveLogs($reff, $admin, 'c', 'bayar kurir');
         if($stmt){
             $totalKurir = $totalAwal - $e;
             echo $config->actionMsg('c', 'pay_kurirs');
@@ -232,6 +246,8 @@ if($_GET['type'] == 'addPayCharge')
                         ':admin'    => $a,
                         ':status'   => '2'
                     ));
+                    $reff = $config->lastInsertId();
+                        $logs = $config->saveLogs($reff, $admin, 'c', 'kredit kas produksi bayar kurir');
                     if($stmt3){
                         echo $config->actionMsg('c', 'kas_ins');
                         
@@ -254,6 +270,48 @@ if($_GET['type'] == 'addPayCharge')
 
     
 }
+if($_GET['type'] == 'delKasIns')
+{
+    $a = $_POST['dataID'];
+    $b = $_POST['typesID'];
+    $c = $_POST['kategori'];
+    $d = $_POST['totalReturn'];
+    $e = $_POST['admin'];
+    $tgl = $config->getDate('Y-m-d H:m:s');
+
+    $stmt = $config->delRecord('kas_ins', 'id', $a);
+    $logs = $config->saveLogs($a, $e, 'd', 'hapus belanja');
+    if($stmt){
+        echo $config->actionMsg('d', 'kas_ins');
+        $cek = $config->runQuery("SELECT total FROM kas_ins WHERE id ='". $c ."' ");
+        $cek->execute();
+        $cek =  $cek->fetch(PDO::FETCH_LAZY);
+        $dana = $cek['total'] + $d;
+        $update = $config->runQuery("UPDATE kas_ins SET total = '". $dana ."' WHERE id = '". $c ."' ");
+        $update->execute();
+
+        if($update){
+                $sql = "INSERT INTO kas_ins (types, title, total, ket, admin_id, status, created_at) VALUES (:a, :c, :b, :d, :e, :f, :tgl)";
+            $stmt = $config->runQuery($sql);
+            $stmt->execute(array(
+                ':a'    => 'debit',
+                ':c'    => 'return belanja',
+                ':b'    => $d,
+                ':d'    => 'return belanja',
+                ':e'    => $e,
+                ':f'    => $c,
+                ':tgl'  => $tgl
+            ));
+            $reff = $config->lastInsertId();
+            $logs = $config->saveLogs($reff, $admin, 'c', 'refund dana belanja ');
+        }
+        
+        
+
+    }else{
+        echo 'Failed!';
+    }
+}
 
 if($_GET['type'] == 'delPayCharge')
 {
@@ -265,6 +323,8 @@ if($_GET['type'] == 'delPayCharge')
 
     if($stmt){
         echo $config->actionMsg('d', 'pay_kurirs');
+        
+        $logs = $config->saveLogs($b, $admin, 'd', 'hapus data pembayaran kurir');
     }else{
         echo 'Failed!';
     }
@@ -304,6 +364,8 @@ if($_GET['type'] == 'reportPayCharge')
                 ':d'    => '2',
                 ':e'    => $a
             ));
+            $reff = $config->lastInsertId();
+                        $logs = $config->saveLogs($reff, $admin, 'c', 'bayar kurir');
             if($input){
                 echo '1';
             }else{
@@ -337,6 +399,8 @@ if($_GET['type'] == 'kasBesar')
         ':f'    => $f,
         ':e'    => $e
     ));
+    $reff = $config->lastInsertId();
+    $logs = $config->saveLogs($reff, $admin, 'c', "insert ". $a ." kas besar");
     $cek = $config->runQuery("SELECT total FROM kas_ins WHERE id = :datas");
     $cek->execute(array(':datas' => $f));
     $cc = $cek->fetch(PDO::FETCH_LAZY);
@@ -355,7 +419,10 @@ if($_GET['type'] == 'kasBesar')
                 ':f'    => $f,
                 ':tgl'  => $tgl
             ));
+            $reff = $config->lastInsertId();
+                $logs = $config->saveLogs($reff, $admin, 'c', 'debit kas type: debit ');
             if($stmt){
+                
                 echo $config->actionMsg('c', 'kas_ins');
                 $kasAkhirTotal = $kasAwal + $b;
                 $query3 = "UPDATE kas_ins SET total = :total WHERE id = :idnya";
@@ -389,6 +456,8 @@ if($_GET['type'] == 'delKasBesar')
     if($d == '0'){
         $stmt = $config->delRecord('kas_besar', 'id', $b);
         if($stmt){
+            
+            $logs = $config->saveLogs($b, $admin, 'd', 'hapus record kas besar');
             echo $config->actionMsg('d', 'kas_besar');
         }
     }else{
@@ -408,9 +477,9 @@ if($_GET['type'] == 'delKasBesar')
                         echo $config->actionMsg('u', 'kas_ins');
 
                             $stmt = $config->delRecord('kas_besar', 'id', $b);
-
+                            $logs = $config->saveLogs($b, $admin, 'd', 'hapus record kas besar');
                             if($stmt){
-                                echo $config->actionMsg('d', 'pay_kurirs');
+                                echo $config->actionMsg('d', 'kas_besar');
                                     $kurang = $config->runQuery("INSERT INTO kas_ins (parent_id, types, title, total, ket, admin_id, status) 
                                     VALUES (:a, :b, :c, :d, :e, :f, :g)");
                                     $kurang->execute(array(
@@ -454,6 +523,8 @@ if($_GET['type'] == 'returnKas'){
     $stmt = $config->runQuery("UPDATE kas_ins SET total = 0 WHERE id = :id");
     $stmt->execute(array(':id'  => $a));
     if($stmt){
+        
+        $logs = $config->saveLogs($a, $admin, 'u', "return kas produksi type: " .$types. "");
         echo $config->actionMsg('u', 'kas_ins');
 
         $input = $config->runQuery("INSERT INTO kas_besar (type, total, title, ket, admin_id) VALUES (:a, :b, :c, :d, :e)");
@@ -464,7 +535,10 @@ if($_GET['type'] == 'returnKas'){
             ':d'    => $types,
             ':e'    => $c
         ));
+        $reff = $input->lastInsertId();
+            $logs = $config->saveLogs($reff, $admin, 'c', 'tambah kas besar');
         if($input){
+            
             echo $config->actionMsg('c', 'kas_besar');
 
             $kurang = $config->runQuery("INSERT INTO kas_ins (parent_id, types, title, total, ket, admin_id, status) 
@@ -478,8 +552,10 @@ if($_GET['type'] == 'returnKas'){
                 ':f'    => $c,
                 ':g'    => $a
             ));
-
+            $reff = $kurang->lastInsertId();
+            $logs = $config->saveLogs($reff, $admin, 'c', 'tambah dana kas produksi');
             if($kurang){
+                
                 echo $config->actionMsg('c', 'kas_ins');
             }
         }
