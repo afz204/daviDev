@@ -219,54 +219,26 @@ if($_GET['type'] == 'addPayCharge')
     $row = $cek->fetch(PDO::FETCH_LAZY);
     $idKas = '2';
     $totalAwal = $row['total'];
-    if($totalAwal > 0){
-        $sql = "INSERT INTO pay_kurirs (no_trx, kurir_id, charge_id, created_at, admin_id) VALUES (:trx, :a, :b, :c, :d)";
+
+        $sql = "INSERT INTO pay_kurirs (no_trx, kurir_id, charge_id, total, created_at, admin_id) VALUES (:trx, :a, :b, :total, :c, :d)";
         $stmt = $config->runQuery($sql);
         $stmt->execute(array(
             ':trx'  => $d,
             ':a'    => $b,
             ':b'    => $c,
+            ':total'=> $e,
             ':c'    => $tgl,
             ':d'    => $a
         ));
         $reff = $config->lastInsertId();
             $logs = $config->saveLogs($reff, $admin, 'c', 'bayar kurir');
         if($stmt){
-            $totalKurir = $totalAwal - $e;
+            
             echo $config->actionMsg('c', 'pay_kurirs');
-
-                    $sql3 = "INSERT INTO kas_ins (parent_id, types, title, total, ket, admin_id, status) VALUES (:parent, :tipe, :title, :total, :ket, :admin, :status)";
-                    $stmt3 = $config->runQuery($sql3);
-                    $stmt3->execute(array(
-                        ':parent'   => $idKas,
-                        ':tipe'     => 'kredit',
-                        ':title'    => $d,
-                        ':total'    => $e,
-                        ':ket'      => $f,
-                        ':admin'    => $a,
-                        ':status'   => '2'
-                    ));
-                    $reff = $config->lastInsertId();
-                        $logs = $config->saveLogs($reff, $admin, 'c', 'kredit kas produksi bayar kurir');
-                    if($stmt3){
-                        echo $config->actionMsg('c', 'kas_ins');
-                        
-                        $query = "UPDATE kas_ins SET total = :totalnya WHERE id = :idnya";
-                        $up = $config->runQuery($query);
-                        $up->execute(array(
-                            ':totalnya' => $totalKurir,
-                            ':idnya'    => $idKas
-                        ));
-                        if($up){
-                            echo $config->actionMsg('u', 'kas_ins');
-                        }
-                    }
+$kasBesar = $config->runQuery("INSERT INTO kas_besar type, total, title, ket, status, admin VALUES (:a, :b, :c, :d, :e, :f, :g)");
         }else{
             echo 'Failed!';
         }
-    }else{
-        echo 'Maaf Saldo Kurir Anda tidak memadai. Silahkan isi Saldo KURIR terlebih dahulu!';
-    }
 
     
 }
@@ -562,11 +534,81 @@ if($_GET['type'] == 'returnKas'){
     }
 }
 
-// if($_GET['type'] == 'returnKas'){
+if($_GET['type'] == 'bayarParkir'){
     
-//     $a = $_POST['dataID'];
-//     $b = $_POST['typesID'];
-//     $c = $_POST['kategori'];
-//     $d = $_POST['totalReturn'];
-//     $e = $_POST['admin'];
-// }
+    $a = $_POST['biaya'];
+    $b = $_POST['nama_parkiran'];
+    $c = $_POST['id_record'];
+
+    $cek = $config->getData('total', 'pay_kurirs', "id = '". $c ."' "); //get total
+    
+
+    $sql = $config->runQuery("UPDATE pay_kurirs SET remarks = 'parkir: ". $b ."', weight = '". $a ."' WHERE id = '". $c ."' ");
+    $sql->execute();
+   
+    $logs = $config->saveLogs($c, $admin, 'u', 'tambah remarks parkir!');
+    if ($sql) {
+        # code...
+        echo $config->actionMsg('u', 'pay_kurirs');
+
+    }
+}
+
+if($_GET['type'] == 'remarksDelivery'){
+    
+    $a = $_POST['id_record'];
+    $b = $_POST['types'];
+
+    $cek = $config->getData('total', 'pay_kurirs', "id = '". $a ."' "); //get total
+    
+
+    $types = 'standing';
+    $charge = '20000';
+    if($b == '3'){
+        $types = 'time charge';
+        $charge = '10000';
+    }
+
+    
+    $sql = $config->runQuery("UPDATE pay_kurirs SET remarks = '". $types ."', weight = '". $charge ."' WHERE id = '". $a."' ");
+    $sql->execute();
+   
+    $logs = $config->saveLogs($b, $admin, 'u', 'tambah remarks parkir!');
+    if ($sql) {
+        # code...
+        echo $config->actionMsg('u', 'pay_kurirs');
+
+    }
+}
+
+if($_GET['type'] == 'payDelivery'){
+    
+    $a = $_POST['id_record'];
+
+    $cek = $config->getData('remarks, weight, total', 'pay_kurirs', "id = '". $a ."' "); //get keterangan
+
+    $sql = $config->runQuery("UPDATE pay_kurirs SET status = '1' WHERE id = '". $a."' ");
+    $sql->execute();
+    
+    $total = $cek['weight'] + $cek['total'];
+    $logs = $config->saveLogs($a, $admin, 'u', 'paid kurir!');
+    if ($sql) {
+        # code...
+        echo $config->actionMsg('u', 'pay_kurirs');
+
+        $kasBesar = $config->runQuery("INSERT INTO kas_besar (type, total, title, ket, status, admin_id) VALUES (:a, :b, :c, :d, :e, :f)");
+        $kasBesar->execute(array(
+            ':a' => 'kredit',
+            ':b' => $total,
+            ':c' => 'pay_kurirs',
+            ':d' => $cek['remarks'],
+            ':e' => '2',
+            ':f' =>  $admin
+        ));
+
+        $reff = $config->lastInsertId();
+        $logs = $config->saveLogs($reff, $admin, 'c', "insert pay_kurirs kas besar");
+
+
+    }
+}

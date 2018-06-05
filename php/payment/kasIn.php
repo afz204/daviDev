@@ -95,25 +95,25 @@ $dl = $config->formatPrice($dll['totalProduksi']);
                             <div class="card-body">
                             <h3 class="card-title" style="margin-bottom: 2%; border-bottom: 2px dashed #cdcdcd;">Your Kas Balance</h3>
                             
-                            <div class="row">
+                            <div class="row justify-content-center">
                                 <div class="col-12 col-md-6 col-lg-4">
                                     <p class="card-text text-<?=$styleProd?>" style="font-weight: 600;"><a href="#" data-nilai="" onclick="returnKas(1, <?=$product['totalProduksi']?>, <?=$admin[0]['user_id']?>)">PRODUKSI</a></p>
                                             <button class="btn btn-xs btn-<?=$styleProd?>" onclick="showListKasIn(1)">
                                     <?=$prod?>
                                             </button>
                                 </div>
-                                <div class="col-12 col-md-6 col-lg-4">
+                                <!-- <div class="col-12 col-md-6 col-lg-4">
                                     <p class="card-text text-<?=$styleKur?>" style="font-weight: 600;"><a href="#" data-nilai="" onclick="returnKas(2, <?=$kurir['totalProduksi']?>, <?=$admin[0]['user_id']?>)">KURIR</a></p>
                                             <button class="btn btn-xs btn-<?=$styleKur?>" onclick="showListKasIn(2)">
                                     <?=$kur?>
                                             </button>
-                                </div>
-                                <div class="col-12 col-md-6 col-lg-4">
+                                </div> -->
+                                <!-- <div class="col-12 col-md-6 col-lg-4">
                                     <p class="card-text text-<?=$styleDl?>" style="font-weight: 600;"><a href="#" data-nilai="" onclick="returnKas(3, <?=$dll['totalProduksi']?>, <?=$admin[0]['user_id']?>)">DLL</a></p>
                                             <button class="btn btn-xs btn-<?=$styleDl?>" onclick="showListKasIn(3)">
                                     <?=$dl?>
                                             </button>
-                                </div>
+                                </div> -->
                             </div>
                                         
                             </div>

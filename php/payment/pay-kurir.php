@@ -5,11 +5,11 @@
     $charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, villages.name', 'delivery_charges',
     'INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan', '');
 
-    $payCharge = $config->ProductsJoin('pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.name, users.name as admin', 'pay_kurirs',
+    $payCharge = $config->ProductsJoin('pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.name, users.name as admin', 'pay_kurirs',
     'INNER JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
     INNER JOIN delivery_charges ON delivery_charges.id = pay_kurirs.charge_id
     INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan
-    INNER JOIN users ON users.id = delivery_charges.admin_id', "WHERE pay_kurirs.status = '' ORDER BY pay_kurirs.created_at DESC");
+    INNER JOIN users ON users.id = delivery_charges.admin_id', " ORDER BY pay_kurirs.created_at DESC");
 
 ?>
 <div id="listPay">
@@ -45,7 +45,11 @@
                                     <div class="form-group">
                                         <input type="text" required id="no_trxCharge" placeholder="nomor invoice" required class="form-control">
                                     </div>
-                                    <button type="submit" class="btn btn-sm btn-block btn-primary">submit pengeluaran</button>
+                                    <div id="btnPayKurir">
+                                            <button type="submit" class="btn btn-sm btn-block btn-primary">submit pengeluaran</button>
+
+                                    </div>
+                                    
                                 </form>
                             </div>
                         </div>
@@ -60,23 +64,49 @@
                                 <th scope="col">Nama Kurir</th>
                                 <th scope="col">Nomor Transaksi</th>
                                 <th scope="col">Kirim ke</th>
+                                <th scope="col">Remarks</th>
+                                <th scope="col">Remarks Charge</th>
                                 <th scope="col">Delivery Charge</th>
-                                <th scope="col">Admin id</th>
-                                <th scope="col">Created_at</th>
+                                <th scope="col">Subtotal</th>
                                 <th scope="col">action</th>
-                            </tr>
+                            </tr> 
                             </thead>
                             <tbody>
-                            <?php while ($row = $payCharge->fetch(PDO::FETCH_LAZY)){ ?>
+                            <?php while ($row = $payCharge->fetch(PDO::FETCH_LAZY)){ 
+                                $remarks = '<span class="badge badge-secondary">unset</span>';
+                                $total = '<span class="badge badge-secondary">unset</span>';
+                                if(!empty($row['remarks'])){
+                                    $remarks = $row['remarks'];
+                                    $total = $config->formatPrice($row['weight']);
+                                }
+                                $subtotal = $row['price'] + $row['weight'];
+                                ?>
                                 <tr style="text-transform: lowercase;">
                                     <td><?=$row['nama_kurir']?></td>
                                     <td><?=$row['no_trx']?></td>
                                     <td><?=$row['name']?></td>
-                                    <td style="text-align: right"><?=$config->formatPrice($row['price'])?></td>
-                                    <td><?=$row['admin']?></td>
-                                    <td><i class="small"><?=$row['created_at']?></i></td>
+                                    <td><?=$remarks?></td>
+                                    <td><?=$total?></td>
+                                    <td style="text-align: right"><?=$config->formatPrice($row['total'])?></td>
+                                    <td style="text-align: right"><?=$config->formatPrice($subtotal)?></td>
                                     <td>
-                                        <button <?=$access['delete']?> class="btn btn-sm btn-danger delPayCharge" style="text-transform: uppercase; font-size: 10px; font-weight: 500;" data-id="<?=$row['payChargeID']?>" data-admin="<?=$admin[0]['user_id']?>" >delete</button>
+                                        <?php if(empty($row['remarks'])){ ?>
+                                        <div class="btn-group">
+                                          <button style="text-transform: uppercase; font-size: 10px; font-weight: 500;" type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            remarks
+                                          </button>
+                                          <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="#" onclick="remarks(1, <?=$row['payChargeID']?>)">parking</a>
+                                            <a class="dropdown-item" href="#" onclick="remarks(2, <?=$row['payChargeID']?>)">standing</a>
+                                            <a class="dropdown-item" href="#" onclick="remarks(3, <?=$row['payChargeID']?>)">time remarks</a>
+                                          </div>
+                                        </div>
+                                    <?php }if(empty($row['status'])){ ?>
+                                        <button <?=$access['delete']?> class="btn btn-sm btn-warning" style="text-transform: uppercase; font-size: 10px; font-weight: 500;" onclick="payDelivery(<?=$row['payChargeID']?>)" >pay</button>
+                                    <?php }else{ ?>
+                                        <button class="btn btn-sm btn-success" style="text-transform: uppercase; font-size: 10px; font-weight: 500;" disabled="">paid</button>
+                                    <?php }  ?>
+                                        <button <?=$access['delete']?> class="btn btn-sm btn-danger delPayCharge" style="text-transform: uppercase; font-size: 10px; font-weight: 500;" data-id="<?=$row['payChargeID']?>" data-admin="<?=$admin[0]['user_id']?>" <?=empty($row['status']) ? '' : 'disabled=""'?> >delete </button>
 
                                     </td>
                                 </tr>
@@ -106,4 +136,31 @@
         </div>
     </div>
 
+</div>
+
+<div class="modal fade" id="modalPayParking" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Parking</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formParkir" data-parsley-validate="" autocomplete="off">
+          <div class="form-group">
+            <input type="text" class="form-control" id="biayaParkir" data-parsley-type="number" placeholder="biaya parkir" required="">
+            <input type="hidden" id="numberRecord" value="">
+          </div>
+          <div class="form-group">
+            <textarea class="form-control" id="tempatParkir" placeholder="tempat parkir" required=""></textarea>
+          </div>
+          <div id="btnParkir">
+              <button type="submit" class="btn btn-block btn-primary">save remarks</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>

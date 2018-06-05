@@ -89,7 +89,7 @@
                     </div>
                     <div id="listKasKeluar">
                         <p>
-                            <button class="btn btn-sm btn-primary" onclick='addKasOut(<?=$admin[0]['user_id']?>)' <?=$access['create']?> type="button"><span class="fa fa-fw fa-plus"></span> pengeluaran</button>
+                            <button class="btn btn-sm btn-primary hidden" onclick='addKasOut(<?=$admin[0]['user_id']?>)' <?=$access['create']?> type="button"><span class="fa fa-fw fa-plus"></span> pengeluaran</button>
                         </p>
                         <table id="table_kas_out" class="table table-bordered  <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
                             <thead class="thead-light">

@@ -1,3 +1,53 @@
+function payDelivery(id)
+{
+if (!confirm('Are you sure want to add remarks ?')) {
+        return false;
+        } else { 
+            $.ajax({
+                url: '../php/ajax/payment.php?type=payDelivery',
+                method: 'post',
+                data: { id_record: id },
+
+                success: function(msg) {
+                    alert(msg);
+
+                    location.reload();
+                }
+            });
+
+        }
+}
+function remarks(type, id){
+    if(type == 1){
+        //parking
+        $('#numberRecord').val(id);
+        $('#modalPayParking').modal({backdrop: 'static', keyboard: false});
+    }else{
+        if (!confirm('Are you sure want to add remarks ?')) {
+        return false;
+        } else {
+            $.ajax({
+                url: '../php/ajax/payment.php?type=remarksDelivery',
+                method: 'post',
+                data: { types: type, id_record: id },
+
+                success: function(msg) {
+                    alert(msg);
+
+                    location.reload();
+                }
+            });
+        }
+    }
+}
+function resetFormParking() {
+    $('#formParkir')[0].reset();
+    $('#biayaParkir').removeClass('parsley-success');
+    $('#tempatParkir').removeClass('parsley-success');
+    $('#biayaParkir').removeClass('parsley-error');
+    $('#tempatParkir').removeClass('parsley-error');
+    $('.parsley-errors-list').addClass('hidden');
+}
 function delKasIns(id, typesID, types, total, admin) {
     if (types == '1') {
         tipe = 'PRODUKSI';
@@ -214,6 +264,8 @@ $(document).ready(function() {
 
     $('#payKurir-form').on('submit', function(e) {
         e.preventDefault();
+        $('#btnPayKurir').addClass('text-center');
+        $('#btnPayKurir').html('<span class="badge badge-primary text-center" style="text-size: 14px;">Please wait while loading!!!!</span>');
         var adm = $('#adminPay').val();
         var kurir = $('#namaKurir option:selected').val();
         var kel = $('#kelurahanCharge option:selected').val();
@@ -390,6 +442,32 @@ $(document).ready(function() {
     });
 
     var reportKasBesar = $('#tableReporKasBesar').DataTable();
+
+    $('#modalPayParking').on('hidden.bs.modal', function (e) {
+      // do something...
+      resetFormParking();
+    });
+
+    $('#formParkir').on('submit', function(e){
+        e.preventDefault();
+        $('#btnParkir').addClass('text-center');
+        $('#btnParkir').html('<span class="badge badge-primary text-center" style="text-size: 14px;">Please wait while loading!!!!</span>');
+        var total = $('#biayaParkir').val();
+        var tmpt = $('#tempatParkir').val();
+        var id = $('#numberRecord').val()
+
+        $.ajax({
+            url: '../php/ajax/payment.php?type=bayarParkir',
+            method: 'post',
+            data: { biaya: total, nama_parkiran: tmpt, id_record: id },
+
+            success: function(msg) {
+                alert(msg);
+
+                location.reload();
+            }
+        });
+    });
 })
 
 

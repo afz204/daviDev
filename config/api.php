@@ -120,6 +120,14 @@ class Admin
         return $stmt;
 
     }
+    public function getData($field, $table, $clause)
+    {
+        $stmt = $this->conn->prepare("SELECT ". $field ." FROM ". $table ." WHERE ". $clause ." ");
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_LAZY);
+        return $row;
+
+    }
     public function getKurir($id)
     {
         $stmt = $this->conn->prepare("SELECT id, nama_kurir, email, phone, wa, alamat, kel, kec, kota, province, status, created_at FROM kurirs WHERE id = :user_id");
