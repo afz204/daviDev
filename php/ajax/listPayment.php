@@ -64,13 +64,14 @@ if($_GET['type'] == 'pay-kurir')
         $daterange = '';
         // $month = 'AND MONTH(pay_kurirs.created_at) = MONTH(CURRENT_DATE())
         // AND YEAR(pay_kurirs.created_at) = YEAR(CURRENT_DATE())';
-        $month = 'AND DATE(pay_kurirs.created_at) = DATE(NOW())';
+        $month = '';
+        // $month = 'AND DATE(pay_kurirs.created_at) = DATE(NOW())';
     }
 
     $payCharge = " SELECT pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.name, users.name as admin FROM pay_kurirs INNER JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
     INNER JOIN delivery_charges ON delivery_charges.id = pay_kurirs.charge_id
     INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan
-    INNER JOIN users ON users.id = delivery_charges.admin_id WHERE pay_kurirs.status != '2' " . $month ." ";
+    INNER JOIN users ON users.id = delivery_charges.admin_id WHERE pay_kurirs.status = '' " . $month ." ";
 
     $totalPembayaran = $config->getData('SUM(total) as TOTAL', 'pay_kurirs', "pay_kurirs.status != '2' ". $month);
     $totalPembayaran = $totalPembayaran['TOTAL'];
