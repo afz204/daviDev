@@ -160,7 +160,20 @@ $(document).ready(function() {
     $('#endDateReport').datetimepicker();
     $('#tableKasOut').DataTable();
     $('#kasMasuk').DataTable();
-    $('#tablePayKurir').DataTable();
+    $('#tablePayKurir').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            url: "../php/ajax/listPayment.php?type=pay-kurir", // json datasource
+            type: "post", // method  , by default get
+            error: function() { // error handling
+                $(".employee-grid-error").html("");
+                $("#tablePayKurir").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                $("#employee-grid_processing").css("display", "none");
+
+            }
+        }
+    });
     $('#table_kas_out').DataTable();
     var listOutKas = $('#listKasKeluar').show();
     var listPayKurir = $('#listPayKurir').show();
