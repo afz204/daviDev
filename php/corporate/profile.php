@@ -6,10 +6,12 @@ INNER JOIN bidang_usahas ON bidang_usahas.id = corporates.bidang
 INNER JOIN states ON states.lokasi_ID = corporates.provinsi WHERE corporates.id = :a");
 $stmt->execute(array(':a' => $id));
 $info = $stmt->fetch(PDO::FETCH_LAZY);
+
+$pic = $config->Products('id, corporate_id, name, nomor, created_at', 'corporate_pics ORDER BY created_at DESC');
 ?>
-<div class="row justify-content-center" id="newAdmin" <?=$access['read']?>>
-    <div class="col-12 col-sm-8 col-lg-6">
-        <div class="card text-white bg-success mb-3">
+<div class="row" id="newAdmin" <?=$access['read']?>>
+    <div class="col-12 col-sm-8 col-lg-8 order-md-1">
+        <div class="card text-secondary bg-white mb-3">
             <div class="card-header">
                 Profile Corporate
             </div>
@@ -73,6 +75,67 @@ $info = $stmt->fetch(PDO::FETCH_LAZY);
                     </div>
                     <button type="submit" class="btn btn-block btn-outline-dark" <?=$access['update']?>>Edit Profile</button>
 
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-4 col-lg-4 order-md-2">
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-muted">List Contact Person</span>
+                <button data-toggle="modal" type="button" data-target="#modalPIC" class="btn btn-sm btn-success"><span class="fa fa-fw fa-plus"></span></button>
+            </h4>
+        <ul class="list-group mb-3 listDataPIC" id="listPIC">
+            <?php if($pic->rowCount() > 0) { while ($row = $pic->fetch(PDO::FETCH_LAZY)) {
+              ?>
+              <li class="list-group-item d-flex justify-content-between lh-condensed">
+
+                        <div>
+                            <h6 class="my-0"><?=$row['name']?></h6>
+                            <small class="text-muted"><?=$row['nomor']?></small>
+                        </div>
+                        <span class="text-muted">
+                            <button <?=$access['delete']?> class="btn btn-sm btn-danger" style="font-size: 12px;" onclick = 'removePIC(<?=$row['id']?>)'> <span class="fa fa-trash"></span> </button>
+                        </span>
+
+                    </li>
+        <?php } }else { ?>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+
+                        <div>
+                            <h6 class="my-0">(empty)</h6>
+                            <small class="text-muted">(empty)</small>
+                        </div>
+                        <span class="text-muted">00</span>
+
+                    </li>
+                <?php } ?>
+            </ul>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalPIC" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <form id="formPIC" method="post" data-parsley-validate="" class="needs-validation" novalidate="" autocomplete="off">
+                    <div class="row">
+                        <div class="col-md-12 mb-12">
+                            <label for="lastName">Nama Lengkap PIC</label>
+                            <input type="text" class="form-control" id="namaPIC" placeholder="" value="" required="">
+                            <input type="hidden" id="kodePerusahaan" value="<?=$info['id']?>">
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-12">
+                            <label for="lastName">Nomor HP.</label>
+                            <input type="text" class="form-control" data-parsley-type="number" id="nomorPIC" placeholder="" value="" required="">
+                        </div>
+                    </div>
+                    <br>
+                    <button class="btn btn-success btn-sm btn-block" type="submit">Submit kebutuhan</button>
                 </form>
             </div>
         </div>

@@ -10,6 +10,8 @@
     INNER JOIN delivery_charges ON delivery_charges.id = pay_kurirs.charge_id
     INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan
     INNER JOIN users ON users.id = delivery_charges.admin_id', " WHERE pay_kurirs.status != '2' ORDER BY pay_kurirs.created_at DESC");
+    $banner = $config->Products('ID, Banner, BannerURL, Title, Text1, BrandName, BannerStart, BannerEnd, ShowTime, IsActive, Status, CreatedDate, CreatedBy, UpdatedDate, UpdatedBy', 
+    'sliding_banner');
 
 ?>
 <div id="listPay">
@@ -17,10 +19,10 @@
         <div class="col-12 col-sm-12 col-lg-12" id="">
             <div class="card">
                 <div class="card-header">
-                    Pembayaran Kurir
+                    List Banner
                 </div>
                 <div class="card-body">
-                    <div id="form-payKurir" class="">
+                    <div id="form-payKurir" class="hidden">
                         <div class="card border-dark mb-3">
                             <div class="card-header bg-transparent border-dark">Form Tambah Pembayaran Kurir</div>
                             <div class="card-body">
@@ -55,24 +57,9 @@
                         </div>
                     </div>
                     <div id="listPayKurir">
-                        <p id="btnFilterPayKurir"> 
+                        <p>
                             <button class="btn btn-sm btn-primary addpayCharge" <?=$access['create']?> type="button"><span class="fa fa-fw fa-plus"></span> charge</button>
-                            <button class="btn btn-sm btn-success filterDate" <?=$access['read']?> type="button" onclick="filterPayKurir()"><span class="fa fa-fw fa-plus"></span> filter</button>
                         </p>
-                        <form id="form-filter-kurir">
-                            <div class="row">
-                                <div class="col-12 col-sm-6 col-lg-6">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" name="startDate" id="startDateFilter">
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-6 col-lg-6">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" name="startDate" id="startDateFilter">
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
                         <table id="tablePayKurir" class="table table-bordered  <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
                             <thead class="thead-light">
                             <tr style="text-transform: lowercase;">

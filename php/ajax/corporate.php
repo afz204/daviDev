@@ -31,12 +31,18 @@ if($_GET['type'] == 'new'){
 
 //    $z = array($a, $b, $c, $d, $e, $f, $g, $h, $i, $j, $k, $l, $m);
 //    print_r($z);
+    $tgl = $config->getDate('YmdHms');
+    $unik = str_replace(' ', '', $a);
+    $unik = substr($unik, 0, 3);
+    $unik = strtoupper($unik);
+    $unik = $unik. $tgl;
 
-    $sql = "INSERT INTO corporates (nama, bidang, telp, handphone, fax, email, website, cp, alamat, kelurahan, kecamatan, kota, provinsi, kodepos, created_at)
-            VALUES (:a, :b, :c, :d, :e, :f, :g, :n, :l, :k, :j, :i, :h, :m, :date)";
+    $sql = "INSERT INTO corporates (nama, CorporateUniqueID, bidang, telp, handphone, fax, email, website, cp, alamat, kelurahan, kecamatan, kota, provinsi, kodepos, created_at)
+            VALUES (:a, :nen, :b, :c, :d, :e, :f, :g, :n, :l, :k, :j, :i, :h, :m, :date)";
     $stmt = $config->runQuery($sql);
     $stmt->execute(array(
         ':a' => $a,
+        ':nen' => $unik,
         ':b' => $b,
         ':c' => $c,
         ':d' => $d,
@@ -58,5 +64,42 @@ if($_GET['type'] == 'new'){
         echo '1';
     }else{
         echo '0';
+    }
+}
+
+if($_GET['type'] == 'savePIC'){
+    $a = $_POST['kode_perusahaan'];
+    $b = $_POST['nama_pic'];
+    $c = $_POST['nomor_hp'];
+
+    $stmt = $config->runQuery("INSERT INTO corporate_pics (corporate_id, name, nomor) VALUES (:a, :b, :c)");
+    $stmt->execute(array(
+        ':a'    => $a,
+        ':b'    => $b,
+        ':c'    => $c
+    ));
+
+    $reff = $config->lastInsertId();
+    $logs = $config->saveLogs($reff, $admin, 'c', 'new PIC');
+
+    if($stmt){
+        echo $config->actionMsg('c', 'corporate_pics');
+    }else{
+        echo 'Failed!';
+    }
+}
+
+if($_GET['type'] == 'deletePIC'){
+    $a = $_POST['kode_perusahaan'];
+
+    $stmt = $config->delRecord('corporate_pics', 'id', $a);
+
+  
+    $logs = $config->saveLogs($a, $admin, 'd', 'hapus PIC');
+
+    if($stmt){
+        echo $config->actionMsg('d', 'corporate_pics');
+    }else{
+        echo 'Failed!';
     }
 }

@@ -80,3 +80,7 @@ LEFT JOIN provinces prov
 ON FIND_IN_SET(prov.id, prod.available_on) > 0
 
 GROUP BY 1, 2
+
+1. Contact person have address
+2. pay kurir add filter by daterange
+3. info total unpaid and paid per hari

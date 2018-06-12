@@ -1,30 +1,30 @@
-function payDelivery(id)
-{
-if (!confirm('Are you sure want to add remarks ?')) {
+function payDelivery(id) {
+    if (!confirm('Are you sure want to add remarks ?')) {
         return false;
-        } else { 
-            $.ajax({
-                url: '../php/ajax/payment.php?type=payDelivery',
-                method: 'post',
-                data: { id_record: id },
+    } else {
+        $.ajax({
+            url: '../php/ajax/payment.php?type=payDelivery',
+            method: 'post',
+            data: { id_record: id },
 
-                success: function(msg) {
-                    alert(msg);
+            success: function(msg) {
+                alert(msg);
 
-                    location.reload();
-                }
-            });
+                location.reload();
+            }
+        });
 
-        }
+    }
 }
-function remarks(type, id){
-    if(type == 1){
+
+function remarks(type, id) {
+    if (type == 1) {
         //parking
         $('#numberRecord').val(id);
-        $('#modalPayParking').modal({backdrop: 'static', keyboard: false});
-    }else{
+        $('#modalPayParking').modal({ backdrop: 'static', keyboard: false });
+    } else {
         if (!confirm('Are you sure want to add remarks ?')) {
-        return false;
+            return false;
         } else {
             $.ajax({
                 url: '../php/ajax/payment.php?type=remarksDelivery',
@@ -40,6 +40,7 @@ function remarks(type, id){
         }
     }
 }
+
 function resetFormParking() {
     $('#formParkir')[0].reset();
     $('#biayaParkir').removeClass('parsley-success');
@@ -48,6 +49,7 @@ function resetFormParking() {
     $('#tempatParkir').removeClass('parsley-error');
     $('.parsley-errors-list').addClass('hidden');
 }
+
 function delKasIns(id, typesID, types, total, admin) {
     if (types == '1') {
         tipe = 'PRODUKSI';
@@ -443,12 +445,12 @@ $(document).ready(function() {
 
     var reportKasBesar = $('#tableReporKasBesar').DataTable();
 
-    $('#modalPayParking').on('hidden.bs.modal', function (e) {
-      // do something...
-      resetFormParking();
+    $('#modalPayParking').on('hidden.bs.modal', function(e) {
+        // do something...
+        resetFormParking();
     });
 
-    $('#formParkir').on('submit', function(e){
+    $('#formParkir').on('submit', function(e) {
         e.preventDefault();
         $('#btnParkir').addClass('text-center');
         $('#btnParkir').html('<span class="badge badge-primary text-center" style="text-size: 14px;">Please wait while loading!!!!</span>');

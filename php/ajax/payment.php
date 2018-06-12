@@ -311,17 +311,18 @@ if($_GET['type'] == 'reportPayCharge')
 
     $sql = "SELECT pay_kurirs.id, SUM(delivery_charges.price) as total FROM pay_kurirs
     INNER JOIN delivery_charges ON delivery_charges.id = pay_kurirs.charge_id
-     WHERE pay_kurirs.kurir_id = :kurir AND pay_kurirs.status = '' ";
+     WHERE pay_kurirs.kurir_id = :kurir AND pay_kurirs.status = '1' ";
     $total = $config->runQuery($sql);
     $total->execute(array(
         ':kurir' => $b
-    ));
-    if($total->rowCount() > 0){
-        $info = $total->fetch(PDO::FETCH_LAZY);
+    )); 
+    $info = $total->fetch(PDO::FETCH_LAZY);
+    if($info['id'] > 0){
+        
 
-        $total = $info['total'];
+        $total = $info['total']; 
 
-        $stmt = $config->runQuery("UPDATE pay_kurirs SET status = '1', report_at = :report WHERE kurir_id = :kurir ");
+        $stmt = $config->runQuery("UPDATE pay_kurirs SET status = '2', report_at = :report WHERE kurir_id = :kurir ");
         $stmt->execute(array(
             ':kurir' => $b,
             ':report'=> $tanggal

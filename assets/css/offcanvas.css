@@ -200,3 +200,41 @@ body::-webkit-scrollbar-thumb {
 .showContent {
     display: block;
 }
+
+
+/* collapse */
+
+.collapse-card {
+    padding: .25rem 1.25rem;
+}
+
+.btn-primary:hover {
+    color: #fff !important;
+    background-color: #007bff !important;
+    border-color: #007bff !important;
+}
+
+.product-list {
+    padding: 0.75rem !important;
+}
+
+.product-img-list {
+    padding-top: .25rem;
+    border-bottom: 1.25px dashed #d2cdcd;
+}
+
+.product-list-title {}
+
+.product-list-content {}
+
+.product-list-btn {
+    text-transform: uppercase;
+}
+
+.product-list-btn:hover {
+    background-color: #1d74d2 !important;
+}
+
+.product-list-col {
+    padding: .25rem !important;
+}
