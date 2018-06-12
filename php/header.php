@@ -18,7 +18,7 @@
     <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/dataTables/css/dataTables.bootstrap4.min.css"/>
     <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/datetime-picker4/css/bootstrap-datetimepicker.min.css"/>
     <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/daterangepicker/daterangepicker.css"/>
-    <?php if($menu == 'bd' OR $menu == 'order'){ ?>
+    <?php if($menu == 'bd' OR $menu == 'order' OR $menu == 'payment'){ ?>
         <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/select2/select2.min.css"/>
         <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/select2/select2-bootstrap4.min.css"/>
         <link href="<?=URL?>assets/vendors/krajeee/css/fileinput.css" media="all" rel="stylesheet" type="text/css"/>

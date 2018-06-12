@@ -34,10 +34,10 @@ if(isset($session_id)){
     WHERE users.id = :userID";
     $stmt = $config->runQuery($sql1);
     $stmt->execute(array(':userID' => $session_id));
-    $admin = '';
+    $admin = array();
     while ($row = $stmt->fetch(PDO::FETCH_LAZY))
     {
-        $admin[] = array(
+        $adm = array(
             'user_id' => $row['id'],    
             'user_name'   => $row['name'],
             'user_email'    => $row['email'],
@@ -47,6 +47,8 @@ if(isset($session_id)){
             'user_status' => $row['status'],
             'user_join' => $row['created_at']    
         );
+
+        array_push($admin, $adm);
     }
 
     

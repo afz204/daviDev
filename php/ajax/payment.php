@@ -218,7 +218,7 @@ if($_GET['type'] == 'addPayCharge')
     $cek->execute(array(':kodeIDnya' => '2'));
     $row = $cek->fetch(PDO::FETCH_LAZY);
     $idKas = '2';
-    $totalAwal = $row['total'];
+    $totalAwal = $row['total'] + $e;
 
         $sql = "INSERT INTO pay_kurirs (no_trx, kurir_id, charge_id, total, created_at, admin_id) VALUES (:trx, :a, :b, :total, :c, :d)";
         $stmt = $config->runQuery($sql);
@@ -287,7 +287,6 @@ if($_GET['type'] == 'delKasIns')
 
 if($_GET['type'] == 'delPayCharge')
 {
-    $a = $_POST['admin'];
     $b = $_POST['id'];
     $tgl = $config->getDate('Y-m-d H:m:s');
 
@@ -543,8 +542,9 @@ if($_GET['type'] == 'bayarParkir'){
 
     $cek = $config->getData('total', 'pay_kurirs', "id = '". $c ."' "); //get total
     
-
-    $sql = $config->runQuery("UPDATE pay_kurirs SET remarks = 'parkir: ". $b ."', weight = '". $a ."' WHERE id = '". $c ."' ");
+    $total = $cek['total'] + $a;
+    
+    $sql = $config->runQuery("UPDATE pay_kurirs SET remarks = 'parkir: ". $b ."', weight = '". $a ."', total = '". $total ."' WHERE id = '". $c ."' ");
     $sql->execute();
    
     $logs = $config->saveLogs($c, $admin, 'u', 'tambah remarks parkir!');
@@ -570,8 +570,9 @@ if($_GET['type'] == 'remarksDelivery'){
         $charge = '10000';
     }
 
+    $total = $cek['total'] + $charge;
     
-    $sql = $config->runQuery("UPDATE pay_kurirs SET remarks = '". $types ."', weight = '". $charge ."' WHERE id = '". $a."' ");
+    $sql = $config->runQuery("UPDATE pay_kurirs SET remarks = '". $types ."', weight = '". $charge ."', total = '". $total ."'  WHERE id = '". $a."' ");
     $sql->execute();
    
     $logs = $config->saveLogs($b, $admin, 'u', 'tambah remarks parkir!');
@@ -590,8 +591,14 @@ if($_GET['type'] == 'payDelivery'){
 
     $sql = $config->runQuery("UPDATE pay_kurirs SET status = '1' WHERE id = '". $a."' ");
     $sql->execute();
+
+    if(!empty($cek['weight'])){
+        $tot = $cek['weight'];
+    }else{
+        $tot = 0;
+    }
     
-    $total = $cek['weight'] + $cek['total'];
+    $total = $cek['total'];
     $logs = $config->saveLogs($a, $admin, 'u', 'paid kurir!');
     if ($sql) {
         # code...
