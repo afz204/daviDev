@@ -62,6 +62,20 @@ if($_GET['type'] == 'new'){
     $logs = $config->saveLogs($reff, $admin, 'c', 'new corporate');
     if($stmt){
         echo '1';
+            $cp = $config->runQuery("INSERT INTO corporate_pics (corporate_id, name, nomor, province_id, city, kecamatan, kelurahan, alamat) VALUES (:a, :b, :c, :d, :e, :f, :g, :h)");
+            $cp->execute(array(
+                ':a'    => $unik,
+                ':b'    => $n,
+                ':c'    => $c,
+                ':d'    => $h,
+                ':e'    => $i,
+                ':f'    => $j,
+                ':g'    => $k,
+                ':h'    => $l
+            ));
+
+            $reff = $config->lastInsertId();
+            $logs = $config->saveLogs($reff, $admin, 'c', 'new PIC');
     }else{
         echo '0';
     }
@@ -71,12 +85,22 @@ if($_GET['type'] == 'savePIC'){
     $a = $_POST['kode_perusahaan'];
     $b = $_POST['nama_pic'];
     $c = $_POST['nomor_hp'];
+    $d = $_POST['provinsi'];
+    $e = $_POST['kota'];
+    $f = $_POST['kec'];
+    $g = $_POST['kel'];
+    $h = $_POST['alamat'];
 
-    $stmt = $config->runQuery("INSERT INTO corporate_pics (corporate_id, name, nomor) VALUES (:a, :b, :c)");
+    $stmt = $config->runQuery("INSERT INTO corporate_pics (corporate_id, name, nomor, province_id, city, kecamatan, kelurahan, alamat) VALUES (:a, :b, :c, :d, :e, :f, :g, :h)");
     $stmt->execute(array(
         ':a'    => $a,
         ':b'    => $b,
-        ':c'    => $c
+        ':c'    => $c,
+        ':d'    => $d,
+        ':e'    => $e,
+        ':f'    => $f,
+        ':g'    => $g,
+        ':h'    => $h
     ));
 
     $reff = $config->lastInsertId();

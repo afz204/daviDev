@@ -1,4 +1,15 @@
+function btn_submit(id){
+    $('#'+id).html('<span class="badge badge-primary text-center" style="font-size: 14px; margin-left: 40%;">Please wait while loading!!!!</span>');
+}
 $(document).ready(function() {
+   
+    $('#ProvinsiCorporate').select2({ width: '100%', theme: "bootstrap4" });
+    $('#KotaCorporate').select2({ width: '100%', theme: "bootstrap4" });
+    $('#kecamatanCorporate').select2({ width: '100%', theme: "bootstrap4" });
+    $('#listCorporate').select2({ width: '100%', theme: "bootstrap4" });
+    $('#listPicCorp').select2({ width: '100%', theme: "bootstrap4" });
+    
+    
     $('#ProvinsiCorporate').on('change', function(e) {
         e.preventDefault();
         var id = $(this).find("option:selected");
@@ -117,5 +128,27 @@ $(document).ready(function() {
             $('#catSatuan').empty();
             $('#satuanCat').addClass('hidden');
         }
+    });
+
+    $('#listCorporate').on('change', function(e) {
+        e.preventDefault();
+        var id = $(this).find("option:selected");
+        var value = id.val();
+        var text = id.text();
+
+        $.ajax({
+            url: '../php/ajax/states.php?type=listCorporate',
+            type: 'post',
+            data: 'id=' + value,
+
+            success: function(msg) {
+                console.log(msg);
+                $('#listPicCorp').empty();
+
+                $.each(msg, function(index, value) {
+                    $('#listPicCorp').append('<option value="' + value.id + '">' + value.name + '</option>');
+                })
+            }
+        });
     });
 })

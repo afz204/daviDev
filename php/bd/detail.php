@@ -1,31 +1,44 @@
 <?php 
 
 $d = $_GET['id'];
-	$prod = $config->Products('category_id, subcategory_id, name_product, cost_price, selling_price, available_on, sort_desc, full_desc, note, images', 'products WHERE id = '.$d);
+	$prod = $config->Products('product_id, category_id, subcategory_id, name_product, cost_price, selling_price, available_on, sort_desc, full_desc, note, images', 'products WHERE id = '.$d);
 
 	$product = $prod->fetch(PDO::FETCH_LAZY);
 
 	$category = $config->Category();
-	$cat = $config->Products('id, name', 'categories WHERE category_id != 0 ');
-    $province = $config->Province();
+	$cat = $config->Products('id, name', 'categories WHERE parent_id != 0 ');
+    $province = $config->Products('id, name', "provinces WHERE id IN (". $product['available_on'] .") ");
+
 
 ?>
 
-<div class="card" <?=$access['create']?>>
+<div class="card" <?=$access['create']?>> 
     <div class="row justify-content-center card-body">
         <div id="imagesProduct" class="col-12 col-md-4 col-lg-4">
             <div class="card-header">
                 <h5 class="card-title">Images Product</h5>
             </div>
             <div class="card-body">
-                <picture>
-				  <!-- <source srcset="http://localhost/bungdav/assets/images/product/bunga_malem_jumat.jpg" type="image/svg+xml"> -->
-				  <!-- <img src="<?=URL.'assets/images/product/bunga_malem_jumat.jpg'?>" class="img-fluid img-thumbnail" alt="..."> -->
-				  <a href="<?=URL.'assets/images/product/'.$product['images']?>" data-toggle="lightbox" data-gallery="example-gallery">
-					    <img src="<?=URL.'assets/images/product/'.$product['images']?>" class="img-fluid img-thumbnail">
-					</a>
-				</picture>
+                <?php if(empty($product['images'])){ ?>
+                    <form id="uploadImagesProduct" method="post" enctype="multipart/form-data" >
+                        <div class="form-group">
+                            <input type="hidden" id="ImagesProductID" value="<?=$product['product_id']?>" name="ImagesProductID">
+                            <input type="hidden" id="ImagesName" value="<?=$product['name_product']?>" name="ImagesName">
+                            <div class="file-loading">
+                                <input type="file" id="images" name="images[]" multiple>
 
+                            </div>
+                            <br>
+
+                        </div>
+                    </form>
+                <?php } else { ?>
+                    <picture>
+                      <a href="<?=URL.'assets/images/product/'.$product['images']?>" data-toggle="lightbox" data-gallery="example-gallery">
+                            <img src="<?=URL.'assets/images/product/'.$product['images']?>" class="img-fluid img-thumbnail">
+                        </a>
+                    </picture>
+                <?php } ?>
                 <div id="kv-success-2" class="alert alert-success" style="margin-top:10px;display:none"></div>
             </div>
         </div>
@@ -79,14 +92,13 @@ $d = $_GET['id'];
                         <input type="text" name="sellProduct" id="sellProduct" data-parsley-type="number" value="<?=$config->formatPrice($product->selling_price)?>" class="form-control" data-parsley-minLength="3" readonly>
                     </div>
 
-                    <div class="form-group " id="lokasiProduct">
-                        <select class="simple-select2 w-100"  id="simple-select2" multiple>
-                            <?php while ($rows = $province->fetch(PDO::FETCH_LAZY)){ ?>
-
-                            <option value="<?=$rows->id?>"><?=$rows->name?></option>
-
-                            <?php } ?>
-                        </select>
+                    <div class="form-group">
+                        <label for="shortDesc">available in</label>
+                        </br>
+                            <?php while ($prov = $province->fetch(PDO::FETCH_LAZY)) {
+                                # code...
+                                echo '<span class="badge badge-primary" style="margin-right: 1%;">'. $prov['name'] .'</span>';
+                            } ?>
                     </div>
 
                     <div class="form-group">
@@ -102,7 +114,7 @@ $d = $_GET['id'];
                         <textarea style="text-transform: capitalize;" data-parsley-minLength="5" value="<?=$product->note?>" name="note" id="noteProduct" class="form-control" rows="5" readonly><?=$product->note?></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-block btn-outline-primary" >submit</button>
+                    <button type="submit" class="btn btn-block btn-outline-primary" disabled="" >update</button>
 
                 </form>
             </div>

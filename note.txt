@@ -42,6 +42,7 @@ ALTER TABLE `roles` ADD `id` INT NOT NULL AUTO_INCREMENT FIRST, ADD PRIMARY KEY 
 ALTER TABLE `staffs` ADD `id` INT NOT NULL AUTO_INCREMENT FIRST, ADD PRIMARY KEY (`id`);
 ALTER TABLE `sub_menus` ADD `id` INT NOT NULL AUTO_INCREMENT FIRST, ADD PRIMARY KEY (`id`);
 ALTER TABLE `stocks` ADD `id` INT NOT NULL AUTO_INCREMENT FIRST, ADD PRIMARY KEY (`id`);
+ALTER TABLE `products` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;
 
 
 INSERT INTO `menus` (`id`, `menu`, `links`) VALUES (NULL, 'production', 'production');
@@ -84,3 +85,48 @@ GROUP BY 1, 2
 1. Contact person have address
 2. pay kurir add filter by daterange
 3. info total unpaid and paid per hari
+
+			<li class="list-group-item">
+                  <div class="checkout-content">
+                     <div class="chekcout-img">
+                        <picture>
+                         <a href="<?=URL?>assets/images/product/the_beautifully_flowers.jpg" data-toggle="lightbox" data-gallery="example-gallery">
+                               <img src="<?=URL?>assets/images/product/the_beautifully_flowers.jpg" class="img-fluid img-thumbnail">
+                           </a>
+                       </picture>
+                     </div>
+                     <div class="checkout-sometext">
+                        <div class="title">the veautifully flowers</div>
+                        <div class="count-product">
+                           
+                           <div class="center">
+                              <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <button class="btn btn-sm btn-outline-secondary btn-number-count" type="button" data-type="minus" disabled="disabled"><span class="fa fa-minus"></span></button>
+                                </div>
+                                <input style="text-align: center;" type="text" value="1" id="count-product-number" name="count-product-number" min="1" max="10" class="input-number form-control form-control-sm" placeholder="" aria-label="" aria-describedby="basic-addon1">
+                                <div class="input-group-append">
+                                  <button class="btn btn-sm btn-outline-secondary btn-number-count" type="button" data-type="plus"><span class="fa fa-plus"></span></button>
+                                </div>
+                              </div>
+                            
+                        </div>
+                        </div>
+                        <div class="price">Rp. 550.000.00</div>
+                        <div class="important-notes">
+                           <div class="note">
+                              Contextual classes also work with .list-group-item-action. Note the addition of the hover styles here not present in the previous example. Also supported is the .active state; apply it to indicate an active selection on a contextual list group item.
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+              </li>
+
+
+              //trasaction
+
+              id_sender
+              id_received
+              id_kurir
+              id_payment
+              discount_code

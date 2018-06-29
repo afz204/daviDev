@@ -194,7 +194,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .showContent {
@@ -237,4 +237,59 @@ body::-webkit-scrollbar-thumb {
 
 .product-list-col {
     padding: .25rem !important;
+}
+
+.listPayment .border-secondary:hover{
+    border-color: #28a745!important;
+}
+.listPayment .border-secondary:focus{
+    border-color: #28a745!important;
+}
+
+.checkout-content{
+    display: inline-flex;
+}
+
+.chekcout-img{
+    width: 50%;
+    padding: 0.25rem;
+}
+.chekcout-img img{
+    width: 100%;
+}
+
+.checkout-sometext{
+    float: left;
+    padding: 0 0.75rem;
+
+}
+
+.checkout-sometext .title{
+    font-size: 20px;
+}
+.checkout-sometext .count-product{
+    display: block;
+    width: 20%;
+     padding-top: 1rem;
+}
+.checkout-sometext .price{
+    font-weight: 600;
+    font-size: 18px;
+    padding: 0.25rem 0rem;
+}
+
+.checkout-sometext .important-notes{
+    display: block;
+    margin-top: 0.75rem;
+    margin-bottom: 1rem;
+}
+.important-notes{
+    background-color: #2a2af35e;
+    border: 1px dashed #000080;
+    border-radius: 4px;
+}
+.important-notes .note{
+    padding: 0.75rem;
+    font-size: 12px;
+    color: #000080;
 }

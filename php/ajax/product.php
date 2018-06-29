@@ -17,12 +17,14 @@
 // $b = str_replace(' ', ',', $b);
 
 // echo $b;
-
+session_start();
 require '../../config/api.php';
 $config = new Admin();
+$admin = $config->adminID();
 
 if($_GET['type'] == 'newProd') {
     $type = $_POST['type'];
+    $code = strtoupper($_POST['codeProduct']);
     $a = $_POST['cat'];
     $b = $_POST['sub'];
     $c = $_POST['title'];
@@ -42,38 +44,73 @@ if($_GET['type'] == 'newProd') {
         $g = $_POST['city'];   
     }
     //echo $g;
-    $images = $c . '.jpg';
+    
     $tgl = $config->getDate('Y-m-d H:m:s');
 
-//    $o = array($a, $b, $c, $d, $e, $f, $g, $h, $i, $j, $k);
-//
-//    echo '<pre>';
-//    print_r($o);
-//    echo '</pre>';
+    $cek = $config->getData('product_id', 'products', "product_id = '". $code ."' ");
 
+    if(!empty($cek['product_id'])){
+        echo '0';
+    }else{
+        $sql = "INSERT INTO products (product_id, category_id, subcategory_id, name_product, cost_price, selling_price, available_on, sort_desc, full_desc, note, permalink, created_at, admin_id) 
+        VALUES (:code, :a, :b, :c, :e, :f, :g, :h, :i, :j, :link, :tgl, :k)";
 
-    $sql = "INSERT INTO products (category_id, subcategory_id, name_product, cost_price, selling_price, available_on, sort_desc, full_desc, note, images, created_at, admin_id) 
-    VALUES (:a, :b, :c, :e, :f, :g, :h, :i, :j, :images, :tgl, :k)";
-
-    $stmt = $config->runQuery($sql);
-    $stmt->execute(array(
-        ':a' => $a,
-        ':b' => $b,
-        ':c' => $c,
-        ':e' => $e,
-        ':f' => $f,
-        ':g' => $g,
-        ':h' => $h,
-        ':i' => $i,
-        ':j' => $j,
-        ':images' => $images,
-        ':tgl' => $tgl,
-        ':k' => $k
-    ));
-
-    if ($stmt) {
-        echo $config->actionMsg('c', 'products');
-    } else {
-        echo 'Failed!';
+        $stmt = $config->runQuery($sql);
+        $stmt->execute(array(
+            ':code' => $code,
+            ':a' => $a,
+            ':b' => $b,
+            ':c' => $c,
+            ':e' => $e,
+            ':f' => $f,
+            ':g' => $g,
+            ':h' => $h,
+            ':i' => $i,
+            ':j' => $j,
+            ':link' => $c,
+            ':tgl' => $tgl,
+            ':k' => $k
+        ));
+        $reff = $config->lastInsertId();
+        $logs = $config->saveLogs($reff, $admin, 'c', 'new products');
+        if ($stmt) {
+            echo $config->actionMsg('c', 'products');
+        } else {
+            echo 'Failed!';
+        }
     }
+
+    
+}
+
+if($_GET['type'] == 'changeStatusProduct'){
+    $a = $_POST['kode_status'];
+    $b = $_POST['kode_product'];
+
+    if($a == 1){
+        $cek = $config->getData('images', 'products', "product_id = '". $b ."' ");
+
+        if(empty($cek['images'])){
+            echo "Upload Images products First!";
+        }else{
+            $stmt = $config->runQuery('UPDATE products SET status = :st WHERE product_id = :code ');
+            $stmt->execute(array(':st' => $a, ':code' => $b ));
+            if($stmt){
+                $logs = $config->saveLogs($b, $admin, 'u', 'change status products');
+                echo $config->actionMsg('u', 'products');
+            }else{
+                echo 'Failed!';
+            }
+        }
+    }else{
+            $stmt = $config->runQuery('UPDATE products SET status = :st WHERE product_id = :code ');
+            $stmt->execute(array(':st' => $a, ':code' => $b ));
+            if($stmt){
+                $logs = $config->saveLogs($b, $admin, 'u', 'change status products');
+                echo $config->actionMsg('u', 'products');
+            }else{
+                echo 'Failed!';
+            }
+    }
+    
 }

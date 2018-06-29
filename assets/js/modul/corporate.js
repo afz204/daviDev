@@ -92,20 +92,28 @@ $(document).ready(function() {
         $('#nomorPIC').removeClass('parsley-success');
         $('#namaPIC').removeClass('parsley-error');
         $('#nomorPIC').removeClass('parsley-error');
+        $('#kelurahanCorporate').removeClass('parsley-error');
+        $('#alamatCorporate').removeClass('parsley-error');
         $('.parsley-errors-list').addClass('hidden');
 
     });
     $('#formPIC').on('submit', function(e) {
         e.preventDefault();
 
-        var id = $('#kodePerusahaan').val();
-        var name = $('#namaPIC').val();
-        var nomor = $('#nomorPIC').val();
+        var id          = $('#kodePerusahaan').val();
+        var name        = $('#namaPIC').val();
+        var nomor       = $('#nomorPIC').val();
+        var provinsi    = $('#ProvinsiCorporate option:selected').val();
+        var kota        = $('#KotaCorporate option:selected').val();
+        var kecamatan   = $('#kecamatanCorporate option:selected').val();
+        var kelurahan   = $('#kelurahanCorporate option:selected').val();
+        var alamat      = $('#alamatCorporate').val();
 
         $.ajax({
             url: '../php/ajax/corporate.php?type=savePIC',
             type: 'post',
-            data: { kode_perusahaan: id, nama_pic: name, nomor_hp: nomor },
+            data: { kode_perusahaan: id, nama_pic: name, nomor_hp: nomor, provinsi: provinsi,
+                    kota: kota, kec: kecamatan, kel: kelurahan, alamat: alamat },
 
             success: function(msg) {
                 alert(msg);

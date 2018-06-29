@@ -124,7 +124,7 @@ $dl = $config->formatPrice($dll['totalProduksi']);
                             </div>
                         </div>
                     </div>
-                    <div id="listKasIn" class="hidden <?=$stylePHP?>">
+                    <div id="listKasIn" class="<?=$stylePHP?>">
 
                         <table id="kasMasuk" class="table table-bordered  <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
                             <thead class="thead-light">

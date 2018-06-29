@@ -1,9 +1,28 @@
-function resetForm() {
+function resetForm()
+{
     location.reload();
+}
+function productStatus(status, id)
+{
+    if(! confirm('Are you sure ?')){
+        return false;
+    }else{
+
+        $.ajax({
+            url  : '../php/ajax/product.php?type=changeStatusProduct',
+            type : 'post',
+            data : { kode_status: status, kode_product: id },
+
+            success: function (msg) {
+                alert(msg);
+                location.reload();
+            }
+        });
+    }
+    
 }
 $(document).ready(function () {
 
-    var url = 'http://localhost/dev/php/ajax/uploadImagesProduct.php';
 
     $('#tableProduct').DataTable();
 
@@ -13,51 +32,12 @@ $(document).ready(function () {
         allowClear: true
     });
 
-    $("#images").fileinput({
-        //'theme': 'explorer-fa',
-        theme: 'fa',
-        overwriteInitial: false,
-        initialPreviewAsData: true,
-        maxFilePreviewSize: 60,
-        previewFileType: "image",
-        allowedFileExtensions: ["jpg"],
-        uploadAsync: false,
-        minFileCount: 1,
-        maxFileCount: 1,
-        uploadUrl: url,
-        uploadExtraData: function() {
-            return {
-                imagesid: $('#ImagesProductID').val()
-            };
-        }
-    }).on('filebatchuploadsuccess', function(event, data) {
-        var buttonSuccessProduct = $('<button class="btn btn-block btn-outline-success" onclick="resetForm()">Done !</button>');
-        // $.each(data.files, function(key, file) {
-        //     var fname = file.name;
-        //     out = out + '<li>' + 'Uploaded file # ' + (key + 1) + ' - '  +  fname + ' successfully.' + '</li>';
-        // });
-        $('#kv-success-2').append(buttonSuccessProduct);
-        $('#kv-success-2').fadeIn('slow');
-    });
-
-    $('#listLokasi').on('change', function () {
-        var id = $(this).find('option:selected').val();
-
-        if(id != '1'){
-            $('#lokasiProduct').removeClass('hidden');
-            $('.select2-container--bootstrap4').removeAttr('style');
-            $('.select2-search__field').removeAttr('style');
-
-        }else{
-            $('#lokasiProduct').addClass('hidden');
-
-        }
-
-    });
+    
 
     $('#newProduct').on('submit', function(e){
         e.preventDefault();
 
+        var code = $('#codeProduct').val();
         var cat = $('#categoryProduct option:selected').val();
         var sub = $('#subCatProduct option:selected').val();
         var title = $('#nameProduct').val();
@@ -74,14 +54,21 @@ $(document).ready(function () {
         $.ajax({
             url  : '../php/ajax/product.php?type=newProd',
             type : 'post',
-            data : 'cat='+cat+'&sub='+sub+'&title='+title+'&tags='+tags+'&cost='+cost+'&sell='+sell+
+            data : 'codeProduct='+code+'&cat='+cat+'&sub='+sub+'&title='+title+'&tags='+tags+'&cost='+cost+'&sell='+sell+
             '&city='+city+'&short='+short+'&full='+full+'&admin='+admin+'&note='+note+'&type='+list,
 
             success: function (msg) {
-                alert(msg);
-                $('#ImagesProductID').val(title);
-                $('#imagesProduct').removeClass('hidden');
-                $('#detailProduct').addClass('hidden');
+                if (msg == '0') {
+                    alert('Code product telah terpakai!');
+                    $('#codeProduct').addClass('parsley-error');
+                } else {
+                     // alert(msg);
+                    location.reload();
+                }
+               
+                // $('#ImagesProductID').val(title);
+                // $('#imagesProduct').removeClass('hidden');
+                // $('#detailProduct').addClass('hidden');
             }
         });
     });

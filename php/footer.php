@@ -36,22 +36,19 @@ Many operating systems, software frameworks, and programs include a logging syst
     <script type="text/javascript" src="<?=URL?>assets/vendors/datetime-picker4/js/bootstrap-datetimepicker.min.js"></script>
     <script type="text/javascript" src="<?=URL?>assets/vendors/daterangepicker/daterangepicker.js"></script>
     <script type="text/javascript" src="<?=URL?>assets/vendors/jquery.countdown-2.2.0/jquery.countdown.min.js"></script>
-
-
-    <script src="<?=URL?>assets/js/custom.js"></script>
-    <?php if($menu == 'corporate'){ ?>
-    <script src="<?=URL?>assets/js/modul/corporate.js"></script>
-    <?php } if($menu == 'order'){ ?>
-    <script src="<?=URL?>assets/js/modul/order.js"></script>
-    <?php } if($menu == 'payment'){ ?>
-    <script src="<?=URL?>assets/js/modul/kas.js"></script>
-    <?php } if($menu == 'management'){ ?>
-        <script src="<?=URL?>assets/js/modul/management.js"></script>
-    <?php } if($menu == 'kurir'){ ?>
-        <script src="<?=URL?>assets/js/modul/kurir.js"></script>
-    <?php } if($menu == 'production'){?>
-        <script src="<?=URL?>assets/js/modul/stocks.js"></script>
-    <?php } if($menu == 'bd'){ ?>
+     <?php if($menu == 'order' && $footer == 'neworder'){ ?>
+        <script src="<?=URL?>assets/vendors/smartWizard/js/jquery.smartWizard.min.js"></script>
+        <script src="<?=URL?>assets/vendors/bootstrapValidator/validator.js"></script>
+        <script src="<?=URL?>assets/vendors/lightbox/ekko-lightbox.js" type="text/javascript"></script> 
+        <script type="text/javascript">
+            $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+        </script>
+        <script type="text/javascript" src="<?=URL?>assets/vendors/dll/jquery.number.min.js"></script>
+    <?php } ?>
+    <?php if($menu == 'bd'){ ?>
 
         <script src="<?=URL?>assets/vendors/krajeee/js/fileinput.js" type="text/javascript"></script>
         <script src="<?=URL?>assets/vendors/krajeee/js/locales/fr.js" type="text/javascript"></script>
@@ -66,6 +63,72 @@ Many operating systems, software frameworks, and programs include a logging syst
                 event.preventDefault();
                 $(this).ekkoLightbox();
             });
+        </script>
+        <script src="<?=URL?>assets/js/modul/bd.js"></script>
+    <?php } ?>
+    <script src="<?=URL?>assets/js/custom.js"></script>
+    <?php if($menu == 'corporate'){ ?>
+    <script src="<?=URL?>assets/js/modul/corporate.js"></script>
+    <?php } if($menu == 'order'){ ?>
+    <script src="<?=URL?>assets/js/modul/order.js"></script>
+    <?php } if($menu == 'payment'){ ?>
+    <script src="<?=URL?>assets/js/modul/kas.js"></script>
+    <?php } if($menu == 'management'){ ?>
+        <script src="<?=URL?>assets/js/modul/management.js"></script>
+    <?php } if($menu == 'kurir'){ ?>
+        <script src="<?=URL?>assets/js/modul/kurir.js"></script>
+    <?php } if($menu == 'production'){?>
+        <script src="<?=URL?>assets/js/modul/stocks.js"></script>
+    
+    <?php } ?>
+
+
+    <?php if($menu == 'bd' && $footer = 'detail'){ ?>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("#images").fileinput({
+                //'theme': 'explorer-fa',
+                theme: 'fa',
+                overwriteInitial: false,
+                initialPreviewAsData: true,
+                maxFilePreviewSize: 60,
+                previewFileType: "image",
+                allowedFileExtensions: ["jpg"],
+                uploadAsync: false,
+                minFileCount: 1,
+                maxFileCount: 1,
+                uploadUrl: '<?=URL?>php/ajax/uploadImagesProduct.php',
+                uploadExtraData: function() {
+                    return {
+                        imagesid: $('#ImagesProductID').val(),
+                        imagesname: $('#ImagesName').val()
+                    };
+                }
+            }).on('filebatchuploadsuccess', function(event, data) {
+                var buttonSuccessProduct = $('<button class="btn btn-block btn-outline-success" onclick="resetForm()">Done !</button>');
+                // $.each(data.files, function(key, file) {
+                //     var fname = file.name;
+                //     out = out + '<li>' + 'Uploaded file # ' + (key + 1) + ' - '  +  fname + ' successfully.' + '</li>';
+                // });
+                $('#kv-success-2').append(buttonSuccessProduct);
+                $('#kv-success-2').fadeIn('slow');
+            });
+
+            $('#listLokasi').on('change', function () {
+                var id = $(this).find('option:selected').val();
+
+                if(id != '1'){
+                    $('#lokasiProduct').removeClass('hidden');
+                    $('.select2-container--bootstrap4').removeAttr('style');
+                    $('.select2-search__field').removeAttr('style');
+
+                }else{
+                    $('#lokasiProduct').addClass('hidden');
+
+                }
+
+            });
+            })
         </script>
     <?php } ?>
 <script>

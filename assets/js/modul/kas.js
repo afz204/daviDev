@@ -1,3 +1,20 @@
+function delPayCharge(id)
+{
+    if(!confirm("Are you sure want to delete this ?")){
+        return false;
+    }else{
+        $.ajax({
+                url: '../php/ajax/payment.php?type=delPayCharge',
+                method: 'post',
+                data: { id: id },
+
+                success: function(msg) {
+                    alert(msg);
+                    location.reload();
+                }
+            });
+    }
+}
 function payDelivery(id) {
     if (!confirm('Are you sure want to add remarks ?')) {
         return false;
@@ -352,29 +369,29 @@ $(document).ready(function() {
         $('#form-payKurir').removeClass('hidden');
     });
 
-    listPayKurir.on('click', '.delPayCharge', function() {
+    // listPayKurir.on('click', '.delPayCharge', function() {
 
-        var id = $(this).data('id');
+    //     var id = $(this).data('id');
 
-        // alert(adminI + id);
-        if (!confirm('Are you sure want to report this?')) {
-            return false;
-        } else {
+    //     // alert(adminI + id);
+    //     if (!confirm('Are you sure want to report this?')) {
+    //         return false;
+    //     } else {
 
-            $.ajax({
-                url: '../php/ajax/payment.php?type=delPayCharge',
-                method: 'post',
-                data: { id: id },
+    //         $.ajax({
+    //             url: '../php/ajax/payment.php?type=delPayCharge',
+    //             method: 'post',
+    //             data: { id: id },
 
-                success: function(msg) {
-                    alert(msg);
-                    location.reload();
-                }
-            });
+    //             success: function(msg) {
+    //                 alert(msg);
+    //                 location.reload();
+    //             }
+    //         });
 
-        }
+    //     }
 
-    });
+    // });
 
     $('#reportPayCharge').on('submit', function(e) {
         e.preventDefault();

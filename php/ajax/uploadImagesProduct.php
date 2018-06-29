@@ -5,6 +5,10 @@
  * Date: 01/05/2018
  * Time: 17.26
  */
+session_start();
+require '../../config/api.php';
+$config = new Admin();
+$admin = $config->adminID();
 
 if (empty($_FILES['images'])) {
     echo json_encode(['error'=>'No files found for upload.']);
@@ -19,10 +23,18 @@ if(empty($_POST['imagesid'])){
     // or you can throw an exception
     return; // terminate
 }
+if(empty($_POST['imagesname'])){
+    echo json_encode(['error'=>'Images Name unset.']);
+    // or you can throw an exception
+    return; // terminate
+}
+
+
 
 $imagesid = empty($_POST['imagesid']) ? '' : $_POST['imagesid'];
+$imagesName = empty($_POST['imagesname']) ? '' : $_POST['imagesname'];
 
-$title = str_replace(" ", '_', $imagesid);
+$title = $imagesName;
 // a flag to see if everything is ok
 $success = null;
 
@@ -61,6 +73,12 @@ if ($success === true) {
     // for example you can get the list of files uploaded this way
     // $output = ['uploaded' => $paths];
     $output = "OK";
+
+    $stmt = $config->runQuery('UPDATE products SET images = :images where product_id = :code');
+    $stmt->execute(array(
+        ':images' => $title . '.jpg',
+        ':code'   => $imagesid
+    ));
 } elseif ($success === false) {
     $output = ['error'=>'Error while uploading images. Contact the system administrator'];
     // delete any uploaded files

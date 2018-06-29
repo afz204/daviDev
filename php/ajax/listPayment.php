@@ -11,46 +11,6 @@ require '../../config/api.php';
 $config = new Admin();
 $admin = $config->adminID();
 
-if($_GET['type'] == 'kasOut'){
-    $outKas = $config->ProductsJoin('kas_outs.id, kas_outs.nama, kas_outs.total, kas_outs.ket, kas_outs.created_at, kas_outs.status, users.name', 'kas_outs',
-        'INNER JOIN users ON users.id = kas_outs.admin_id', "WHERE DATE(kas_outs.created_at)= CURDATE() AND kas_outs.status ='' ");
-
-    $request = $_REQUEST;
-    $colom = array(
-        0   => 'id',
-        1   => 'nama',
-        2   => 'total',
-        3   => 'ket',
-        4   => 'created_at',
-        5   => 'status'
-    );
-
-    $totalData = $outKas->fetchAll();
-    $totalData = count($totalData);
-    
-    $logs = $config->saveLogs('0', $admin, 'f', 'get data kas_outs');
-
-    $data = array();
-
-    while ($row = $outKas->fetch(PDO::FETCH_LAZY)){
-        $subdata = array();
-        $subdata[]  = $row[0];
-        $subdata[]  = $row[1];
-        $subdata[]  = $row[2];
-        $subdata[]  = $row[3];
-        $subdata[]  = $row[4];
-        $subdata[]  = $row[5];
-        $data = $subdata;
-    }
-
-    $json_data = array(
-        'draw'              => intval($request['draw']),
-        'recordsTotal'      => intval($totalData),
-        'recordsFiltered'   => intval($totalData),
-        'data'              => $data
-    );
-    echo json_encode($json_data);
-}
 
 if($_GET['type'] == 'pay-kurir')
 {
@@ -71,7 +31,7 @@ if($_GET['type'] == 'pay-kurir')
     $payCharge = " SELECT pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.name, users.name as admin FROM pay_kurirs INNER JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
     INNER JOIN delivery_charges ON delivery_charges.id = pay_kurirs.charge_id
     INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan
-    INNER JOIN users ON users.id = delivery_charges.admin_id WHERE pay_kurirs.status = '' " . $month ." ";
+    INNER JOIN users ON users.id = delivery_charges.admin_id WHERE pay_kurirs.status != '2' " . $month ." ";
 
     $totalPembayaran = $config->getData('SUM(total) as TOTAL', 'pay_kurirs', "pay_kurirs.status != '2' ". $month);
     $totalPembayaran = $totalPembayaran['TOTAL'];
@@ -155,7 +115,7 @@ if($_GET['type'] == 'pay-kurir')
 
         $pay = '<button type="button" class="btn btn-sm btn-warning" style="text-transform: uppercase; font-size: 10px; font-weight: 500;" data-toggle="tooltip" data-placement="top" title="Pay Charge" onclick="payDelivery('. $row["payChargeID"] .')" '. $stPay .' > '. $payy .' </button>';
         $del = '
-        <button type="button"  class="btn btn-sm btn-danger delPayCharge" style="text-transform: uppercase; font-size: 10px; font-weight: 500;" data-toggle="tooltip" data-placement="top" title="delete" data-id="'. $row['payChargeID'] .'"  '. $stDel .'>  <span class="fa fa-trash"></span> </button>
+        <button type="button"  class="btn btn-sm btn-danger" onclick="delPayCharge('. $row['payChargeID'] .')" style="text-transform: uppercase; font-size: 10px; font-weight: 500;" data-toggle="tooltip" data-placement="top" title="delete"  '. $stDel .'>  <span class="fa fa-trash"></span> </button>
         ';
         $remk = '
         <div class="btn-group">

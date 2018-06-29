@@ -40,4 +40,10 @@ elseif($_GET['type'] == 'subCat'){
     header('Content-Type: application/json');
     echo json_encode($stmt->fetchAll());
 }
+elseif($_GET['type'] == 'listCorporate'){
+    $stmt = $config->runQuery('SELECT * FROM corporate_pics WHERE corporate_id = :id');
+    $stmt->execute(array(':id' => $id));
+    header('Content-Type: application/json');
+    echo json_encode($stmt->fetchAll());
+}
 

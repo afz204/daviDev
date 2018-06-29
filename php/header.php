@@ -18,13 +18,18 @@
     <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/dataTables/css/dataTables.bootstrap4.min.css"/>
     <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/datetime-picker4/css/bootstrap-datetimepicker.min.css"/>
     <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/daterangepicker/daterangepicker.css"/>
-    <?php if($menu == 'bd' OR $menu == 'order' OR $menu == 'payment'){ ?>
+    <?php if($menu == 'bd' OR $menu == 'order' OR $menu == 'payment' OR $menu == 'corporate'){ ?>
         <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/select2/select2.min.css"/>
         <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/select2/select2-bootstrap4.min.css"/>
         <link href="<?=URL?>assets/vendors/krajeee/css/fileinput.css" media="all" rel="stylesheet" type="text/css"/>
         <link href="<?=URL?>assets/vendors/krajeee/themes/explorer-fa/theme.css" media="all" rel="stylesheet" type="text/css"/>
         <link href="<?=URL?>assets/vendors/lightbox/ekko-lightbox.css" media="all" rel="stylesheet" type="text/css"/>
         <link href="<?=URL?>assets/vendors/lightbox/ekko-main.css" media="all" rel="stylesheet" type="text/css"/>
+    <?php } ?>
+
+    <?php if($menu == 'order' && $footer == 'neworder'){ ?>
+        <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/smartWizard/css/smart_wizard.css"/>
+        <!-- <link rel="stylesheet" type="text/css" href="<?=URL?>assets/vendors/smartWizard/css/smart_wizard_theme_dots.css"/> -->
     <?php } ?>
     <style type="text/css">
         .bootstrap-datetimepicker-widget{
