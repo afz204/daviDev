@@ -127,3 +127,80 @@ if($_GET['type'] == 'deletePIC'){
         echo 'Failed!';
     }
 }
+
+if($_GET['type'] == 'saveCustomer'){
+    $a = $_POST['first_name'];
+    $b = $_POST['last_name'];
+    $c = $_POST['email'];
+    $d = $_POST['jenis_kelamin'];
+    $e = $_POST['mobile_phone'];
+    $f = $_POST['phone_number'];
+    $g = $_POST['birth_day'];
+    $h = $config->newPassword($_POST['password']);
+    $z = $a. ' ' . $b;
+
+    $stmt = $config->runQuery("INSERT INTO customer (FirstName, LastName, FullName, Email, Gender, Mobile, Phone, DOB, Username, Password, IsActive, CreatedDate, CreatedBy) VALUES (:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l)");
+    $stmt->execute(array(
+        ':a'    => $a,
+        ':b'    => $b,
+        ':z'    => $z,
+        ':c'    => $c,
+        ':d'    => $d,
+        ':e'    => $e,
+        ':f'    => $f,
+        ':g'    => $g,
+        ':h'    => $c,
+        ':i'    => $h,
+        ':j'    => '1',
+        ':k'    => $config->getDate('Y-m-d H:m:s'),
+        ':l'    => $admin
+    ));
+
+    $reff = $config->lastInsertId();
+    $logs = $config->saveLogs($reff, $admin, 'c', 'new Customer Organic');
+
+    if($stmt){
+        echo $config->actionMsg('c', 'customer');
+    }else{
+        echo 'Failed!';
+    }
+}
+
+if($_GET['type'] == 'saveFlorist'){
+    $a = $_POST['FloristName'];
+    $b = $_POST['Email'];
+    $c = $_POST['Username'];
+    $d = $config->newPassword($_POST['Password']);
+    $e = $_POST['mobile_phone'];
+    $f = $_POST['ProvinsiCorporate'];
+    $g = $_POST['KotaCorporate'];
+    $h = $_POST['kecamatanCorporate'];
+    $i = $_POST['kelurahanCorporate'];
+    $j = $_POST['alamatCorporate'];
+
+    $stmt = $config->runQuery("INSERT INTO florist (FloristName, Email, Username, Password, mobile_phone, province, city, kecamatan, kelurahan, alamat, IsActive, CreatedDate, CreatedBy) VALUES (:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m)");
+    $stmt->execute(array(
+        ':a'    => $a,
+        ':b'    => $b,
+        ':c'    => $c,
+        ':d'    => $d,
+        ':e'    => $e,
+        ':f'    => $f,
+        ':g'    => $g,
+        ':h'    => $h,
+        ':i'    => $i,
+        ':j'    => $j,
+        ':k'    => '1',
+        ':l'    => $config->getDate('Y-m-d H:m:s'),
+        ':m'    => $admin
+    ));
+
+    $reff = $config->lastInsertId();
+    $logs = $config->saveLogs($reff, $admin, 'c', 'new Florist');
+
+    if($stmt){
+        echo $config->actionMsg('c', 'florist');
+    }else{
+        echo 'Failed!';
+    }
+}

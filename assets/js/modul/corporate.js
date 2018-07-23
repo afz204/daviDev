@@ -22,7 +22,9 @@ $(document).ready(function() {
 
     });
 
-    $('#listCorporate').DataTable();
+    $('#listCorporateBD').DataTable();
+    $('#listPersonal').DataTable();
+    $('#listFlorist').DataTable();
 
     var message = $('#messageCorporate').hide();
 
@@ -100,20 +102,98 @@ $(document).ready(function() {
     $('#formPIC').on('submit', function(e) {
         e.preventDefault();
 
-        var id          = $('#kodePerusahaan').val();
-        var name        = $('#namaPIC').val();
-        var nomor       = $('#nomorPIC').val();
-        var provinsi    = $('#ProvinsiCorporate option:selected').val();
-        var kota        = $('#KotaCorporate option:selected').val();
-        var kecamatan   = $('#kecamatanCorporate option:selected').val();
-        var kelurahan   = $('#kelurahanCorporate option:selected').val();
-        var alamat      = $('#alamatCorporate').val();
+        var id = $('#kodePerusahaan').val();
+        var name = $('#namaPIC').val();
+        var nomor = $('#nomorPIC').val();
+        var provinsi = $('#ProvinsiCorporate option:selected').val();
+        var kota = $('#KotaCorporate option:selected').val();
+        var kecamatan = $('#kecamatanCorporate option:selected').val();
+        var kelurahan = $('#kelurahanCorporate option:selected').val();
+        var alamat = $('#alamatCorporate').val();
 
         $.ajax({
             url: '../php/ajax/corporate.php?type=savePIC',
             type: 'post',
-            data: { kode_perusahaan: id, nama_pic: name, nomor_hp: nomor, provinsi: provinsi,
-                    kota: kota, kec: kecamatan, kel: kelurahan, alamat: alamat },
+            data: {
+                kode_perusahaan: id,
+                nama_pic: name,
+                nomor_hp: nomor,
+                provinsi: provinsi,
+                kota: kota,
+                kec: kecamatan,
+                kel: kelurahan,
+                alamat: alamat
+            },
+
+            success: function(msg) {
+                alert(msg);
+                location.reload();
+            }
+        });
+    });
+
+    $('#formCustomer').on('submit', function(e) {
+
+        e.preventDefault();
+        var first = $('#first_name').val();
+        var last = $('#last_name').val();
+        var email = $('#email_customer').val();
+        var sex = $('#jenis_kelamin option:selected').val();
+        var mobile = $('#mobile_phone').val();
+        var phone = $('#phone_number').val();
+        var birthday = $('#birth_day').val();
+        var pass = $('#password_login').val();
+
+        $.ajax({
+            url: '../php/ajax/corporate.php?type=saveCustomer',
+            type: 'post',
+            data: {
+                first_name: first,
+                last_name: last,
+                email: email,
+                jenis_kelamin: sex,
+                mobile_phone: mobile,
+                phone_number: phone,
+                birth_day: birthday,
+                password: pass
+            },
+
+            success: function(msg) {
+                alert(msg);
+                location.reload();
+            }
+        });
+    });
+
+    $('#formFlorist').on('submit', function(e) {
+
+        e.preventDefault();
+        var FloristName = $('#FloristName').val();
+        var Email = $('#Email').val();
+        var Username = $('#Username').val();
+        var Password = $('#Password').val();
+        var mobile_phone = $('#mobile_phone').val();
+        var ProvinsiCorporate = $('#ProvinsiCorporate option:selected').val();
+        var KotaCorporate = $('#KotaCorporate option:selected').val();
+        var kecamatanCorporate = $('#kecamatanCorporate option:selected').val();
+        var kelurahanCorporate = $('#kelurahanCorporate option:selected').val();
+        var alamatCorporate = $('#alamatCorporate').val();
+
+        $.ajax({
+            url: '../php/ajax/corporate.php?type=saveFlorist',
+            type: 'post',
+            data: {
+                FloristName: FloristName,
+                Email: Email,
+                Username: Username,
+                Password: Password,
+                mobile_phone: mobile_phone,
+                ProvinsiCorporate: ProvinsiCorporate,
+                KotaCorporate: KotaCorporate,
+                kecamatanCorporate: kecamatanCorporate,
+                kelurahanCorporate: kelurahanCorporate,
+                alamatCorporate: alamatCorporate
+            },
 
             success: function(msg) {
                 alert(msg);

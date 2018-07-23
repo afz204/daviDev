@@ -32,20 +32,21 @@ if($_GET['type'] == 'generate'){
     }
     // $tanggal = $config->getDate('Y-m-d H:m:s');
 
-    $sql = 'INSERT INTO transaction (transactionID, type, created_by) VALUES (:a, :b, :c)';
+    // $sql = 'INSERT INTO transaction (transactionID, type, created_by) VALUES (:a, :b, :c)';
 
-    $stmt = $config->runQuery($sql);
-    $stmt->execute(array(
-        ':a'    => $new_code,
-        ':b'    => $kode,
-        ':c'    => $admin
-    ));
+    // $stmt = $config->runQuery($sql);
+    // $stmt->execute(array(
+    //     ':a'    => $new_code,
+    //     ':b'    => $kode,
+    //     ':c'    => $admin
+    // ));
 
-    if($stmt){
+    // if($stmt){
         echo $new_code;
-    }else{
-        echo 'Failed!';
-    }
+        $logs = $config->saveLogs($new_code, $admin, 'f', 'Generate trx Code');
+    // }else{
+    //     echo 'Failed!';
+    // }
 
 
 }
@@ -64,6 +65,7 @@ if($_GET['type'] == 'deliveryCharges')
         $data['id'] = $row['id'];
         $data['price'] = '('. $config->formatPrice($row['price']) .')';
         $data['kelurahan'] = $row['name'];
+        $data['delivery_charges'] = $row['price'];
     }
 
     $data = json_encode($data);
@@ -162,11 +164,11 @@ if($_GET['type'] == 'addProducts')
                            <div class="center">
                               <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                  <button class="btn btn-sm btn-outline-secondary btn-number-count" type="button" data-type="minus" data-field="count-product-number['. $id .']" data-id="selling_price_product['. $id .']" disabled="disabled"><span class="fa fa-minus"></span></button>
+                                  <button class="btn btn-sm btn-outline-secondary btn-number-count" type="button" data-type="minus" data-field="count-product-number['. $id .']" data-id="selling_price_product['. $id .']" data-trx="'. $trx .'" disabled="disabled"><span class="fa fa-minus"></span></button>
                                 </div>
                                 <input style="text-align: center;" type="text" value="1" id="count-product-number['. $id .']" name="count-product-number['. $id .']" min="1" max="10" class="input-number form-control form-control-sm" placeholder="" aria-label="" aria-describedby="basic-addon1" data-field="count-product-number['. $id .']" data-qty="'. $qty .'">
                                 <div class="input-group-append">
-                                  <button class="btn btn-sm btn-outline-secondary btn-number-count" type="button" data-type="plus" data-field="count-product-number['. $id .']" data-id="selling_price_product['. $id .']"><span class="fa fa-plus"></span></button>
+                                  <button class="btn btn-sm btn-outline-secondary btn-number-count" type="button" data-type="plus" data-field="count-product-number['. $id .']" data-id="selling_price_product['. $id .']" data-trx="'. $trx .'"><span class="fa fa-plus"></span></button>
                                 </div>
                               </div>
                             
@@ -181,7 +183,7 @@ if($_GET['type'] == 'addProducts')
                                    </div>
                                 <input type="text" data-parsley-type="number" class="form-control" name="selling_price_product['. $id .']" id="selling_price_product['. $id .']" value="'.$price.'" aria-describedby="basic-addon2">
                                 <div class="input-group-append">
-                                  <button class="btn btn-outline-info selling_price_btn" type="button" data-id="selling_price_product['. $id .']">Change</button>
+                                  <button class="btn btn-outline-info selling_price_btn" type="button" data-id="selling_price_product['. $id .']" data-trx="'. $trx .'">Change</button>
                                 </div>
                               </div>
                            
@@ -342,44 +344,308 @@ if($_GET['type'] == 'changeQty'){
 if($_GET['type'] == 'listCheckout'){
     $a = $_POST['transctionID'];
 
-    $product = $config->runQuery("SELECT transaction.id, transaction.delivery_charge, transaction.grandTotal FROM transaction WHERE transaction.transactionID = '". $a ."' ");
+    $product = $config->runQuery("SELECT transaction_details.id FROM transaction_details WHERE transaction_details.id_trx = '". $a ."' ");
     $product->execute();
     
     $totalRow = $product->rowCount();
 
-    $totaltransaction = '';
+    $delivery = $config->getData('delivery_charge', '  transaction', " transaction.transactionID = '". $a ."'");
+    $deliveryCharge = $delivery['delivery_charge'];
+    if(empty($delivery['delivery_charge'])) $deliveryCharge = '0';
+    
+    $total = $config->getData('SUM(detail.product_qty * detail.product_price) as subtotal', '  transaction_details as detail', " detail.id_trx = '". $a ."'");
+    $totalTransaction = $total['subtotal'];
 
-    while ($row = $product->fetch(PDO::FETCH_LAZY)) {
-        # code...
-        $deliveryCharge = $row['grandTotal'] - $row['delivery_charge'];
-        $totaltransaction = '
+    $grandTotal = $totalTransaction + $deliveryCharge;
+        $dataContent = '
     <li class="list-group-item d-flex justify-content-between lh-condensed">
             <div>
                <h6 class="my-0">Total Harga Barang</h6>
             </div>
-            <span class="text-muted" id="subTotal">'. $config->formatPrice($row['grandTotal']) .'</span>
+            <span class="text-muted" id="subTotal">'. $config->formatPrice($totalTransaction) .'</span>
          </li>
          <li class="list-group-item d-flex justify-content-between lh-condensed">
             <div>
                <h6 class="my-0">Biaya Kirim</h6>
             </div>
-            <span class="text-danger" id="deliveryCharges">'. $row['delivery_charge'] . '</span>
+            <span class="text-muted" id="deliveryCharges">'. $config->formatPrice($deliveryCharge).'</span>
          </li>
          <li class="list-group-item d-flex justify-content-between">
             <strong>Total Belanja</strong>
-            <strong id="totalTransaction">'. $config->formatPrice($deliveryCharge) .'</strong>
+            <strong id="totalTransaction">'. $config->formatPrice($grandTotal) .'</strong>
          </li>
     ';
-    }
-
     
 
     
     $data = array(
         'totalRow' => $totalRow,
-        'product' => $totaltransaction
+        'product' => $dataContent,
+        'subtotal' => $totalTransaction,
+        'delivery_charge' => $deliveryCharge,
+        'grandtotal' => $grandTotal
     );
 
     $data = json_encode($data, true);
     echo $data;
+}
+
+if($_GET['type'] == 'deleteProduct'){
+    $a = $_POST['dataID'];
+
+    $hapus = $config->delRecord('transaction_details', 'id', $a);
+
+    if($hapus)
+    {
+        echo $config->actionMsg('d', 'transaction_details');
+        $logs = $config->saveLogs($a, $admin, 'd', 'hapus list product checkout');
+    }else{
+        echo 'Failed';
+    }
+}
+if($_GET['type'] == 'step1'){
+    $a = $_POST['TransactionID'];
+    $b = $_POST['CustomerID'];
+    $c = $_POST['picID'];
+    $d = $_POST['namePic'];
+
+    $type = substr($a, 0, 5);
+
+    $data = $config->getDataTable('transactionID', 'transaction', " transactionID = '". $a ."' ");
+    if($data->rowCount() > 0 ){
+        //edit
+    }else{
+        //new
+        $input = $config->runQuery("INSERT INTO transaction (transactionID, type, CustomerID, CustomerName) VALUES (:a, :b, :c, :d)");
+        $input->execute(array(
+            ':a'    => $a,
+            ':b'    => $type,
+            ':c'    => $b,
+            ':d'    => $d
+        ));
+        $reff = $config->lastInsertId();
+        $logs = $config->saveLogs($reff, $admin, 'c', 'add transactionID');
+        if($input)
+        {
+            echo $config->actionMsg('c', 'transaction');
+        }else{
+            echo 'Failed!';
+        }
+    }
+}
+if($_GET['type'] == 'step2'){
+    $a = $_POST['Name'];
+    $b = $_POST['Email'];
+    $c = $_POST['Provinsi'];
+    $d = $_POST['Kota'];
+    $e = $_POST['Kec'];
+    $f = $_POST['Kel'];
+    $g = $_POST['Alamat'];
+    $trx = $_POST['TransactionID'];
+
+   
+    $data = $config->getDataTable('id_trx', 'transaction_details', " id_trx = '". $trx ."' ");
+    if($data->rowCount() > 0 ){
+        //edit
+        $update = $config->runQuery("UPDATE transaction_details SET nama_penerima = :a, email = :b, provinsi_id = :c, kota_id = :d, kecamata_id = :e, kelurahan_id = :f, alamat_penerima = :g WHERE id_trx = :trx");
+        $update->execute(array(
+            ':a'    => $a,
+            ':b'    => $b,
+            ':c'    => $c,
+            ':d'    => $d,
+            ':e'    => $e,
+            ':f'    => $f,
+            ':g'    => $g,
+            ':trx'  => $trx
+        ));
+        $logs = $config->saveLogs($trx, $admin, 'u', 'update detail transaction');
+        if($update)
+        {
+            echo $config->actionMsg('u', 'transaction_details');
+        }else{
+            echo 'Failed!';
+        }
+    }else{
+        //new
+        echo 'NEwQ';
+    }
+}
+if($_GET['type'] == 'step3'){
+    $a = $_POST['TransactionID'];
+    $b = $_POST['deliverCharge'];
+    $c = $_POST['deliveryDate'];
+    $d = $_POST['deliveryTimes'];
+    $e = $_POST['deliveryRemarks'];
+
+   
+    $data = $config->getDataTable('id_trx', 'transaction_details', " id_trx = '". $a ."' ");
+    if($data->rowCount() > 0 ){
+        //edit
+        $update = $config->runQuery("UPDATE transaction_details SET delivery_charge = :a, delivery_date = :b, delivery_time = :c, delivery_marks = :d WHERE id_trx = :trx");
+        $update->execute(array(
+            ':a'    => $b,
+            ':b'    => $c,
+            ':c'    => $d,
+            ':d'    => $e,
+            ':trx'  => $a
+        ));
+        $logs = $config->saveLogs($a, $admin, 'u', 'update detail transaction');
+        if($update)
+        {
+            echo $config->actionMsg('u', 'transaction_details');
+        }else{
+            echo 'Failed!';
+        }
+    }else{
+        //new
+        echo 'NEwQ';
+    }
+}
+if($_GET['type'] == 'step4'){
+    $a = $_POST['TransactionID'];
+    $b = $_POST['from'];
+    $c = $_POST['to'];
+    $d = $_POST['msg'];
+    $e = $_POST['level1'];
+    $f = $_POST['level2'];
+
+   
+    $data = $config->getDataTable('id_trx', 'transaction_details', " id_trx = '". $a ."' ");
+    if($data->rowCount() > 0 ){
+        //edit
+        $update = $config->runQuery("UPDATE transaction_details SET card_from = :a, card_to = :b, card_template1 = :c, card_template2 = :d, card_isi = :e WHERE id_trx = :trx");
+        $update->execute(array(
+            ':a'    => $b,
+            ':b'    => $c,
+            ':c'    => $e,
+            ':d'    => $f,
+            ':e'    => $d,
+            ':trx'  => $a
+        ));
+        $logs = $config->saveLogs($a, $admin, 'u', 'update detail transaction');
+        if($update)
+        {
+            echo $config->actionMsg('u', 'transaction_details');
+        }else{
+            echo 'Failed!';
+        }
+    }else{
+        //new
+        echo 'NEwQ';
+    }
+}
+if($_GET['type'] == 'PaymentSelected'){
+    $a = $_POST['transctionID'];
+    $b = $_POST['paymentID'];
+
+
+    $stmt = "UPDATE transaction SET paymentID = :pay WHERE transactionID = :trx";
+    $stmt = $config->runQuery($stmt);
+    $stmt->execute(array(':pay' => $b, ':trx' => $a));
+
+    if($stmt){
+        echo $config->actionMsg('u', 'transaction');
+        $logs = $config->saveLogs($a, $admin, 'u', 'update payment order');
+    }else{
+        echo 'Failed!';
+    }
+}
+if($_GET['type'] == 'proccessOrder'){
+    $a = $_POST['transctionID'];
+    $delivery = $config->getData('delivery_charge', '  transaction', " transaction.transactionID = '". $a ."'");
+    $deliveryCharge = 0;
+    if($delivery['delivery_charge'] > 0) { $deliveryCharge = $delivery['delivery_charge']; }
+    $total = $config->getData('SUM(detail.product_qty * detail.product_price) as subtotal', '  transaction_details as detail', " detail.id_trx = '". $a ."'");
+    $totalTransaction = $total['subtotal'];
+
+    $grandTotal = $totalTransaction - $deliveryCharge;
+
+
+    $stmt = "UPDATE transaction SET statusOrder = '0', grandTotal = '". $grandTotal ."' WHERE transactionID = :trx";
+    $stmt = $config->runQuery($stmt);
+    $stmt->execute(array(
+        ':trx' => $a
+    ));
+
+    if($stmt){
+        echo $config->actionMsg('u', 'transaction'); 
+        $logs = $config->saveLogs($a, $admin, 'u', 'proccess order');
+    }else{
+        echo 'Failed!';
+    }
+}
+
+if($_GET['type'] == 'changeOrderStatus'){
+    $a = $_POST['status'];
+    $b = $_POST['transctionID'];
+	$c = $_POST['types'];
+	
+	if($c == 'florist'){
+		$cek = $config->getData('id_florist', 'transaction_details', "id_trx ='". $b ."' ");
+		
+		if($cek['id_florist'])
+		{
+			
+			$stmt = "UPDATE transaction SET statusOrder = '". $a ."' WHERE transactionID = '". $b ."'";
+			$stmt = $config->runQuery($stmt);
+			$stmt->execute();
+
+			if($stmt){
+				echo $config->actionMsg('u', 'transaction');
+				$logs = $config->saveLogs($a, $admin, 'u', 'update statusOrder');
+			}else{
+				echo 'Failed!';
+			}
+		}else{
+			echo 'Pilih Florist Terlebih dahulu!';
+		}
+	}
+}
+
+if($_GET['type'] == 'addDeliveryCharges'){
+    $a = $_POST['transctionID'];
+    $b = $_POST['transctionPrice'];
+
+
+    $stmt = "UPDATE transaction SET delivery_charge = '". $b ."' WHERE transactionID = '". $a ."'";
+    $stmt = $config->runQuery($stmt);
+    $stmt->execute();
+
+    if($stmt){
+        echo $config->actionMsg('u', 'transaction');
+        $logs = $config->saveLogs($a, $admin, 'u', 'update delivery_charge');
+    }else{
+        echo 'Failed!';
+    }
+}
+
+if($_GET['type'] == 'selectFlorist'){
+    $a = $_POST['transctionID'];
+    $b = $_POST['floristID'];
+
+    $stmt = "UPDATE transaction_details SET id_florist = '". $b ."' WHERE id_trx = '". $a ."'";
+    $stmt = $config->runQuery($stmt);
+    $stmt->execute();
+
+    if($stmt){
+        echo $config->actionMsg('u', 'transaction_details');
+        $logs = $config->saveLogs($a, $admin, 'u', 'update florist!');
+    }else{
+        echo 'Failed!';
+    }
+}
+if($_GET['type'] == 'selectKurir'){
+    $a = $_POST['transctionID'];
+    $b = $_POST['KurirID'];
+
+    $stmt = "UPDATE transaction_details SET id_kurir = '". $b ."' WHERE id_trx = '". $a ."'";
+    $stmt = $config->runQuery($stmt);
+    $stmt->execute();
+
+    if($stmt){
+        echo $config->actionMsg('u', 'transaction_details');
+        $logs = $config->saveLogs($a, $admin, 'u', 'update kurir!');
+    }else{
+        echo 'Failed!';
+    }
 }

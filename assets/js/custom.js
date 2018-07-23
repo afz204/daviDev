@@ -1,15 +1,20 @@
-function btn_submit(id){
-    $('#'+id).html('<span class="badge badge-primary text-center" style="font-size: 14px; margin-left: 40%;">Please wait while loading!!!!</span>');
+function hideContent(id1, id2) {
+    $('#' + id1).addClass('hidden');
+    $('#' + id2).removeClass('hidden');
+}
+
+function btn_submit(id) {
+    $('#' + id).html('<span class="badge badge-primary text-center" style="font-size: 14px; margin-left: 40%;">Please wait while loading!!!!</span>');
 }
 $(document).ready(function() {
-   
+
     $('#ProvinsiCorporate').select2({ width: '100%', theme: "bootstrap4" });
     $('#KotaCorporate').select2({ width: '100%', theme: "bootstrap4" });
     $('#kecamatanCorporate').select2({ width: '100%', theme: "bootstrap4" });
     $('#listCorporate').select2({ width: '100%', theme: "bootstrap4" });
     $('#listPicCorp').select2({ width: '100%', theme: "bootstrap4" });
-    
-    
+
+
     $('#ProvinsiCorporate').on('change', function(e) {
         e.preventDefault();
         var id = $(this).find("option:selected");
@@ -146,7 +151,7 @@ $(document).ready(function() {
                 $('#listPicCorp').empty();
 
                 $.each(msg, function(index, value) {
-                    $('#listPicCorp').append('<option value="' + value.id + '">' + value.name + '</option>');
+                    $('#listPicCorp').append('<option value="' + value.id + '" data-name="' + value.name + '">' + value.name + '</option>');
                 })
             }
         });

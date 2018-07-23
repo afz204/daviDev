@@ -28,7 +28,7 @@ if($_GET['type'] == 'newProd') {
     $a = $_POST['cat'];
     $b = $_POST['sub'];
     $c = $_POST['title'];
-    $c = str_replace(' ', '_', $c);
+    $link = str_replace(' ', '_', $c);
     $d = $_POST['tags'];
     $e = $_POST['cost'];
     $f = $_POST['sell'];
@@ -67,7 +67,7 @@ if($_GET['type'] == 'newProd') {
             ':h' => $h,
             ':i' => $i,
             ':j' => $j,
-            ':link' => $c,
+            ':link' => $link,
             ':tgl' => $tgl,
             ':k' => $k
         ));

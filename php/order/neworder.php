@@ -33,7 +33,17 @@
     if($totalProduct > 0){
       $ProductTotal = $totalProduct;
     }
+    //total transaction
+    $delivery = $config->getData('delivery_charge', '  transaction', " transaction.transactionID = '". $_GET['trx'] ."'");
+    $deliveryCharge = 0;
+    if($delivery['delivery_charge'] > 0) { $deliveryCharge = $delivery['delivery_charge']; }
+    $total = $config->getData('SUM(detail.product_qty * detail.product_price) as subtotal', '  transaction_details as detail', " detail.id_trx = '". $_GET['trx'] ."'");
+    $totalTransaction = $total['subtotal'];
+
+    $grandTotal = $totalTransaction + $deliveryCharge;
     // /var_dump($card);
+
+    $paymentList = $config->Products('ID, PaymentName, AccountName, AccountNumber, PaymentImages', 'payment WHERE Status = 1 ');
     ?>
 <div class="row">
    <div class="col-md-4 order-md-2 mb-4">
@@ -60,13 +70,13 @@
             <div>
                <h6 class="my-0">Total Harga Barang</h6>
             </div>
-            <span class="text-muted" id="subTotal">00</span>
+            <span class="text-muted" id="subTotal"><?=$config->formatprice($totalTransaction)?></span>
          </li>
          <li class="list-group-item d-flex justify-content-between lh-condensed">
             <div>
                <h6 class="my-0">Biaya Kirim</h6>
             </div>
-            <span class="text-muted" id="deliveryCharges">00</span>
+            <span class="text-muted" id="deliveryCharges"><?=$config->formatprice($deliveryCharge)?></span>
          </li>
          <!-- <li class="list-group-item d-flex justify-content-between bg-light">
             <div class="text-danger">
@@ -77,9 +87,11 @@
          </li> -->
          <li class="list-group-item d-flex justify-content-between">
             <strong>Total Belanja</strong>
-            <strong id="totalTransaction">00</strong>
+            <strong id="totalTransaction"><?=$config->formatprice($grandTotal)?></strong>
          </li>
+
       </ul>
+      <button type="button" id="btnProccessOrder" onclick="proccessOrder('<?=$_GET['trx']?>')" class="btn btn-block btn-outline-success hidden">Proccess Order</button>
    </div>
    <div class="col-md-8 order-md-1" id="SmartWizard">
       <input type="hidden" name="nomorTrx" id="nomorTrx" value="<?=$_GET['trx']?>">
@@ -192,6 +204,26 @@
                         </div>
                      </div>
                      <div class="row ">
+                        <div class="col-md-6 form-group">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input AddDeliveryChargesClass" id="AddDeliveryCharges">
+                            <label class="custom-control-label" for="AddDeliveryCharges">Tambah ke Biaya Kirim</label>
+                          </div>
+                           <div class="help-block with-errors"></div>
+                        </div>
+                        <div class="col-md-6 form-group hidden" id="manual_delivery_charges">
+                            <div class="input-group mb-3">
+                                 <div class="input-group-prepend">
+                                     <span class="input-group-text">Rp.</span>
+                                   </div>
+                                <input type="text" data-parsley-type="number" class="form-control" name="delivery_charges_values" id="delivery_charges_values" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                  <button class="btn btn-outline-primary delivery_charges_values_btn" data-trx = "<?=$_GET['trx']?>" type="button" >biaya kirim</button>
+                                </div>
+                              </div>
+                        </div>
+                     </div>
+                     <div class="row ">
                         <div class="col-md-6 mb-3 form-group">
                            <label for="delivery_dates">tanggal_pengiriman</label>
                            <input type="text" class="form-control" id="delivery_dates" required>
@@ -212,20 +244,20 @@
                      <h5 class="text-muted">Pilih salah satu dari pilihan dibawah ini untuk memastikan pengiriman berhasil: </h5>
                      <div class="col-md-12 form-group">
                         <div class="custom-control custom-radio ">
-                           <input type="radio" class="custom-control-input" id="caseOne" name="radio-stacked" required>
-                           <label class="custom-control-label" for="caseOne">Jangan hubungi penerima. Jika penerima tidak ditempat
+                           <input type="radio" class="custom-control-input" id="Jangan hubungi penerima. Jika penerima tidak ditempat" name="radio-remarks" required>
+                           <label class="custom-control-label" for="Jangan hubungi penerima. Jika penerima tidak ditempat">Jangan hubungi penerima. Jika penerima tidak ditempat
                            </label>
                            <div class="help-block with-errors"></div>
                         </div>
                         <div class="custom-control custom-radio ">
-                           <input type="radio" class="custom-control-input" id="caseTwo" name="radio-stacked" required>
-                           <label class="custom-control-label" for="caseTwo">Tinggalkan didepan pintu, tetangga atau petugas
+                           <input type="radio" class="custom-control-input" id="Tinggalkan didepan pintu, tetangga atau petugas" name="radio-remarks" required>
+                           <label class="custom-control-label" for="Tinggalkan didepan pintu, tetangga atau petugas">Tinggalkan didepan pintu, tetangga atau petugas
                            </label>
                            <div class="help-block with-errors"></div>
                         </div>
                         <div class="custom-control custom-radio ">
-                           <input type="radio" class="custom-control-input" id="caseThree" name="radio-stacked" required>
-                           <label class="custom-control-label" for="caseThree">Hubungi penerima sebelum pengiriman
+                           <input type="radio" class="custom-control-input" id="Hubungi penerima sebelum pengiriman" name="radio-remarks" required>
+                           <label class="custom-control-label" for="Hubungi penerima sebelum pengiriman">Hubungi penerima sebelum pengiriman
                            </label>
                            <div class="help-block with-errors"></div>
                         </div>
@@ -254,7 +286,7 @@
                               <option value="">Choose...</option>
                               <?php while ($crd = $card->fetch(PDO::FETCH_LAZY)) {
                                  ?>
-                              <option value="<?=$crd['id']?>"><?=$crd['level1']?></option>
+                              <option value="<?=$crd['id']?>" data-name="<?=$crd['level1']?>"><?=$crd['level1']?></option>
                               <?php } ?>
                            </select>
                            <div class="help-block with-errors"></div>
@@ -280,13 +312,16 @@
                <div id="step-5" class="">
                   <div id="form-step-3" class="card-body" role="form" data-toggle="validator">
                      <div class="row">
+                      <?php while ($row = $paymentList->fetch(PDO::FETCH_LAZY)) {
+                        ?>
                         <div class="col-4 col-md-3 col-lg-3 listPayment">
-                           <a href="#step-5" class="card btn border-success">
+                           <a href="#" class="card btn border-success" onclick="selectPayment('<?=$_GET['trx']?>', <?=$row['ID']?>)">
                               <div class="text-center">
-                                 <img src="<?=URL?>assets/images/payment/bca.jpg" width="50%" class="rounded mx-auto d-block" alt="...">
+                                 <img src="<?=URL?>assets/images/payment/<?=$row['PaymentImages']?>.jpg" width="50%" class="rounded mx-auto d-block" alt="...">
                               </div>
                            </a>
                         </div>
+                      <?php } ?>
                      </div>
                      <input type="text" name="step_4" id="step_4" autocomplete="address-level2" required>
                   </div>
@@ -318,13 +353,13 @@
                        </picture>
                      </div>
                      <div class="checkout-sometext" style="width: 120%">
-                        <div class="title"><?=$product['name_product']?> <div class="pull-right"><button class="btn btn-sm btn-danger deleteListProduct" type="button" data-id="<?=$product['id']?>"><span class="fa fa-trash"></span></button></div></div>
+                        <div class="title"><?=$product['name_product']?> <div class="pull-right"><button class="btn btn-sm btn-danger deleteListProduct" type="button" data-id="<?=$product['id']?>" data-trx="<?=$_GET['trx']?>"><span class="fa fa-trash"></span></button></div></div>
                         <div class="count-product">
                            
                            <div class="center">
                               <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                  <button class="btn btn-sm btn-outline-secondary btn-number-count"  type="button" data-type="minus" data-field="count-product-number[<?=$product['id']?>]"  <?=$product['product_qty'] > 1 ? '': 'disabled="disabled"' ?> ><span class="fa fa-minus"></span></button>
+                                  <button class="btn btn-sm btn-outline-secondary btn-number-count"  type="button" data-type="minus" data-field="count-product-number[<?=$product['id']?>]"  <?=$product['product_qty'] > 1 ? '': 'disabled="disabled"' ?>  data-trx="<?=$_GET['trx']?>"><span class="fa fa-minus"></span></button>
                                 </div>
                                 <input style="text-align: center;" type="text" 
                                 value="<?=$product['product_qty']?>" 
@@ -335,7 +370,7 @@
                                 data-field="count-product-number[<?=$product['id']?>]"
                                 data-qty="<?=$product['product_qty']?>" >
                                 <div class="input-group-append">
-                                  <button class="btn btn-sm btn-outline-secondary btn-number-count"  type="button" data-type="plus" data-field="count-product-number[<?=$product['id']?>]"><span class="fa fa-plus"></span></button>
+                                  <button class="btn btn-sm btn-outline-secondary btn-number-count"  type="button" data-type="plus" data-field="count-product-number[<?=$product['id']?>]" data-trx="<?=$_GET['trx']?>"><span class="fa fa-plus"></span></button>
                                 </div>
                               </div>
                             
@@ -350,7 +385,7 @@
                                    </div>
                                 <input type="text" data-parsley-type="number" class="form-control" name="selling_price_product[<?=$product['id']?>]" id="selling_price_product[<?=$product['id']?>]" value="<?=$product['product_price']?>" aria-describedby="basic-addon2">
                                 <div class="input-group-append">
-                                  <button class="btn btn-outline-info selling_price_btn" type="button" data-id="selling_price_product[<?=$product['id']?>]">Change</button>
+                                  <button class="btn btn-outline-info selling_price_btn" type="button" data-id="selling_price_product[<?=$product['id']?>]" data-trx="<?=$_GET['trx']?>">Change</button>
                                 </div>
                               </div>
                            

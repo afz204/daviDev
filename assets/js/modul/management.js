@@ -1,3 +1,20 @@
+function changePaymentStatus(id, type){
+    $.ajax({
+        url: '../php/ajax/management.php?type=changePaymentStatus',
+        method: 'post',
+        data: { data: id, types: type },
+
+        success: function(msg) {
+            location.reload();
+            alert(msg);
+        }
+    })
+}
+function formPaymentShow()
+{
+    $('#showFormPayment').removeClass('hidden');
+    $('#btnPayment').addClass('hidden');
+}
 function formPrevillage() {
     $('#form-previllage').removeClass('hidden');
     $('#listPrevillages').hide();
@@ -252,6 +269,26 @@ $(document).ready(function() {
 
         window.location.href = '?p=log_user&type=logs&range=' + tgl + '&admin=' + listAdm;
 
+    });
+
+    $('#formPayment').on('submit', function(e){
+        e.preventDefault();
+
+        var name = $('#paymentName').val();
+        var account = $('#accountName').val();
+        var number = $('#accountNumber').val();
+        var images = $('#imagesPayment').val();
+        alert(images);
+        $.ajax({
+            url: '../php/ajax/management.php?type=addPayment',
+            method: 'post',
+            data: { imagesPayment: images, paymentName: name, accountName: account, accountNumber: number },
+
+            success: function(msg) {
+                location.reload();
+                alert(msg);
+            }
+        })
     });
 
 })

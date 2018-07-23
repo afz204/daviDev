@@ -128,6 +128,13 @@ class Admin
         return $row;
 
     }
+    public function getDataTable($field, $table, $clause)
+    {
+        $stmt = $this->conn->prepare("SELECT ". $field ." FROM ". $table ." WHERE ". $clause ." ");
+        $stmt->execute();
+        return $stmt;
+
+    }
     public function getKurir($id)
     {
         $stmt = $this->conn->prepare("SELECT id, nama_kurir, email, phone, wa, alamat, kel, kec, kota, province, status, created_at FROM kurirs WHERE id = :user_id");
@@ -609,6 +616,14 @@ class Admin
         $price = 'Rp. ' . $price;
 
         return $price;
+    }
+    public function insert($table, $field, $data)
+    {
+        $sql = "INSERT INTO ". $table ." (" . $field . ") VALUES (". $data .") ";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+
+        return $stmt;
     }
     public function delRecord($table, $field, $id)
     {

@@ -218,4 +218,59 @@ if($_GET['type'] == 'addAdmin') {
             echo 'Failed!';
         }     
     }
+}elseif($_GET['type'] == 'addPayment'){
+    $a = $_POST['paymentName'];
+    $b = $_POST['accountName'];
+    $c = $_POST['accountNumber'];
+    
+$title = str_replace(' ', '', $a);
+    if(isset($_FILES['imagesPayment'])){
+        $images = $_FILES['imagesPayment'];
+
+        
+        $path = '../../assets/images/payment/' . $title . '.png';
+        if(move_uploaded_file($images['tmp_name'], $path)) {
+                echo "Success!";
+            } else {
+                echo "Failed!";
+            }
+
+    }
+
+    
+    $sql = "INSERT INTO payment (PaymentName, AccountName, AccountNumber, PaymentImages) VALUES (:con, :content, :category, :admin_id)";
+        $stmt = $config->runQuery($sql);
+        $stmt->execute(array(
+            ':con'      => $a,
+            ':content'  => $b,
+            ':category' => $c,
+            ':admin_id' => $title
+        ));
+
+        $reff = $config->lastInsertId();
+        $logs = $config->saveLogs($reff, $admin, 'c', 'new payment');
+
+        if($stmt)
+        {
+            echo $config->actionMsg('c', 'payment');
+        }else{
+            echo 'Failed!';
+        }
+}
+elseif ($_GET['type'] == 'changePaymentStatus') {
+    # code...
+    $a = $_POST['data'];
+    $b = $_POST['types'];
+
+    $stmt = $config->runQuery("UPDATE payment SET Status = :status WHERE ID = :id");
+    $stmt->execute(array(
+        ':status' => $b,
+        ':id'   => $a
+    ));
+    $logs = $config->saveLogs($a, $admin, 'u', 'update status');
+    if($stmt){
+        echo $config->actionMsg('u', 'payment');
+    }else{
+        echo 'Failed';
+    }
 }

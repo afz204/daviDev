@@ -36,7 +36,7 @@ Many operating systems, software frameworks, and programs include a logging syst
     <script type="text/javascript" src="<?=URL?>assets/vendors/datetime-picker4/js/bootstrap-datetimepicker.min.js"></script>
     <script type="text/javascript" src="<?=URL?>assets/vendors/daterangepicker/daterangepicker.js"></script>
     <script type="text/javascript" src="<?=URL?>assets/vendors/jquery.countdown-2.2.0/jquery.countdown.min.js"></script>
-     <?php if($menu == 'order' && $footer == 'neworder'){ ?>
+     <?php if($menu == 'order' OR $footer == 'neworder' OR $footer == 'detailtrx'){ ?>
         <script src="<?=URL?>assets/vendors/smartWizard/js/jquery.smartWizard.min.js"></script>
         <script src="<?=URL?>assets/vendors/bootstrapValidator/validator.js"></script>
         <script src="<?=URL?>assets/vendors/lightbox/ekko-lightbox.js" type="text/javascript"></script> 
@@ -47,6 +47,9 @@ Many operating systems, software frameworks, and programs include a logging syst
             });
         </script>
         <script type="text/javascript" src="<?=URL?>assets/vendors/dll/jquery.number.min.js"></script>
+    <?php } ?>
+    <?php if($menu == 'order' && $footer == 'neworder'){ ?>
+        <script src="<?=URL?>assets/js/modul/createorder.js"></script>
     <?php } ?>
     <?php if($menu == 'bd'){ ?>
 

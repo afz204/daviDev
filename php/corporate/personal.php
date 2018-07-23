@@ -9,7 +9,7 @@ $stmt->execute();
     </div>
     <div class="card-body">
 
-        <table id="listCorporate" class="table table-bordered <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
+        <table id="listPersonal" class="table table-bordered <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
             <thead class="thead-light">
             <tr>
                 <th scope="col">full name</th>

@@ -2,6 +2,7 @@
 $listAdmin = $config->Products('id, name', 'users');
 $kurir     = $config->Products('id, nama_kurir', 'kurirs');
 
+$formR = '';
 if(isset($_GET['type'])) $formR = 'hidden';
 
 ?>
@@ -121,8 +122,9 @@ ORDER BY kas_besar.type";
         $stmtKredit = $config->runQuery("SELECT SUM(total) as total FROM kas_besar WHERE type = 'kredit' AND created_at BETWEEN '". $dateFrom ."' AND '". $dateTo ."' ". $adminID);
         $stmtKredit->execute(); $stmtKredit = $stmtKredit->fetch(PDO::FETCH_LAZY);
         $totalKredit = $stmtKredit['total'];
+
         ?>
-<div id="hasilReport" class="hidden" style = "margin-top:2%; <?=$reportH?>">
+<div id="hasilReport" style = "margin-top:2%; <?=$reportH?>">
     <div class="card">
         <div class="card-header">
             <h5>Hasil Report Kas Besar
@@ -222,7 +224,7 @@ ORDER BY kas_ins.types";
         $totalKredit = $stmtKredit['total'];
 
         ?>
-<div id="hasilReport" class="hidden" style = "margin-top:2%; <?=$reportH?>">
+<div id="hasilReport" style = "margin-top:2%; <?=$reportH?>">
     <div class="card">
         <div class="card-header">
             <h5>Hasil Report Kas Operasional
@@ -325,7 +327,7 @@ INNER JOIN users ON users.id = kas.admin_id
 //        $stmtKredit->execute(); $stmtKredit = $stmtKredit->fetch(PDO::FETCH_LAZY);
 //        $totalKredit = $stmtKredit['total'];
         ?>
-<div id="hasilReport" class="hidden" style = "margin-top:2%; <?=$reportH?>">
+<div id="hasilReport" style = "margin-top:2%; <?=$reportH?>">
     <div class="card">
         <div class="card-header">
             <h5>Hasil Report Belanja

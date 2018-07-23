@@ -62,8 +62,8 @@
                 <input type="text" class="form-control" id="birth_day" autocomplete="text" placeholder="" value="" required="">
             </div>
             <div class="col-md-6 mb-3">
-                <label for="lastName">password_login</label>
-                <input type="text" data-parsley-type="password" class="form-control" id="password_login" autocomplete="text" placeholder="" value="" required="">
+                <label for="password_login">password_login</label>
+                <input type="password" class="form-control" id="password_login" placeholder="" value="" required="">
                 <div class="invalid-feedback">
                     Valid last name is required.
                 </div>
