@@ -581,23 +581,24 @@ if($_GET['type'] == 'changeOrderStatus'){
 	$c = $_POST['types'];
 	
 	if($c == 'florist'){
-		$cek = $config->getData('id_florist', 'transaction_details', "id_trx ='". $b ."' ");
+		$cek = $config->getData('id_florist, id_kurir', 'transaction_details', "id_trx ='". $b ."' ");
 		
-		if($cek['id_florist'])
+		if(empty($cek['id_florist']))
 		{
-			
-			$stmt = "UPDATE transaction SET statusOrder = '". $a ."' WHERE transactionID = '". $b ."'";
+			echo 'Pilih Florist Terlebih dahulu!';
+		} elseif(empty($cek['id_kurir'])) {
+            echo 'Pilih Kurir Terlebih dahulu!';
+        } else { 
+            $stmt = "UPDATE transaction SET statusOrder = '". $a ."' WHERE transactionID = '". $b ."'";
 			$stmt = $config->runQuery($stmt);
 			$stmt->execute();
 
-			if($stmt){
+			if($stmt) {
 				echo $config->actionMsg('u', 'transaction');
 				$logs = $config->saveLogs($a, $admin, 'u', 'update statusOrder');
-			}else{
+			} else {
 				echo 'Failed!';
 			}
-		}else{
-			echo 'Pilih Florist Terlebih dahulu!';
 		}
 	}
 }
@@ -643,6 +644,9 @@ if($_GET['type'] == 'selectKurir'){
     $stmt->execute();
 
     if($stmt){
+        $insert = "INSERT INTO kurir_jobs (TransactionNumber, KurirID, Created_by) VALUES ('". $a ."', '". $b ."', '". $admin ."')";
+        $insert = $config->runQuery($insert);
+        $insert->execute();
         echo $config->actionMsg('u', 'transaction_details');
         $logs = $config->saveLogs($a, $admin, 'u', 'update kurir!');
     }else{

@@ -79,7 +79,7 @@ $provinsi = $config->Products('id, name', 'provinces');
                         <label for="usernameAdmin">Bergabung Sejak</label>
                         <input style="text-transform: capitalize;" type="text" class="form-control" value="<?=date('d M Y H:m:s', strtotime($info->created_at))?>" readonly>
                     </div>
-                    <button type="submit" class="btn btn-block btn-outline-dark" <?=$access['update']?>>Edit Profile</button>
+                    <button type="button" class="btn btn-block btn-outline-dark" onclick="location.href='<?=CORPORATE?>?p=newCP&edit=<?=$info['id']?>';" <?=$access['update']?>>Edit Profile</button>
 
                 </form>
             </div>
@@ -135,6 +135,20 @@ $provinsi = $config->Products('id, name', 'provinces');
                             <input type="text" class="form-control" id="namaPIC" placeholder="" value="" required="">
                             <input type="hidden" id="kodePerusahaan" value="<?=$info['CorporateUniqueID']?>">
 
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="usernameAdmin">Type Document</label>
+                        <select class="form-control" name="typePIC" id="typePIC" required>
+                            <option value="">:: soft copy / hard copy ::</option>
+                            <option value="0">Soft Copy</option>
+                            <option value="1">Hard Copy</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-12">
+                            <label for="lastName">Alamat Email</label>
+                            <input type="text" class="form-control" data-parsley-type="email" id="emailPIC" placeholder="" value="" required="">
                         </div>
                     </div>
                     <div class="row">

@@ -30,7 +30,7 @@ $(document).ready(function() {
 
     $('#newCorporate').on('submit', function(e) {
         e.preventDefault();
-
+        var type = $('#typeFormCorporate').val();
         var nama = $('#nameCorporate').val();
         var bidang = $('#bidangCorporate option:selected').val();
         var telp = $('#telpCorporate').val();
@@ -49,7 +49,7 @@ $(document).ready(function() {
         $.ajax({
             url: '../php/ajax/corporate.php?type=new',
             type: 'post',
-            data: 'nama=' + nama + '&bidang=' + bidang + '&telp=' + telp + '&hp=' + hp + '&fax=' + fax + '&email=' + email + '&web=' + web + '&prov=' + prov + '&kota=' + kota +
+            data: 'type=' + type + 'nama=' + nama + '&bidang=' + bidang + '&telp=' + telp + '&hp=' + hp + '&fax=' + fax + '&email=' + email + '&web=' + web + '&prov=' + prov + '&kota=' + kota +
                 '&kec=' + kec + '&kel=' + kel + '&alamat=' + addr + '&pos=' + pos + '&cp=' + cp,
 
             success: function(msg) {
@@ -91,6 +91,8 @@ $(document).ready(function() {
 
         $('#formPIC')[0].reset();
         $('#namaPIC').removeClass('parsley-success');
+        $('#typePIC').removeClass('parsley-success');
+        $('#emailPIC').removeClass('parsley-success');
         $('#nomorPIC').removeClass('parsley-success');
         $('#namaPIC').removeClass('parsley-error');
         $('#nomorPIC').removeClass('parsley-error');
@@ -104,6 +106,8 @@ $(document).ready(function() {
 
         var id = $('#kodePerusahaan').val();
         var name = $('#namaPIC').val();
+        var typePIC = $('#typePIC').val();
+        var emailPIC = $('#emailPIC').val();
         var nomor = $('#nomorPIC').val();
         var provinsi = $('#ProvinsiCorporate option:selected').val();
         var kota = $('#KotaCorporate option:selected').val();
@@ -115,14 +119,16 @@ $(document).ready(function() {
             url: '../php/ajax/corporate.php?type=savePIC',
             type: 'post',
             data: {
-                kode_perusahaan: id,
-                nama_pic: name,
-                nomor_hp: nomor,
-                provinsi: provinsi,
-                kota: kota,
-                kec: kecamatan,
-                kel: kelurahan,
-                alamat: alamat
+                'kode_perusahaan': id,
+                'nama_pic': name,
+                'typePIC': typePIC,
+                'emailPIC': emailPIC,
+                'nomor_hp': nomor,
+                'provinsi': provinsi,
+                'kota': kota,
+                'kec': kecamatan,
+                'kel': kelurahan,
+                'alamat': alamat
             },
 
             success: function(msg) {
@@ -193,6 +199,42 @@ $(document).ready(function() {
                 kecamatanCorporate: kecamatanCorporate,
                 kelurahanCorporate: kelurahanCorporate,
                 alamatCorporate: alamatCorporate
+            },
+
+            success: function(msg) {
+                alert(msg);
+                location.reload();
+            }
+        });
+    });
+    $('#formEditFlorist').on('submit', function(e) {
+        e.preventDefault();
+
+        var IDFlorist = $('#IDFlorist').val();
+        var FloristName = $('#FloristName').val();
+        var Email = $('#Email').val();
+        var Username = $('#Username').val();
+        var mobile_phone = $('#mobile_phone').val();
+        var ProvinsiCorporate = $('#ProvinsiCorporate option:selected').val();
+        var KotaCorporate = $('#KotaCorporate option:selected').val();
+        var kecamatanCorporate = $('#kecamatanCorporate option:selected').val();
+        var kelurahanCorporate = $('#kelurahanCorporate option:selected').val();
+        var alamatCorporate = $('#alamatCorporate').val();
+
+        $.ajax({
+            url: '../php/ajax/corporate.php?type=updateFlorist',
+            type: 'post',
+            data: {
+                'IDFlorist': IDFlorist,
+                'FloristName': FloristName,
+                'Email': Email,
+                'Username': Username,
+                'mobile_phone': mobile_phone,
+                'ProvinsiCorporate': ProvinsiCorporate,
+                'KotaCorporate': KotaCorporate,
+                'kecamatanCorporate': kecamatanCorporate,
+                'kelurahanCorporate': kelurahanCorporate,
+                'alamatCorporate': alamatCorporate
             },
 
             success: function(msg) {

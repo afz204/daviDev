@@ -126,7 +126,7 @@ $provinsi = $config->Products('id, name', 'provinces');
                     <td><?=$status?></td>
                     <td><?=date('d M Y H:m', strtotime($row['CreatedDate']))?></td>
                     <td >
-                        <a href="<?=CORPORATE?>?p=detailOrganic&id=<?=$row['ID']?>" <?=$access['read']?>>
+                        <a href="<?=CORPORATE?>?p=detailFlorist&id=<?=$row['ID']?>" <?=$access['read']?>>
                             <button class="btn btn-sm btn-primary" style="text-transform: uppercase; font-size: 10px; font-weight: 500;">details</button>
                         </a>
                     </td>
