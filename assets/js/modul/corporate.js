@@ -49,7 +49,7 @@ $(document).ready(function() {
         $.ajax({
             url: '../php/ajax/corporate.php?type=new',
             type: 'post',
-            data: 'type=' + type + 'nama=' + nama + '&bidang=' + bidang + '&telp=' + telp + '&hp=' + hp + '&fax=' + fax + '&email=' + email + '&web=' + web + '&prov=' + prov + '&kota=' + kota +
+            data: 'type=' + type + '&nama=' + nama + '&bidang=' + bidang + '&telp=' + telp + '&hp=' + hp + '&fax=' + fax + '&email=' + email + '&web=' + web + '&prov=' + prov + '&kota=' + kota +
                 '&kec=' + kec + '&kel=' + kel + '&alamat=' + addr + '&pos=' + pos + '&cp=' + cp,
 
             success: function(msg) {
