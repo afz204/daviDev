@@ -414,6 +414,15 @@ if($_GET['type'] == 'step1'){
     $data = $config->getDataTable('transactionID', 'transaction', " transactionID = '". $a ."' ");
     if($data->rowCount() > 0 ){
         //edit
+        $update = $config->runQuery("UPDATE transaction SET CustomerID = '". $b ."', CustomerName = '". $d ."' WHERE transactionID = '". $a ."' ");
+        $update->execute();
+
+        if($update) {
+            echo $config->actionMsg('u', 'transaction');
+            $logs = $config->saveLogs($a, $admin, 'u', 'Customer');
+        } else {
+            echo 'Failed!';
+        }
     }else{
         //new
         $input = $config->runQuery("INSERT INTO transaction (transactionID, type, CustomerID, CustomerName) VALUES (:a, :b, :c, :d)");
@@ -444,10 +453,10 @@ if($_GET['type'] == 'step2'){
     $trx = $_POST['TransactionID'];
 
    
-    $data = $config->getDataTable('id_trx', 'transaction_details', " id_trx = '". $trx ."' ");
+    $data = $config->getDataTable('transactionID', 'transaction', " transactionID = '". $trx ."' ");
     if($data->rowCount() > 0 ){
         //edit
-        $update = $config->runQuery("UPDATE transaction_details SET nama_penerima = :a, email = :b, provinsi_id = :c, kota_id = :d, kecamata_id = :e, kelurahan_id = :f, alamat_penerima = :g WHERE id_trx = :trx");
+        $update = $config->runQuery("UPDATE transaction SET nama_penerima = :a, email = :b, provinsi_id = :c, kota_id = :d, kecamata_id = :e, kelurahan_id = :f, alamat_penerima = :g WHERE transactionID = :trx");
         $update->execute(array(
             ':a'    => $a,
             ':b'    => $b,
@@ -461,7 +470,13 @@ if($_GET['type'] == 'step2'){
         $logs = $config->saveLogs($trx, $admin, 'u', 'update detail transaction');
         if($update)
         {
-            echo $config->actionMsg('u', 'transaction_details');
+            $charge = $config->getData('price', '  delivery_charges', " delivery_charges.id_kelurahan = '". $f ."'");
+
+            if($charge) {
+                die(json_encode(['response' => 'OK', 'msg' => $charge['price']], JSON_FORCE_OBJECT));
+            } else {
+                die(json_encode(['response' => 'ERROR', 'msg' => $config->actionMsg('u', 'transaction')], JSON_FORCE_OBJECT));
+            }
         }else{
             echo 'Failed!';
         }
@@ -478,10 +493,10 @@ if($_GET['type'] == 'step3'){
     $e = $_POST['deliveryRemarks'];
 
    
-    $data = $config->getDataTable('id_trx', 'transaction_details', " id_trx = '". $a ."' ");
+    $data = $config->getDataTable('TransactionID', 'transaction', " TransactionID = '". $a ."' ");
     if($data->rowCount() > 0 ){
         //edit
-        $update = $config->runQuery("UPDATE transaction_details SET delivery_charge = :a, delivery_date = :b, delivery_time = :c, delivery_marks = :d WHERE id_trx = :trx");
+        $update = $config->runQuery("UPDATE transaction SET delivery_charge = :a, delivery_date = :b, delivery_time = :c, delivery_marks = :d WHERE TransactionID = :trx");
         $update->execute(array(
             ':a'    => $b,
             ':b'    => $c,
@@ -492,7 +507,7 @@ if($_GET['type'] == 'step3'){
         $logs = $config->saveLogs($a, $admin, 'u', 'update detail transaction');
         if($update)
         {
-            echo $config->actionMsg('u', 'transaction_details');
+            echo $config->actionMsg('u', 'transaction');
         }else{
             echo 'Failed!';
         }
@@ -510,10 +525,10 @@ if($_GET['type'] == 'step4'){
     $f = $_POST['level2'];
 
    
-    $data = $config->getDataTable('id_trx', 'transaction_details', " id_trx = '". $a ."' ");
+    $data = $config->getDataTable('transactionID', 'transaction', " transactionID = '". $a ."' ");
     if($data->rowCount() > 0 ){
         //edit
-        $update = $config->runQuery("UPDATE transaction_details SET card_from = :a, card_to = :b, card_template1 = :c, card_template2 = :d, card_isi = :e WHERE id_trx = :trx");
+        $update = $config->runQuery("UPDATE transaction SET card_from = :a, card_to = :b, card_template1 = :c, card_template2 = :d, card_isi = :e WHERE transactionID = :trx");
         $update->execute(array(
             ':a'    => $b,
             ':b'    => $c,
@@ -522,10 +537,10 @@ if($_GET['type'] == 'step4'){
             ':e'    => $d,
             ':trx'  => $a
         ));
-        $logs = $config->saveLogs($a, $admin, 'u', 'update detail transaction');
+        $logs = $config->saveLogs($a, $admin, 'u', 'update messages transaction');
         if($update)
         {
-            echo $config->actionMsg('u', 'transaction_details');
+            echo $config->actionMsg('u', 'transaction');
         }else{
             echo 'Failed!';
         }
@@ -581,14 +596,16 @@ if($_GET['type'] == 'changeOrderStatus'){
 	$c = $_POST['types'];
 	
 	if($c == 'florist'){
-		$cek = $config->getData('id_florist, id_kurir', 'transaction_details', "id_trx ='". $b ."' ");
+		$cek = $config->getData('id_florist, id_kurir', 'transaction', "transactionID ='". $b ."' ");
 		
-		if(empty($cek['id_florist']))
+		if(empty($cek['id_florist']) && $c == 'florist')
 		{
 			echo 'Pilih Florist Terlebih dahulu!';
-		} elseif(empty($cek['id_kurir'])) {
+        }
+         elseif(empty($cek['id_kurir'])) {
             echo 'Pilih Kurir Terlebih dahulu!';
-        } else { 
+        } 
+        else { 
             $stmt = "UPDATE transaction SET statusOrder = '". $a ."' WHERE transactionID = '". $b ."'";
 			$stmt = $config->runQuery($stmt);
 			$stmt->execute();
@@ -624,7 +641,7 @@ if($_GET['type'] == 'selectFlorist'){
     $a = $_POST['transctionID'];
     $b = $_POST['floristID'];
 
-    $stmt = "UPDATE transaction_details SET id_florist = '". $b ."' WHERE id_trx = '". $a ."'";
+    $stmt = "UPDATE transaction SET id_florist = '". $b ."' WHERE transactionID = '". $a ."'";
     $stmt = $config->runQuery($stmt);
     $stmt->execute();
 
@@ -649,6 +666,20 @@ if($_GET['type'] == 'selectKurir'){
         $insert->execute();
         echo $config->actionMsg('u', 'transaction_details');
         $logs = $config->saveLogs($a, $admin, 'u', 'update kurir!');
+    }else{
+        echo 'Failed!';
+    }
+}
+if($_GET['type'] == 'removecharges'){
+    $a = $_POST['transctionID'];
+
+    $stmt = "UPDATE transaction SET delivery_charge = '' WHERE transactionID = '". $a ."'";
+    $stmt = $config->runQuery($stmt);
+    $stmt->execute();
+
+    if($stmt){
+        echo $config->actionMsg('u', 'transaction');
+        $logs = $config->saveLogs($a, $admin, 'u', 'hapus delivery charge!');
     }else{
         echo 'Failed!';
     }

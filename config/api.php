@@ -713,6 +713,14 @@ class Admin
         return $password;
     }
 
+    function _debugvar($var){
+        echo '<pre>';
+        $data = var_dump($var);
+        echo '</pre>';
+
+        return $data;
+    }
+
 }
 
 ?>

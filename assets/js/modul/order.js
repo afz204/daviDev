@@ -60,7 +60,7 @@ function btnProccessOrder(id) {
 }
 
 function dataCheckout(data) {
-    //console.log(data);
+    // console.log(data);
     $.ajax({
         url: '../php/ajax/order.php?type=listCheckout',
         type: 'post',
@@ -68,7 +68,7 @@ function dataCheckout(data) {
 
         success: function(msg) {
             var data = JSON.parse(msg);
-            //console.log(data);
+            // console.log(data);
             var listProduct = $('#checkoutData').html(" ");
             listProduct.hide().html(data.product).fadeIn(1000);
         }
@@ -103,6 +103,7 @@ function formRedeemPromo() {
 function formAddProduct() {
     $('#addProductCheckout')[0].reset();
     $('#codeSearch').removeClass('parsley-success');
+    $('#codeSearch option:selected').val("");
     $('#checkProduct').html('');
     $('#checkProduct').html('<button type="submit"  class="btn btn-block btn-primary ">submit</button>');
 }
@@ -118,7 +119,7 @@ function formValidate(id) {
         $.ajax({
             url: '../php/ajax/order.php?type=step1',
             type: 'post',
-            data: { TransactionID: trx, CustomerID: corp, picID: cpic, namePic: namepic },
+            data: { 'TransactionID': trx, 'CustomerID': corp, 'picID': cpic, 'namePic': namepic },
 
             success: function(msg) {
                 alert(msg);
@@ -149,12 +150,19 @@ function formValidate(id) {
             },
 
             success: function(msg) {
-                alert(msg);
+                data = JSON.parse(msg);
+                if (data['response'] == 'OK') {
+                    alert('Done !');
+                    $('#delivery_charges').val(data['msg']);
+                } else {
+                    alert(data['msg']);
+                    $('#delivery_charges').val(0);
+                }
             }
         });
     };
     if (id == 2) {
-        var charge = $('#delivery_charges option:selected').val();
+        var charge = $('#delivery_charges').val();
         var dates = $('#delivery_dates').val();
         var times = $('#time_slot option:selected').val();
         var remarks = $('input[name=radio-remarks]:checked').val();
@@ -214,10 +222,21 @@ $(document).ready(function() {
     $('#template_level2').select2({ width: '100%', theme: "bootstrap4" });
     $('#ListSelectedFlorist').select2({ width: '100%', theme: "bootstrap4" });
     $('#ListSelectedKurir').select2({ width: '100%', theme: "bootstrap4" });
-    $('#tableOrder').DataTable();
+    $('#tableOrder').removeAttr('width').DataTable({
+        scrollY: "300px",
+        scrollX: true,
+        scrollCollapse: true,
+        paging: false,
+        columnDefs: [
+            { width: 200, targets: 0 }
+        ],
+        fixedColumns: true
+    });
 
     $('.AddDeliveryChargesClass').on('change', function() { // on change of state
-        var value = $('#delivery_charges option:selected').data('price');
+        var value = $('#delivery_charges').val();
+        var trx = $('#AddDeliveryCharges').data('trx');
+        // alert(trx);
         if (this.checked) // if changed state is "CHECKED"
         {
             $('#delivery_charges_values').val(value);
@@ -226,6 +245,17 @@ $(document).ready(function() {
             if (!confirm('Are you Sure ?')) {
                 return false;
             } else {
+                $.ajax({
+                    url: '../php/ajax/order.php?type=removecharges',
+                    type: 'post',
+                    data: { 'transctionID': trx },
+
+                    success: function(msg) {
+                        alert(msg);
+                        dataCheckout(trx);
+                    }
+                });
+
                 $('#manual_delivery_charges').addClass('hidden');
             }
         }
@@ -256,8 +286,7 @@ $(document).ready(function() {
     $('#delivery_dates').datetimepicker({
 
         format: 'YYYY/MM/DD',
-        minDate: new Date()
-
+        minDate: new Date(),
     });
 
     $('#template_level1').on('change', function(e) {
@@ -315,7 +344,7 @@ $(document).ready(function() {
             data: 'id=' + value,
 
             success: function(msg) {
-                console.log(msg);
+                // console.log(msg);
                 $('#delivery_charges').empty();
 
 
@@ -492,7 +521,7 @@ $(document).ready(function() {
     $('#addProductCheckout').on('submit', function(e) {
         e.preventDefault();
         btn_submit('checkProduct');
-        var code = $('#codeSearch').val();
+        var code = $('#codeSearch option:selected').val();
         var trx = $('#noTransaction').val();
 
         $.ajax({
@@ -503,7 +532,7 @@ $(document).ready(function() {
             success: function(msg) {
                 dataCheckout(trx);
                 var data = JSON.parse(msg);
-                console.log(data);
+                // console.log(data);
                 var count = parseInt(data.qty);
                 $('#listProductsData').hide().append(data.data).fadeIn('fast');
                 $('#countProduct').hide().html(count).fadeIn(800);

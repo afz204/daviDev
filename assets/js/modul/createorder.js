@@ -1,5 +1,6 @@
 $(document).ready(function() {
 
+    $('#codeSearch').select2({ width: '100%', theme: "bootstrap4" });
     // // Toolbar extra buttons
     // var btnFinish = $('<button></button>').text('Finish')
     //     .addClass('btn btn-info')
