@@ -3,6 +3,17 @@ function selectFlorist(trx) {
     $('[name="IDSelectedFlorist"]').val(trx);
 }
 
+function pilihKurir(trx) {
+    $('#modalselectkurir').modal({ show: true, backdrop: 'static', keyboard: false });
+    $('[name="TransactionNumberKurir"]').val(trx);
+    $('#listKurir').select2({ width: '100%', theme: "bootstrap4" });
+}
+
+function chagestatusordermodal(trx) {
+    $('#chagestatusorder').modal({ show: true, backdrop: 'static', keyboard: false });
+    $('[name="NomorTransaction"]').val(trx);
+}
+
 function selectKurir(trx) {
     $('#selectKurir').modal({ show: true, backdrop: 'static', keyboard: false });
     $('[name="IDSelectedKurir"]').val(trx);
@@ -171,11 +182,11 @@ function formValidate(id) {
             url: '../php/ajax/order.php?type=step3',
             type: 'post',
             data: {
-                TransactionID: trx,
-                deliverCharge: charge,
-                deliveryDate: dates,
-                deliveryTimes: times,
-                deliveryRemarks: remarks
+                'TransactionID': trx,
+                'deliverCharge': charge,
+                'deliveryDate': dates,
+                'deliveryTimes': times,
+                'deliveryRemarks': remarks
             },
 
             success: function(msg) {
@@ -405,7 +416,7 @@ $(document).ready(function() {
         e.preventDefault();
         var trx = $('[name="IDSelectedFlorist"]').val();
         var id = $('#ListSelectedFlorist option:selected').val();
-
+        alert(id);
         $.ajax({
             url: '../php/ajax/order.php?type=selectFlorist',
             type: 'post',
@@ -417,11 +428,19 @@ $(document).ready(function() {
         });
 
     });
+    $('#formChangeStatusOrder').on('submit', function(e) {
+        e.preventDefault();
+        var trx = $('[name="NomorTransaction"]').val();
+        var status = $('[name="TypeStatus"]').val();
+        var id = $('#listStatusOrder option:selected').val();
+
+        changeOrderStatus(id, trx, status);
+    });
 
     $('#formSelectKurir').on('submit', function(e) {
         e.preventDefault();
-        var trx = $('[name="IDSelectedKurir"]').val();
-        var id = $('#ListSelectedKurir option:selected').val();
+        var trx = $('[name="TransactionNumberKurir"]').val();
+        var id = $('#listKurir option:selected').val();
 
         $.ajax({
             url: '../php/ajax/order.php?type=selectKurir',
@@ -650,21 +669,6 @@ $(document).ready(function() {
                     dataCheckout(trx);
                 }
             });
-        }
-    });
-
-    $('#changeOrderStatus').on('change', function(e) {
-        e.preventDefault();
-
-        var data = $(this).find(':selected');
-
-        var id = data.val();
-        var trx = data.data('trx');
-
-        if (!confirm('Are you sure want move to Production ?')) {
-            return false;
-        } else {
-            changeOrderStatus(id, trx, 'florist');
         }
     });
 

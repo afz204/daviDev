@@ -113,7 +113,7 @@ if($_GET['type'] == 'addProducts')
 
             $grandTotal = $trxd['grandTotal'] + $info['selling_price'];
 
-            $transaction = $config->runQuery('UPDATE transaction SET grandTotal = :a WHERE transactionID = :b ');
+            $transaction = $config->runQuery("UPDATE transaction SET grandTotal = :a WHERE transactionID = :b ");
             $transaction->execute(array(':a' => $grandTotal, ':b' => $trx));
             //
 
@@ -576,7 +576,7 @@ if($_GET['type'] == 'proccessOrder'){
     $grandTotal = $totalTransaction - $deliveryCharge;
 
 
-    $stmt = "UPDATE transaction SET statusOrder = '0', grandTotal = '". $grandTotal ."' WHERE transactionID = :trx";
+    $stmt = "UPDATE transaction SET statusOrder = '0', grandTotal = '". $grandTotal ."', created_by = '". $admin ."' WHERE transactionID = :trx";
     $stmt = $config->runQuery($stmt);
     $stmt->execute(array(
         ':trx' => $a
@@ -602,9 +602,6 @@ if($_GET['type'] == 'changeOrderStatus'){
 		{
 			echo 'Pilih Florist Terlebih dahulu!';
         }
-         elseif(empty($cek['id_kurir'])) {
-            echo 'Pilih Kurir Terlebih dahulu!';
-        } 
         else { 
             $stmt = "UPDATE transaction SET statusOrder = '". $a ."' WHERE transactionID = '". $b ."'";
 			$stmt = $config->runQuery($stmt);
@@ -617,7 +614,48 @@ if($_GET['type'] == 'changeOrderStatus'){
 				echo 'Failed!';
 			}
 		}
-	}
+	} else {
+
+        $cek = $config->runQuery("select transaction.id_kurir, transaction.transactionID, delivery_charges.id, delivery_charges.price from transaction
+        left join delivery_charges on delivery_charges.id_kelurahan = transaction.kelurahan_id WHERE transaction.transactionID ='". $b ."' ");
+        $cek->execute();
+        $data = $cek->fetch(PDO::FETCH_LAZY);
+		
+		if(empty($data['id_kurir']) && $c == 'kurir')
+		{
+			echo 'Pilih Kurir Terlebih dahulu!';
+        }
+        else { 
+            $paykurir = $config->runQuery("INSERT INTO pay_kurirs (no_trx, kurir_id, charge_id, created_at, admin_id) VALUES (:a, :b, :c, :d, :e)");
+            $paykurir->execute(array(
+                ':a' => $b,
+                ':b' => $data['id_kurir'],
+                ':c' => $data['id'],
+                ':d' => $config->getDate('Y-m-d H:m:s'),
+                ':e' => $admin
+            ));
+            $reff = $config->lastInsertId();
+            if($paykurir) {
+                echo $config->actionMsg('c', 'payment kurir');
+                $logs = $config->saveLogs($reff, $admin, 'c', 'add payment kurir');
+
+                $stmt = "UPDATE transaction SET statusOrder = '". $a ."' WHERE transactionID = '". $b ."'";
+                $stmt = $config->runQuery($stmt);
+                $stmt->execute();
+
+                if($stmt) {
+                    echo $config->actionMsg('u', 'transaction');
+                    $logs = $config->saveLogs($a, $admin, 'u', 'update statusOrder');
+                } else {
+                    echo 'Failed!';
+                }
+                
+            } else {
+                echo 'Failed !';
+            }
+        }
+        
+    }
 }
 
 if($_GET['type'] == 'addDeliveryCharges'){
@@ -641,7 +679,7 @@ if($_GET['type'] == 'selectFlorist'){
     $a = $_POST['transctionID'];
     $b = $_POST['floristID'];
 
-    $stmt = "UPDATE transaction SET id_florist = '". $b ."' WHERE transactionID = '". $a ."'";
+    $stmt = "UPDATE transaction SET id_florist = '". $b ."', updated_date = '". $config->getDate('Y-m-d H:m:s') ."', updated_by = '". $admin."' WHERE transactionID = '". $a ."'";
     $stmt = $config->runQuery($stmt);
     $stmt->execute();
 
@@ -656,12 +694,12 @@ if($_GET['type'] == 'selectKurir'){
     $a = $_POST['transctionID'];
     $b = $_POST['KurirID'];
 
-    $stmt = "UPDATE transaction_details SET id_kurir = '". $b ."' WHERE id_trx = '". $a ."'";
+    $stmt = "UPDATE transaction SET id_kurir = '". $b ."' WHERE transactionID = '". $a ."'";
     $stmt = $config->runQuery($stmt);
     $stmt->execute();
-
+    $tanggall = $config->getDate("Y-m-d H:m:s");
     if($stmt){
-        $insert = "INSERT INTO kurir_jobs (TransactionNumber, KurirID, Created_by) VALUES ('". $a ."', '". $b ."', '". $admin ."')";
+        $insert = "INSERT INTO kurir_jobs (TransactionNumber, KurirID, Created_date, Created_by) VALUES ('". $a ."', '". $b ."', '".$tanggall ."', '". $admin ."')";
         $insert = $config->runQuery($insert);
         $insert->execute();
         echo $config->actionMsg('u', 'transaction_details');
@@ -673,7 +711,7 @@ if($_GET['type'] == 'selectKurir'){
 if($_GET['type'] == 'removecharges'){
     $a = $_POST['transctionID'];
 
-    $stmt = "UPDATE transaction SET delivery_charge = '' WHERE transactionID = '". $a ."'";
+    $stmt = "UPDATE transaction SET delivery_charge = '', updated_date = ". $config->getDate('Y-m-d H:m:s') .", updated_by = ". $admin." WHERE transactionID = '". $a ."'";
     $stmt = $config->runQuery($stmt);
     $stmt->execute();
 
