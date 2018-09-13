@@ -30,23 +30,9 @@ if($_GET['type'] == 'generate'){
 
         $new_code = $kode. $tgl;
     }
-    // $tanggal = $config->getDate('Y-m-d H:m:s');
 
-    // $sql = 'INSERT INTO transaction (transactionID, type, created_by) VALUES (:a, :b, :c)';
-
-    // $stmt = $config->runQuery($sql);
-    // $stmt->execute(array(
-    //     ':a'    => $new_code,
-    //     ':b'    => $kode,
-    //     ':c'    => $admin
-    // ));
-
-    // if($stmt){
         echo $new_code;
         $logs = $config->saveLogs($new_code, $admin, 'f', 'Generate trx Code');
-    // }else{
-    //     echo 'Failed!';
-    // }
 
 
 }
@@ -152,8 +138,8 @@ if($_GET['type'] == 'addProducts')
                   <div class="checkout-content">
                      <div class="chekcout-img">
                         <picture>
-                         <a href="http://localhost/bungdav/assets/images/product/'. $images .'" data-toggle="lightbox" data-gallery="example-gallery">
-                               <img src="http://localhost/bungdav/assets/images/product/'. $images .'" class="img-fluid img-thumbnail">
+                         <a href="'. $config->url() .'assets/images/product/'. $images .'" data-toggle="lightbox" data-gallery="example-gallery">
+                               <img src="'. $config->url() .'assets/images/product/'. $images .'" class="img-fluid img-thumbnail" width="50%">
                            </a>
                        </picture>
                      </div>
@@ -166,7 +152,7 @@ if($_GET['type'] == 'addProducts')
                                 <div class="input-group-prepend">
                                   <button class="btn btn-sm btn-outline-secondary btn-number-count" type="button" data-type="minus" data-field="count-product-number['. $id .']" data-id="selling_price_product['. $id .']" data-trx="'. $trx .'" disabled="disabled"><span class="fa fa-minus"></span></button>
                                 </div>
-                                <input style="text-align: center;" type="text" value="1" id="count-product-number['. $id .']" name="count-product-number['. $id .']" min="1" max="10" class="input-number form-control form-control-sm" placeholder="" aria-label="" aria-describedby="basic-addon1" data-field="count-product-number['. $id .']" data-qty="'. $qty .'">
+                                <input style="text-align: center;" type="text" value="1" id="count-product-number['. $id .']" name="count-product-number['. $id .']" min="1" max="10" class="input-number form-control form-control-sm" placeholder="" aria-label="" aria-describedby="basic-addon1" data-field="count-product-number['. $id .']" data-qty="'. $qty .'" data-transactionid="'. $trx .'">
                                 <div class="input-group-append">
                                   <button class="btn btn-sm btn-outline-secondary btn-number-count" type="button" data-type="plus" data-field="count-product-number['. $id .']" data-id="selling_price_product['. $id .']" data-trx="'. $trx .'"><span class="fa fa-plus"></span></button>
                                 </div>
@@ -496,7 +482,7 @@ if($_GET['type'] == 'step3'){
     $data = $config->getDataTable('TransactionID', 'transaction', " TransactionID = '". $a ."' ");
     if($data->rowCount() > 0 ){
         //edit
-        $update = $config->runQuery("UPDATE transaction SET delivery_charge = :a, delivery_date = :b, delivery_time = :c, delivery_marks = :d WHERE TransactionID = :trx");
+        $update = $config->runQuery("UPDATE transaction SET delivery_date = :b, delivery_time = :c, delivery_marks = :d WHERE TransactionID = :trx");
         $update->execute(array(
             ':a'    => $b,
             ':b'    => $c,
@@ -573,7 +559,7 @@ if($_GET['type'] == 'proccessOrder'){
     $total = $config->getData('SUM(detail.product_qty * detail.product_price) as subtotal', '  transaction_details as detail', " detail.id_trx = '". $a ."'");
     $totalTransaction = $total['subtotal'];
 
-    $grandTotal = $totalTransaction - $deliveryCharge;
+    $grandTotal = $totalTransaction + $deliveryCharge;
 
 
     $stmt = "UPDATE transaction SET statusOrder = '0', grandTotal = '". $grandTotal ."', created_by = '". $admin ."' WHERE transactionID = :trx";
@@ -721,4 +707,9 @@ if($_GET['type'] == 'removecharges'){
     }else{
         echo 'Failed!';
     }
+}
+if($_GET['type'] == 'getTime'){
+    $a = $_POST['Tanggal'];
+
+    $data = $config->getData('*', 'time_slots', "");
 }

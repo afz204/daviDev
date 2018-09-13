@@ -1,6 +1,34 @@
+function formatState(state) {
+    if (!state.id) {
+        return state.text;
+    }
+    var baseUrl = "assets/images/product";
+    var base_url = window.location.origin;
+    var pathArray = window.location.pathname.split('/');
+    var folder = '';
+    if (pathArray[1] == 'bungdav') {
+        folder = 'bungdav/';
+    } else {
+        folder = '';
+    }
+
+    var nameproduct = state.text.toLowerCase();
+    nameproduct = nameproduct.split('_');
+    // console.log(nameproduct);
+    var $state = $(
+        '<span><img style="width: 8%; border-radius: 4%;" src="' + base_url + '/' + folder + baseUrl + '/' + nameproduct[0].split(' ').join('_') + '.jpg" class="img-flag" /> ' + state.text + '</span>'
+    );
+    return $state;
+};
 $(document).ready(function() {
 
-    $('#codeSearch').select2({ width: '100%', theme: "bootstrap4" });
+    $('#codeSearch').select2({
+        width: '100%',
+        theme: "bootstrap4",
+        templateResult: formatState,
+        placeholder: 'Select Product',
+        allowClear: true
+    });
     // // Toolbar extra buttons
     // var btnFinish = $('<button></button>').text('Finish')
     //     .addClass('btn btn-info')

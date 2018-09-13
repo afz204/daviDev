@@ -123,6 +123,7 @@ function formValidate(id) {
     var trx = $('#nomorTrx').val();
 
     if (id == 0) {
+
         var corp = $('#listCorporate option:selected').val();
         var cpic = $('#listPicCorp option:selected').val();
         var namepic = $('#listPicCorp option:selected').data('name');
@@ -133,9 +134,10 @@ function formValidate(id) {
             data: { 'TransactionID': trx, 'CustomerID': corp, 'picID': cpic, 'namePic': namepic },
 
             success: function(msg) {
-                alert(msg);
+                console.log(msg);
             }
         });
+        return false;
     };
     if (id == 1) {
         var receiveName = $('#nama_penerima').val();
@@ -163,10 +165,10 @@ function formValidate(id) {
             success: function(msg) {
                 data = JSON.parse(msg);
                 if (data['response'] == 'OK') {
-                    alert('Done !');
+                    console.log('Done !');
                     $('#delivery_charges').val(data['msg']);
                 } else {
-                    alert(data['msg']);
+                    console.log(data['msg']);
                     $('#delivery_charges').val(0);
                 }
             }
@@ -190,7 +192,7 @@ function formValidate(id) {
             },
 
             success: function(msg) {
-                alert(msg);
+                console.log(msg);
             }
         });
     };
@@ -214,7 +216,7 @@ function formValidate(id) {
             },
 
             success: function(msg) {
-                alert(msg);
+                console.log(msg);
             }
         });
     };
@@ -295,10 +297,20 @@ $(document).ready(function() {
     });
 
     $('#delivery_dates').datetimepicker({
-
         format: 'YYYY/MM/DD',
         minDate: new Date(),
-    });
+    }).on('dp.change', function(e) {
+        var times = e.date.format("YYYY-MM-DD");
+        $.ajax({
+            url: '../php/ajax/order.php?type=getTime',
+            type: 'post',
+            data: { 'Tanggal': times },
+
+            success: function(msg) {
+                console.log(msg);
+            }
+        });
+    })
 
     $('#template_level1').on('change', function(e) {
         e.preventDefault();
@@ -377,7 +389,7 @@ $(document).ready(function() {
 
             success: function(msg) {
                 if (type === '1') {
-
+                    console.log(msg);
                     alert('Anda Memilih Corporate!');
                     var newLocation = '?p=neworder&trx=' + msg;
                     window.location = newLocation;
@@ -500,16 +512,23 @@ $(document).ready(function() {
         minValue = parseInt($(this).attr('min'));
         maxValue = parseInt($(this).attr('max'));
         valueCurrent = parseInt($(this).val());
+        var field = $(this).data('field');
+        var id = $(this).data('id');
+        var type = $(this).data('type');
+        var input = $("input[name='" + field + "']");
+        var trx = input.data('transactionid');
 
         name = $(this).attr('name');
         if (valueCurrent >= minValue) {
-            $(".btn-number-count[data-type='minus']").removeAttr('disabled')
+            $(".btn-number-count[data-type='minus']").removeAttr('disabled');
         } else {
             alert('Sorry, the minimum value was reached');
             $(this).val($(this).data('oldValue'));
         }
         if (valueCurrent <= maxValue) {
-            $(".btn-number-count[data-type='plus']").removeAttr('disabled')
+            $(".btn-number-count[data-type='plus']").removeAttr('disabled');
+            // console.log(valueCurrent);
+            changeQtyProduct(id, type, field, valueCurrent, trx);
         } else {
             alert('Sorry, the maximum value was reached');
             $(this).val($(this).data('oldValue'));
@@ -549,7 +568,11 @@ $(document).ready(function() {
             data: 'id=' + code + '&trx=' + trx,
 
             success: function(msg) {
+
+                formAddProduct();
                 dataCheckout(trx);
+                $('#codeSearch').select2("val", "");
+                $('#modalAddProducts').modal('hide');
                 var data = JSON.parse(msg);
                 // console.log(data);
                 var count = parseInt(data.qty);

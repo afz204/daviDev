@@ -17,7 +17,7 @@
    </div>
 </div>
 <?php }else{ $type = substr($_GET['trx'], 3, 2);
-   
+  
   $provinsi = $config->Products('id, name', 'provinces');
   $kota = $config->Products('id, name', 'regencies');
   $kecamatan = $config->Products('id, name', 'districts');
@@ -140,7 +140,8 @@
           <div>
              <div id="step-1">
                 <div id="form-step-0" class="card-body" role="form" data-toggle="validator">
-                   <div class="form-group">
+                   <?php if($type == 'CP') { ?>
+                    <div class="form-group">
                       <div class="row">
                          <div class="col-md-12">
                             <label for="listCorporate">Pilih Corporate:</label>
@@ -166,7 +167,38 @@
                          </div>
                       </div>
                       <input type="text" name="step_0" id="step_0" required>
+                      <input type="hidden" name="typeform" id="typeform" value="corporate" required>
                    </div>
+                   <?php } else { ?>
+                   <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-6 mb-3">
+                          <label for="OrganicFirstName">First Name</label>
+                          <input type="text" class="form-control" id="OrganicFirstName" value="" required>
+                          <div class="help-block with-errors"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label for="OrganicLastName">Last Name</label>
+                          <input type="text" class="form-control" id="OrganicLastName" value="" required>
+                          <div class="help-block with-errors"></div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-6 mb-3">
+                          <label for="OrganicEmail">Email</label>
+                          <input type="text" class="form-control" data-parsley-type="email" id="OrganicEmail" value="" required>
+                          <div class="help-block with-errors"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label for="OrganicMobileNumber">Mobile Number</label>
+                          <input type="text" class="form-control" data-parsley-type="number" id="OrganicMobileNumber" value="" required>
+                          <div class="help-block with-errors"></div>
+                        </div>
+                      </div>
+                      <input type="text" name="step_0" id="step_0" required>
+                      <input type="hidden" name="typeform" id="typeform" value="organic" required>
+                   </div>
+                   <?php } ?>
                 </div>
              </div>
              <div id="step-2">
@@ -391,7 +423,7 @@
                    <div class="chekcout-img">
                       <picture>
                        <a href="<?=URL?>assets/images/product/<?=$product['images']?>" data-toggle="lightbox" data-gallery="example-gallery">
-                             <img src="<?=URL?>assets/images/product/<?=$product['images']?>" class="img-fluid img-thumbnail">
+                             <img src="<?=URL?>assets/images/product/<?=$product['images']?>" class="img-fluid img-thumbnail" width="30%">
                          </a>
                      </picture>
                    </div>
@@ -411,7 +443,8 @@
                               min="1" 
                               max="10" class="input-number form-control form-control-sm" placeholder="" aria-label="" aria-describedby="basic-addon1" 
                               data-field="count-product-number[<?=$product['id']?>]"
-                              data-qty="<?=$product['product_qty']?>" >
+                              data-qty="<?=$product['product_qty']?>"
+                              data-transactionID = "<?=$_GET['trx']?>">
                               <div class="input-group-append">
                                 <button class="btn btn-sm btn-outline-secondary btn-number-count"  type="button" data-type="plus" data-field="count-product-number[<?=$product['id']?>]" data-trx="<?=$_GET['trx']?>"><span class="fa fa-plus"></span></button>
                               </div>
@@ -426,7 +459,7 @@
                                <div class="input-group-prepend">
                                    <span class="input-group-text">Rp.</span>
                                  </div>
-                              <input type="text" data-parsley-type="number" class="form-control" name="selling_price_product[<?=$product['id']?>]" id="selling_price_product[<?=$product['id']?>]" value="<?=$product['product_price']?>" aria-describedby="basic-addon2">
+                              <input type="text" data-parsley-type="number" class="form-control" name="selling_price_product[<?=$product['id']?>]" id="selling_price_product[<?=$product['id']?>]" value="<?=$product['product_price']?>" aria-describedby="basic-addon2" data-transactionID = "<?=$_GET['trx']?>">
                               <div class="input-group-append">
                                 <button class="btn btn-outline-info selling_price_btn" type="button" data-id="selling_price_product[<?=$product['id']?>]" data-trx="<?=$_GET['trx']?>">Change</button>
                               </div>
@@ -478,7 +511,7 @@
                   <select class="form-control" name="codeSearch" id="codeSearch" required>
                       <option value="">Choose...</option>
                       <?php while ($p = $products->fetch(PDO::FETCH_LAZY)){ ?>
-                      <option value="<?=$p->product_id?>"><?=$p->name_product?></option>
+                      <option value="<?=$p->product_id?>" data-images="<?=$p->images?>"><?=$p->name_product?>_(<?=$config->formatPrice($p->selling_price)?>)</option>
                       <?php } ?>
                   </select>
                   <div class="help-block with-errors"></div>

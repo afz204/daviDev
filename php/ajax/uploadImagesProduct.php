@@ -34,7 +34,7 @@ if(empty($_POST['imagesname'])){
 $imagesid = empty($_POST['imagesid']) ? '' : $_POST['imagesid'];
 $imagesName = empty($_POST['imagesname']) ? '' : $_POST['imagesname'];
 
-$title = $imagesName;
+$title = strtolower(str_replace(" ", "_", $imagesName));
 // a flag to see if everything is ok
 $success = null;
 
