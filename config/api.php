@@ -627,6 +627,11 @@ class Admin
 
         return $price;
     }
+    public function _formatdate($val) {
+        $Dates = Date('d F Y', strtotime($val));
+
+        return $Dates;
+    }
     public function insert($table, $field, $data)
     {
         $sql = "INSERT INTO ". $table ." (" . $field . ") VALUES (". $data .") ";
@@ -711,19 +716,19 @@ class Admin
         $device = !$device? 'SYSTEM':$device;
         return array('os'=>$os_platform,'device'=>$device);
     }
-    function generateRandomString($length = 10)
+    public function generateRandomString($length = 10)
     {
 
         return substr(str_shuffle(str_repeat($x='!@#$%^&*()0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length/strlen($x)) )),1,$length);
     }
 
-    function newPassword($pass){
+    public function newPassword($pass){
         $password = password_hash($pass, PASSWORD_DEFAULT);
 
         return $password;
     }
 
-    function _debugvar($var){
+    public function _debugvar($var){
         echo '<pre>';
         $data = var_dump($var);
         echo '</pre>';
@@ -731,7 +736,7 @@ class Admin
         return $data;
     }
 
-    function url(){
+    public function url() {
         // first get http protocol if http or https
 
         $base_url = (isset($_SERVER['HTTPS']) &&
@@ -795,10 +800,26 @@ class Admin
         $base_url = explode('/', $base_url);
         $BasedURL = $base_url[0]. '//' . $base_url[2] . '/';
         if($base_url[3] == 'bungdav') {
-            $BasedURL = $base_url[0]. '//' . $base_url[2] . '/'. $base_url[3];
+            $BasedURL = $base_url[0]. '//' . $base_url[2] . '/'. $base_url[3].'/';
         }
 
         return $BasedURL; // = http://example.com/path/directory
+    }
+
+    public function _rangedate($start, $end, $format = 'Y-m-d') {
+        $array = array();
+        $interval = new DateInterval('P1D');
+    
+        $realEnd = new DateTime($end);
+        $realEnd->add($interval);
+    
+        $period = new DatePeriod(new DateTime($start), $interval, $realEnd);
+    
+        foreach($period as $date) { 
+            $array[] = $date->format($format); 
+        }
+    
+        return $array;
     }
 
 }

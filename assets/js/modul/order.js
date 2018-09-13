@@ -1,3 +1,22 @@
+function timeslotcharge(trx) {
+    var data = $('[name="time_slot"] option:selected').val();
+
+    $.ajax({
+        url: '../php/ajax/order.php?type=timeslotcharge',
+        type: 'post',
+        data: { 'transctionID': trx, 'ID': data },
+
+        success: function(msg) {
+            var data = JSON.parse(msg);
+            if (data['response'] == 'OK') {
+                dataCheckout(trx);
+            } else {
+                alert(data['msg']);
+            }
+        }
+    });
+}
+
 function selectFlorist(trx) {
     $('#selectFlorist').modal({ show: true, backdrop: 'static', keyboard: false });
     $('[name="IDSelectedFlorist"]').val(trx);
@@ -33,19 +52,25 @@ function changeOrderStatus(status, trx, type) {
 }
 
 function proccessOrder(trx) {
-    if (!confirm('Are you sure done with this?')) {
+    var namainvoice = $('[name="NameInvoice"]').val();
+    if (namainvoice == '') {
+        alert("Isi Nama Invoice dahulu!");
         return false;
     } else {
-        $.ajax({
-            url: '../php/ajax/order.php?type=proccessOrder',
-            type: 'post',
-            data: { transctionID: trx },
+        if (!confirm('Are you sure done with this?')) {
+            return false;
+        } else {
+            $.ajax({
+                url: '../php/ajax/order.php?type=proccessOrder',
+                type: 'post',
+                data: { 'transctionID': trx, 'InvoiceName': namainvoice },
 
-            success: function(msg) {
-                alert(msg);
-                window.location.href = '?p=order';
-            }
-        });
+                success: function(msg) {
+                    alert(msg);
+                    window.location.href = '?p=order';
+                }
+            });
+        }
     }
 }
 
@@ -61,6 +86,7 @@ function selectPayment(trx, id) {
             success: function(msg) {
                 alert(msg);
                 $('#btnProccessOrder').removeClass('hidden').fadeIn(1000);
+                $('[name="NameInvoice"]').removeClass('hidden').fadeIn(1000);
             }
         });
     }
@@ -192,7 +218,7 @@ function formValidate(id) {
             },
 
             success: function(msg) {
-                console.log(msg);
+                // console.log(msg);
             }
         });
     };
@@ -296,9 +322,10 @@ $(document).ready(function() {
         }
     });
 
+    var settanggal = new Date($('[name="delivery_dates"]').val());
     $('#delivery_dates').datetimepicker({
         format: 'YYYY/MM/DD',
-        minDate: new Date(),
+        minDate: new Date(settanggal.getFullYear(), settanggal.getMonth(), settanggal.getDate()),
     }).on('dp.change', function(e) {
         var times = e.date.format("YYYY-MM-DD");
         $.ajax({
@@ -307,10 +334,23 @@ $(document).ready(function() {
             data: { 'Tanggal': times },
 
             success: function(msg) {
-                console.log(msg);
+                var data = JSON.parse(msg);
+                if (data['response'] == 'OK') {
+                    var timeslot = '';
+                    $.each(data['msg'], function(key, val) {
+                        timeslot += '<option value="' + key + '" >' + val + '</option>';
+                    });
+                    $('[name="time_slot"]').removeAttr("disabled");
+                    $('[name="time_slot"]').html(timeslot);
+
+                } else {
+                    $('[name="time_slot"]').val('');
+                    alert(data['msg']);
+                }
             }
         });
-    })
+    });
+
 
     $('#template_level1').on('change', function(e) {
         e.preventDefault();

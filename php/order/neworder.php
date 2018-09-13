@@ -17,7 +17,14 @@
    </div>
 </div>
 <?php }else{ $type = substr($_GET['trx'], 3, 2);
-  
+  $arrtime = [
+		0 => '9am - 1pm',
+		1 => '2pm - 5pm',
+		2 => '6pm - 8pm',
+		3 => '9pm - 0am Rp. 100.000 JABODETABEK',
+		4 => '1am - 5am Rp. 200.000 JABODETABEK',
+		5 => '6am - 8am Rp. 50.000 JABODETABEK'
+	];
   $provinsi = $config->Products('id, name', 'provinces');
   $kota = $config->Products('id, name', 'regencies');
   $kecamatan = $config->Products('id, name', 'districts');
@@ -65,9 +72,11 @@
     $ProductTotal = $totalProduct;
   }
   //total transaction
-  $delivery = $config->getData('delivery_charge', '  transaction', " transaction.transactionID = '". $_GET['trx'] ."'");
+  $delivery = $config->getData('delivery_charge, delivery_charge_time', '  transaction', " transaction.transactionID = '". $_GET['trx'] ."'");
   $deliveryCharge = 0;
   if($delivery['delivery_charge'] > 0) { $deliveryCharge = $delivery['delivery_charge']; }
+  $timeslotcharges = 0;
+  if($delivery['delivery_charge_time'] > 0) { $timeslotcharges = $delivery['delivery_charge_time']; }
   $total = $config->getData('SUM(detail.product_qty * detail.product_price) as subtotal', '  transaction_details as detail', " detail.id_trx = '". $_GET['trx'] ."'");
   $totalTransaction = $total['subtotal'];
 
@@ -76,6 +85,14 @@
 
   $paymentList = $config->Products('ID, PaymentName, AccountName, AccountNumber, PaymentImages', 'payment WHERE Status = 1 ');
   ?>
+  <style>
+  .listPayment span {
+  text-align: center;
+  display: block;
+  width: 100%;
+  padding-top: 3%;
+  }
+  </style>
 <div class="row">
  <div class="col-md-4 order-md-2 mb-4">
     <h4 class="d-flex justify-content-between align-items-center mb-3">
@@ -109,6 +126,12 @@
           </div>
           <span class="text-muted" id="deliveryCharges"><?=$config->formatprice($deliveryCharge)?></span>
        </li>
+       <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <div>
+             <h6 class="my-0">Biaya Time Slot</h6>
+          </div>
+          <span class="text-muted" id="timeslotcharges"><?=$config->formatprice($timeslotcharges)?></span>
+       </li>
        <!-- <li class="list-group-item d-flex justify-content-between bg-light">
           <div class="text-danger">
              <h6 class="my-0">Promo code</h6>
@@ -122,7 +145,10 @@
        </li>
 
     </ul>
-    <button type="button" id="btnProccessOrder" onclick="proccessOrder('<?=$_GET['trx']?>')" class="btn btn-block btn-outline-success hidden">Proccess Order</button>
+    
+    <input style="margin-bottom: 2%;" type="text" class="form-control <?=(isset($trx[0]['paymentID']) && $trx[0]['paymentID']) !='' ? '' : 'hidden' ?>" name="NameInvoice" value="" placeholder="Nama Invoice" >
+
+    <button type="button" id="btnProccessOrder" onclick="proccessOrder('<?=$_GET['trx']?>')" class="btn btn-block btn-outline-success <?=(isset($trx[0]['paymentID']) && $trx[0]['paymentID']) !='' ? '' : 'hidden' ?>">Proccess Order</button>
  </div>
  <div class="col-md-8 order-md-1" id="SmartWizard">
     <input type="hidden" name="nomorTrx" id="nomorTrx" value="<?=$_GET['trx']?>">
@@ -166,7 +192,7 @@
                             <div class="help-block with-errors"></div>
                          </div>
                       </div>
-                      <input type="text" name="step_0" id="step_0" required>
+                      <input type="hidden" name="step_0" id="step_0" required>
                       <input type="hidden" name="typeform" id="typeform" value="corporate" required>
                    </div>
                    <?php } else { ?>
@@ -195,7 +221,7 @@
                           <div class="help-block with-errors"></div>
                         </div>
                       </div>
-                      <input type="text" name="step_0" id="step_0" required>
+                      <input type="hidden" name="step_0" id="step_0" required>
                       <input type="hidden" name="typeform" id="typeform" value="organic" required>
                    </div>
                    <?php } ?>
@@ -265,7 +291,7 @@
                       </div>
                    </div>
                 </div>
-                <input type="text" name="step_1" id="step_1" required>
+                <input type="hidden" name="step_1" id="step_1" required>
              </div>
              <div id="step-3">
                 <div id="form-step-2" class="card-body" role="form" data-toggle="validator">
@@ -299,16 +325,17 @@
                    <div class="row ">
                       <div class="col-md-6 mb-3 form-group">
                          <label for="delivery_dates">tanggal_pengiriman</label>
-                         <input type="text" class="form-control" id="delivery_dates" value="<?=isset($trx[0]['delivery_date']) ? $trx[0]['delivery_charge'] : '0' ?>" required>
+                         <input type="text" class="form-control" id="delivery_dates" value="<?=isset($trx[0]['delivery_date']) && $trx[0]['delivery_date'] !='' ? $trx[0]['delivery_charge'] : '0' ?>" required>
+                         <input type="hidden" class="form-control" name="delivery_dates" value="<?=isset($trx[0]['delivery_date']) && $trx[0]['delivery_date'] !='' ? $trx[0]['delivery_date'] : $config->getDate("Y-m-d") ?>" required>
                          <div class="help-block with-errors"></div>
                       </div>
                       <div class=" col-md-6 mb-3 form-group">
                          <label for="time_slot">time_slot</label>
-                         <select class="form-control" id="time_slot" required>
+                         <select class="form-control" id="time_slot" onchange="timeslotcharge('<?=$_GET['trx']?>')" name="time_slot" required disabled>
                             <option value="">Choose...</option>
-                            <option value="9am to 2pm" <?=isset($trx[0]['delivery_time']) && $trx[0]['delivery_time'] == '9am to 2pm' ? 'selected' : '' ?>>9am to 2pm</option>
-                            <option value="3pm to 7pm"<?=isset($trx[0]['delivery_time']) && $trx[0]['delivery_time'] == '3pm to 7pm' ? 'selected' : '' ?>>3pm to 7pm</option>
-                            <option value="8pm to 11pm"<?=isset($trx[0]['delivery_time']) && $trx[0]['delivery_time'] == '8pm to 11pm' ? 'selected' : '' ?>>8pm to 11pm + rp. 20.000</option>
+                            <?php if(isset($trx[0]['delivery_time']) && $trx[0]['delivery_time'] !=''){ foreach($arrtime as $key => $val){ ?>
+                              <option value="<?=$key?>" <?=$trx[0]['delivery_time'] == $key ? 'selected' : '' ?>><?=$val?></option>
+                            <?php } } ?>
                          </select>
                          <div class="help-block with-errors"></div>
                       </div>
@@ -336,7 +363,7 @@
                       </div>
                    </div>
                 </div>
-                <input type="text" name="step_2" id="step_2" required>
+                <input type="hidden" name="step_2" id="step_2" required>
              </div>
              <div id="step-4">
                 <div id="form-step-3" role="form" class="card-body" data-toggle="validator">
@@ -381,7 +408,7 @@
                          <div class="help-block with-errors"></div>
                       </div>
                    </div>
-                   <input type="text" name="step_3" id="step_3" required>
+                   <input type="hidden" name="step_3" id="step_3" required>
                 </div>
              </div>
              <div id="step-5" class="">
@@ -395,10 +422,11 @@
                                <img src="<?=URL?>assets/images/payment/<?=$row['PaymentImages']?>.jpg" width="50%" class="rounded mx-auto d-block" alt="...">
                             </div>
                          </a>
+                         <?=isset($trx[0]['paymentID']) && $trx[0]['paymentID'] !='' ? '<span class="fa fa-check-circle-o text-success"></span>' : '' ?>
                       </div>
                     <?php } ?>
                    </div>
-                   <input type="text" name="step_4" id="step_4" autocomplete="address-level2" required>
+                   <input type="hidden" name="step_4" id="step_4" autocomplete="address-level2" required>
                 </div>
              </div>
           </div>

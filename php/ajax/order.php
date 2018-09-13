@@ -335,14 +335,16 @@ if($_GET['type'] == 'listCheckout'){
     
     $totalRow = $product->rowCount();
 
-    $delivery = $config->getData('delivery_charge', '  transaction', " transaction.transactionID = '". $a ."'");
+    $delivery = $config->getData('delivery_charge, delivery_charge_time', '  transaction', " transaction.transactionID = '". $a ."'");
     $deliveryCharge = $delivery['delivery_charge'];
+    $timeslot = $delivery['delivery_charge_time'];
     if(empty($delivery['delivery_charge'])) $deliveryCharge = '0';
+    if(empty($delivery['delivery_charge_time'])) $timeslot = '0';
     
     $total = $config->getData('SUM(detail.product_qty * detail.product_price) as subtotal', '  transaction_details as detail', " detail.id_trx = '". $a ."'");
     $totalTransaction = $total['subtotal'];
 
-    $grandTotal = $totalTransaction + $deliveryCharge;
+    $grandTotal = $totalTransaction + $deliveryCharge + $timeslot;
         $dataContent = '
     <li class="list-group-item d-flex justify-content-between lh-condensed">
             <div>
@@ -355,6 +357,12 @@ if($_GET['type'] == 'listCheckout'){
                <h6 class="my-0">Biaya Kirim</h6>
             </div>
             <span class="text-muted" id="deliveryCharges">'. $config->formatPrice($deliveryCharge).'</span>
+         </li>
+         <li class="list-group-item d-flex justify-content-between lh-condensed">
+            <div>
+               <h6 class="my-0">Biaya Time Slot</h6>
+            </div>
+            <span class="text-muted" id="deliveryCharges">'. $config->formatPrice($timeslot).'</span>
          </li>
          <li class="list-group-item d-flex justify-content-between">
             <strong>Total Belanja</strong>
@@ -482,12 +490,11 @@ if($_GET['type'] == 'step3'){
     $data = $config->getDataTable('TransactionID', 'transaction', " TransactionID = '". $a ."' ");
     if($data->rowCount() > 0 ){
         //edit
-        $update = $config->runQuery("UPDATE transaction SET delivery_date = :b, delivery_time = :c, delivery_marks = :d WHERE TransactionID = :trx");
+        $update = $config->runQuery("UPDATE transaction SET delivery_date = :c, delivery_time = :d, delivery_marks = :e WHERE TransactionID = :trx");
         $update->execute(array(
-            ':a'    => $b,
-            ':b'    => $c,
-            ':c'    => $d,
-            ':d'    => $e,
+            ':c'    => $c,
+            ':d'    => $d,
+            ':e'    => $e,
             ':trx'  => $a
         ));
         $logs = $config->saveLogs($a, $admin, 'u', 'update detail transaction');
@@ -553,6 +560,7 @@ if($_GET['type'] == 'PaymentSelected'){
 }
 if($_GET['type'] == 'proccessOrder'){
     $a = $_POST['transctionID'];
+    $b = $_POST['InvoiceName'];
     $delivery = $config->getData('delivery_charge', '  transaction', " transaction.transactionID = '". $a ."'");
     $deliveryCharge = 0;
     if($delivery['delivery_charge'] > 0) { $deliveryCharge = $delivery['delivery_charge']; }
@@ -562,7 +570,7 @@ if($_GET['type'] == 'proccessOrder'){
     $grandTotal = $totalTransaction + $deliveryCharge;
 
 
-    $stmt = "UPDATE transaction SET statusOrder = '0', grandTotal = '". $grandTotal ."', created_by = '". $admin ."' WHERE transactionID = :trx";
+    $stmt = "UPDATE transaction SET invoice_name = '". $b ."', statusOrder = '0', grandTotal = '". $grandTotal ."', created_by = '". $admin ."' WHERE transactionID = :trx";
     $stmt = $config->runQuery($stmt);
     $stmt->execute(array(
         ':trx' => $a
@@ -697,7 +705,7 @@ if($_GET['type'] == 'selectKurir'){
 if($_GET['type'] == 'removecharges'){
     $a = $_POST['transctionID'];
 
-    $stmt = "UPDATE transaction SET delivery_charge = '', updated_date = ". $config->getDate('Y-m-d H:m:s') .", updated_by = ". $admin." WHERE transactionID = '". $a ."'";
+    $stmt = "UPDATE transaction SET delivery_charge = '', updated_date = '". $config->getDate('Y-m-d H:m:s') ."', updated_by = '". $admin." ' WHERE transactionID = '". $a ."'";
     $stmt = $config->runQuery($stmt);
     $stmt->execute();
 
@@ -710,6 +718,73 @@ if($_GET['type'] == 'removecharges'){
 }
 if($_GET['type'] == 'getTime'){
     $a = $_POST['Tanggal'];
+    $arrtime = [
+		0 => '9am - 1pm',
+		1 => '2pm - 5pm',
+		2 => '6pm - 8pm',
+		3 => '9pm - 0am',
+		4 => '1am - 5am',
+		5 => '6am - 8am'
+	];
 
-    $data = $config->getData('*', 'time_slots', "");
+	$arrcharge = [
+		0 => $config->formatPrice('0'),
+		1 => $config->formatPrice('0'),
+		2 => $config->formatPrice('0'),
+		3 => $config->formatPrice('100000'),
+		4 => $config->formatPrice('200000'),
+		5 => $config->formatPrice('50000')
+	];
+
+	$arrdescription = [
+		0 => '-',
+		1 => '-',
+		2 => '-',
+		3 => 'JABODETABEK',
+		4 => 'JABODETABEK',
+		5 => 'JABODETABEK'
+    ];
+    
+    $data = $config->getData('*', 'time_slots', "DateSlots = '".$a."'");
+    if($data['ID'] != '') {
+        $time = [];
+        
+        foreach(json_decode($data['TimeSlots'], true) as $key => $value) {
+            # code...
+            $time[] = $arrtime[$key].' '.$arrcharge[$key].' '.$arrdescription[$key];
+        }
+        die(json_encode(['response' => 'OK', 'msg' => $time]));
+    } else {
+        die(json_encode(['response' => 'ERROR', 'msg' => 'Time Slot Not Available !']));
+    }
+}
+if($_GET['type'] == 'timeslotcharge'){
+    $a = $_POST['transctionID'];
+    $b = $_POST['ID'];
+    $arrcharge = [
+		0 => 0,
+		1 => 0,
+		2 => 0,
+		3 => 100000,
+		4 => 200000,
+		5 => 50000
+    ];
+    
+    $newcharge = $arrcharge[$b];
+
+    $stmt = "UPDATE transaction SET delivery_charge_time = :a, updated_date = :b, updated_by = :c WHERE transactionID = :d";
+    $stmt = $config->runQuery($stmt);
+    $stmt->execute(array(
+        ':a' => $newcharge,
+        ':b' => $config->getDate('Y-m-d H:m:s'),
+        ':c' => $admin,
+        ':d' => $a
+    ));
+
+    if($stmt){
+        die(json_encode(['response' => 'OK', 'msg' => $config->actionMsg('u', 'transaction')]));
+        $logs = $config->saveLogs($a, $admin, 'u', 'delivery time charge!');
+    }else{
+        die(json_encode(['response' => 'ERROR', 'msg' => $stmt]));
+    }
 }
