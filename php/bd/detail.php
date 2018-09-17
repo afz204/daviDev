@@ -1,15 +1,15 @@
 <?php 
 
 $d = $_GET['id'];
-	$prod = $config->Products('product_id, category_id, subcategory_id, name_product, cost_price, selling_price, available_on, sort_desc, full_desc, note, images', 'products WHERE id = '.$d);
+	$prod = $config->Products('product_id, category_id, subcategory_id, name_product, cost_price, selling_price, available_on, sort_desc, full_desc, note, tags, images', 'products WHERE id = '.$d);
 
 	$product = $prod->fetch(PDO::FETCH_LAZY);
 
 	$category = $config->Category();
 	$cat = $config->Products('id, name', 'categories WHERE parent_id != 0 ');
     $province = $config->Products('id, name', "provinces WHERE id IN (". $product['available_on'] .") ");
-
-
+    $tags = $config->getData('id,name', "categories", "parent_id IN (". $product['tags'] .")");
+    print_r($tags);
 ?>
 
 <div class="card" <?=$access['create']?>> 
@@ -26,10 +26,8 @@ $d = $_GET['id'];
                             <input type="hidden" id="ImagesName" value="<?=$product['name_product']?>" name="ImagesName">
                             <div class="file-loading">
                                 <input type="file" id="images" name="images[]" multiple>
-
                             </div>
-                            <br>
-
+                            <br/>
                         </div>
                     </form>
                 <?php } else { ?>
@@ -79,7 +77,7 @@ $d = $_GET['id'];
 
                     <div class="form-group">
                         <label for="tagsProduct">Tags Product</label>
-                        <input type="text" name="tagsProduct" id="tagsProduct" placeholder="multiple: use 'koma'" class="form-control" data-parsley-minLength="3" readonly>
+                        <input type="text" name="tagsProduct" id="tagsProduct" placeholder="multiple: use 'koma'" class="form-control" data-parsley-minLength="3" readonly value="<?=$tags['']?>">
                     </div>
 
                     <div class="form-group">

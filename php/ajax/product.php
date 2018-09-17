@@ -28,7 +28,7 @@ if($_GET['type'] == 'newProd') {
     $a = $_POST['cat'];
     $b = $_POST['sub'];
     $c = $_POST['title'];
-    $link = str_replace(' ', '_', $c);
+    $link = str_replace(' ', '_', strtolower($c));
     $d = $_POST['tags'];
     $e = $_POST['cost'];
     $f = $_POST['sell'];
@@ -37,7 +37,7 @@ if($_GET['type'] == 'newProd') {
     $i = $_POST['full'];
     $j = $_POST['note'];
     $k = $_POST['admin'];
-
+    $title = strtolower(str_replace(" ", "_", $c)).'.jpg';
     if ($type == '1') {
         $g = '11,12,13,14,15,16,17,18,19,21,31,32,33,34,35,36,51,52,53,61,62,63,64,65,71,72,73,74,75,76,81,82,91,94';
     }else{
@@ -52,8 +52,8 @@ if($_GET['type'] == 'newProd') {
     if(!empty($cek['product_id'])){
         echo '0';
     }else{
-        $sql = "INSERT INTO products (product_id, category_id, subcategory_id, name_product, cost_price, selling_price, available_on, sort_desc, full_desc, note, permalink, created_at, admin_id) 
-        VALUES (:code, :a, :b, :c, :e, :f, :g, :h, :i, :j, :link, :tgl, :k)";
+        $sql = "INSERT INTO products (product_id, category_id, subcategory_id, name_product, cost_price, selling_price, available_on, sort_desc, full_desc, note, tags, images, permalink, created_at, admin_id) 
+        VALUES (:code, :a, :b, :c, :e, :f, :g, :h, :i, :j, :d, :title, :link, :tgl, :k)";
 
         $stmt = $config->runQuery($sql);
         $stmt->execute(array(
@@ -67,6 +67,8 @@ if($_GET['type'] == 'newProd') {
             ':h' => $h,
             ':i' => $i,
             ':j' => $j,
+            ':d' => $d,
+            ':title' => $title,
             ':link' => $link,
             ':tgl' => $tgl,
             ':k' => $k

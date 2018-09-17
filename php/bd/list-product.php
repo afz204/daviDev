@@ -2,11 +2,12 @@
 
     $category = $config->Category();
     $province = $config->Province();
-
+    $tags = $config->Products('id,name', "categories WHERE parent_id != '0'");
+    
 ?>
 <div class="card" <?=$access['create']?>>
     <div class="row justify-content-center card-body">
-        <div id="imagesProduct" class="col-12 col-md-4 col-lg-4 hidden">
+        <div id="imagesProduct" class="col-12 col-md-4 col-lg-4">
             <div class="card-header">
                 <h5 class="card-title">Images Product</h5>
             </div>
@@ -14,15 +15,13 @@
                 <form id="uploadImagesProduct" method="post" enctype="multipart/form-data" >
                     <div class="form-group">
                         <input type="hidden" id="ImagesProductID" name="ImagesProductID">
+                        <input type="hidden" id="ImagesName" name="ImagesName">
                         <div class="file-loading">
                             <input type="file" id="images" name="images[]" multiple>
-
                         </div>
                         <br>
-
                     </div>
                 </form>
-
                 <div id="kv-success-2" class="alert alert-success" style="margin-top:10px;display:none"></div>
             </div>
         </div>
@@ -64,7 +63,12 @@
 
                     <div class="form-group">
                         <label for="tagsProduct">Tags Product</label>
-                        <input type="text" name="tagsProduct" id="tagsProduct" placeholder="multiple: use 'koma'" class="form-control" data-parsley-minLength="3" required="">
+                        <!-- <input type="text" name="tagsProduct" id="tagsProduct" placeholder="multiple: use 'koma'" class="form-control" data-parsley-minLength="3" required=""> -->
+                        <select class="form-control simple-select2 w-100" multiple="multiple" name="tagsProduct" id="tagsProduct">
+                            <?php while($list = $tags->fetch(PDO::FETCH_LAZY)){ ?>
+                                <option value="<?=$list['id']?>"><?=$list['name']?></option>
+                            <?php } ?>
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -108,7 +112,7 @@
                         <textarea style="text-transform: capitalize;" data-parsley-minLength="5" name="note" id="noteProduct" class="form-control" rows="5" required=""></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-block btn-outline-primary" >submit</button>
+                    <button type="submit" class="btn btn-block btn-outline-primary">submit</button>
 
                 </form>
             </div>

@@ -89,33 +89,10 @@ Many operating systems, software frameworks, and programs include a logging syst
     <?php if($menu == 'bd' && $footer = 'detail'){ ?>
         <script type="text/javascript">
             $(document).ready(function(){
-                $("#images").fileinput({
-                //'theme': 'explorer-fa',
-                theme: 'fa',
-                overwriteInitial: false,
-                initialPreviewAsData: true,
-                maxFilePreviewSize: 60,
-                previewFileType: "image",
-                allowedFileExtensions: ["jpg"],
-                uploadAsync: false,
-                minFileCount: 1,
-                maxFileCount: 1,
-                uploadUrl: '<?=URL?>php/ajax/uploadImagesProduct.php',
-                uploadExtraData: function() {
-                    return {
-                        imagesid: $('#ImagesProductID').val(),
-                        imagesname: $('#ImagesName').val()
-                    };
-                }
-            }).on('filebatchuploadsuccess', function(event, data) {
-                var buttonSuccessProduct = $('<button class="btn btn-block btn-outline-success" onclick="resetForm()">Done !</button>');
-                // $.each(data.files, function(key, file) {
-                //     var fname = file.name;
-                //     out = out + '<li>' + 'Uploaded file # ' + (key + 1) + ' - '  +  fname + ' successfully.' + '</li>';
-                // });
-                $('#kv-success-2').append(buttonSuccessProduct);
-                $('#kv-success-2').fadeIn('slow');
-            });
+                var productID = $('[name="ImagesProductID"]').val();
+                var productName = $('[name="ImagesName"]').val();
+                
+                
 
             $('#listLokasi').on('change', function () {
                 var id = $(this).find('option:selected').val();

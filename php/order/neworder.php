@@ -200,24 +200,24 @@
                       <div class="row">
                         <div class="col-md-6 mb-3">
                           <label for="OrganicFirstName">First Name</label>
-                          <input type="text" class="form-control" id="OrganicFirstName" value="" required>
+                          <input type="text" class="form-control" id="OrganicFirstName" name="OrganicFirstName" required>
                           <div class="help-block with-errors"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                           <label for="OrganicLastName">Last Name</label>
-                          <input type="text" class="form-control" id="OrganicLastName" value="" required>
+                          <input type="text" class="form-control" id="OrganicLastName" name="OrganicLastName" required>
                           <div class="help-block with-errors"></div>
                         </div>
                       </div>
                       <div class="row">
                         <div class="col-md-6 mb-3">
                           <label for="OrganicEmail">Email</label>
-                          <input type="text" class="form-control" data-parsley-type="email" id="OrganicEmail" value="" required>
+                          <input type="email" class="form-control" data-parsley-type="email" id="OrganicEmail" name="OrganicEmail" required>
                           <div class="help-block with-errors"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                           <label for="OrganicMobileNumber">Mobile Number</label>
-                          <input type="text" class="form-control" data-parsley-type="number" id="OrganicMobileNumber" value="" required>
+                          <input type="text" class="form-control" data-parsley-type="number" id="OrganicMobileNumber" name="OrganicMobileNumber" required>
                           <div class="help-block with-errors"></div>
                         </div>
                       </div>

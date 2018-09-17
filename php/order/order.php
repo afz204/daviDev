@@ -11,6 +11,14 @@ $arrstatuspaid = array(
     0 => 'UNPAID',
     1 => 'PAID'
 );
+$arrtime = [
+    0 => '9am - 1pm',
+    1 => '2pm - 5pm',
+    2 => '6pm - 8pm',
+    3 => '9pm - 0am',
+    4 => '1am - 5am',
+    5 => '6am - 8am'
+];
 $order = $config->runQuery('SELECT 
 (select GROUP_CONCAT(transaction_details.product_name SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as product, 
 (select GROUP_CONCAT(transaction_details.product_price SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as price, 
@@ -101,8 +109,8 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                         <td><?=$rows['CustomerName']?> <small class="badge badge-sm badge-info"><?=$type['nama']?></small></td>
                         <td> <?php foreach($price as $val => $key) { echo '<span class="badge badge-info">'.$config->formatprice($key).'</span></br>'; } ?> </td>
                         <td> <?php foreach($quantity as $val => $key) { echo '<span class="badge badge-info">'.$key.'</span></br>'; } ?> </td>
-                        <td><?=$config->formatprice($rows['grandTotal'])?></td>
-                        <td><?=$Kirim?> <span class="small"><?=$rows['delivery_time']?></span></td>
+                        <td><?=$config->formatprice($rows['grandTotal'] + $rows['delivery_charge'] + $rows['delivery_charge_time'])?></td>
+                        <td><?=$Kirim?> <span class="small"><?=$arrtime[$rows['delivery_time']]?></span></td>
                         <td><?=$rows['kelurahan']?></td>
                         <td><?=$btnchangestatus?></td>
                         <td><span class="badge badge-sm badge-<?=$rows['statusPaid'] == 1 ? 'success' : 'warning'?>"><?=$arrstatuspaid[$rows['statusPaid']]?></span></td>

@@ -21,20 +21,16 @@ if($_GET['type'] == 'generate'){
         $tgl = $config->getDate('Ydmhms');
 
         $new_code = $kode. $tgl;
-
     }else{
         $field = 'id_trx';
         $table = 'detail_trxs';
-        $kode = 'BD_PR';
+        $kode = 'BD_OG';
         $tgl = $config->getDate('Ydmhms');
 
         $new_code = $kode. $tgl;
     }
-
         echo $new_code;
         $logs = $config->saveLogs($new_code, $admin, 'f', 'Generate trx Code');
-
-
 }
 
 if($_GET['type'] == 'deliveryCharges')
@@ -370,8 +366,6 @@ if($_GET['type'] == 'listCheckout'){
          </li>
     ';
     
-
-    
     $data = array(
         'totalRow' => $totalRow,
         'product' => $dataContent,
@@ -398,41 +392,120 @@ if($_GET['type'] == 'deleteProduct'){
     }
 }
 if($_GET['type'] == 'step1'){
-    $a = $_POST['TransactionID'];
-    $b = $_POST['CustomerID'];
-    $c = $_POST['picID'];
-    $d = $_POST['namePic'];
+    $Types = $_POST['Types'];
 
-    $type = substr($a, 0, 5);
+    if($Types == 'organic') {
+        $a = $_POST['TransactionID'];
+        $b = $_POST['OrganicFirstName'];
+        $c = $_POST['OrganicLastName'];
+        $d = $_POST['OrganicEmail'];
+        $e = $_POST['OrganicMobileNumber'];
 
-    $data = $config->getDataTable('transactionID', 'transaction', " transactionID = '". $a ."' ");
-    if($data->rowCount() > 0 ){
-        //edit
-        $update = $config->runQuery("UPDATE transaction SET CustomerID = '". $b ."', CustomerName = '". $d ."' WHERE transactionID = '". $a ."' ");
-        $update->execute();
-
-        if($update) {
-            echo $config->actionMsg('u', 'transaction');
-            $logs = $config->saveLogs($a, $admin, 'u', 'Customer');
+        $cekemail = $config->getData('Email', 'customer',"Email LIKE '% ". $d ." %'");
+        if($cekemail['Email']) {
+            die(json_encode(['response' => 'ERROR', 'msg' => 'Duplicated Email']));
         } else {
-            echo 'Failed!';
+            $kode = 'BDO';
+            $tgl = $config->getDate('Ydmhms');
+            $new_code = $kode. $tgl;
+            $email = explode('@', $d);
+            $password = $config->newPassword($email[0]);
+            //create customer
+            $insert = "INSERT INTO customer (CustomerUniqueID, FirstName, LastName, FullName, Email, Mobile, Username, Password, IsActive, CreatedDate, CreatedBy, permalink) VALUES (:CustomerUniqueID, :FirstName, :LastName, :FullName, :Email, :Mobile, :Username, :Password, :IsActive, :CreatedDate, :CreatedBy, :permalink) ";
+            $stmt = $config->runQuery($insert);
+            $stmt->execute(array(
+                ':CustomerUniqueID' => $new_code,
+                ':FirstName' => $b,
+                ':LastName' => $c,
+                ':FullName' => $b.' '.$c,
+                ':Email' => $d,
+                ':Mobile' => $e,
+                ':Username' => $d,
+                ':Password' => $password,
+                ':IsActive' => 1,
+                ':CreatedDate' => $config->getDate("Y-m-d H:m:s"),
+                ':CreatedBy' => $admin,
+                ':permalink' => strtolower($b.'-'.$email[0])
+            ));
+
+            if($stmt) {
+                $logs = $config->saveLogs($new_code, $admin, 'c', 'New Customer');
+
+                $data = $config->getDataTable('transactionID', 'transaction', " transactionID = '". $a ."' ");
+                if($data->rowCount() > 0 ){
+                    //edit
+                    $namecustomer = $b. ' ' . $c;
+                    $update = $config->runQuery("UPDATE transaction SET CustomerID = '". $new_code ."', CustomerName = '". $namecustomer ."' WHERE transactionID = '". $a ."' ");
+                    $update->execute();
+
+                    if($update) {
+                        $logs = $config->saveLogs($a, $admin, 'u', 'Customer');
+                        die(json_encode(['response' => 'OK', 'msg' => $config->actionMsg('u', 'transaction')]));
+                    } else {
+                        die(json_encode(['response' => 'ERROR', 'msg' => 'Failed!']));
+                    }
+                }else{
+                    //new
+                    $namecustomer = $b. ' ' . $c;
+
+                    $input = $config->runQuery("INSERT INTO transaction (transactionID, type, CustomerID, CustomerName) VALUES (:a, :b, :c, :d)");
+                    $input->execute(array(
+                        ':a'    => $a,
+                        ':b'    => 'BD_OG',
+                        ':c'    => $new_code,
+                        ':d'    => $namecustomer
+                    ));
+                    $reff = $config->lastInsertId();
+                    $logs = $config->saveLogs($reff, $admin, 'c', 'add transactionID');
+                    if($input)
+                    {
+                        die(json_encode(['response' => 'OK', 'msg' => $config->actionMsg('c', 'transaction')]));
+                    }else{
+                        die(json_encode(['response' => 'ERROR', 'msg' => 'Failed!']));
+                    }
+                }
+            } else {
+                die(json_encode(['response' => 'ERROR', 'msg' => 'Failed!']));
+            }
         }
-    }else{
-        //new
-        $input = $config->runQuery("INSERT INTO transaction (transactionID, type, CustomerID, CustomerName) VALUES (:a, :b, :c, :d)");
-        $input->execute(array(
-            ':a'    => $a,
-            ':b'    => $type,
-            ':c'    => $b,
-            ':d'    => $d
-        ));
-        $reff = $config->lastInsertId();
-        $logs = $config->saveLogs($reff, $admin, 'c', 'add transactionID');
-        if($input)
-        {
-            echo $config->actionMsg('c', 'transaction');
+    } else {
+        $a = $_POST['TransactionID'];
+        $b = $_POST['CustomerID'];
+        $c = $_POST['picID'];
+        $d = $_POST['namePic'];
+
+        $type = substr($a, 0, 5);
+
+        $data = $config->getDataTable('transactionID', 'transaction', " transactionID = '". $a ."' ");
+        if($data->rowCount() > 0 ){
+            //edit
+            $update = $config->runQuery("UPDATE transaction SET CustomerID = '". $b ."', CustomerName = '". $d ."' WHERE transactionID = '". $a ."' ");
+            $update->execute();
+
+            if($update) {
+                
+                $logs = $config->saveLogs($a, $admin, 'u', 'Customer');
+                die(json_encode(['response' => 'OK', 'msg' => $config->actionMsg('u', 'transaction')]));
+            } else {
+                die(json_encode(['response' => 'ERROR', 'msg' => 'Failed!']));
+            }
         }else{
-            echo 'Failed!';
+            //new
+            $input = $config->runQuery("INSERT INTO transaction (transactionID, type, CustomerID, CustomerName) VALUES (:a, :b, :c, :d)");
+            $input->execute(array(
+                ':a'    => $a,
+                ':b'    => $type,
+                ':c'    => $b,
+                ':d'    => $d
+            ));
+            $reff = $config->lastInsertId();
+            $logs = $config->saveLogs($reff, $admin, 'c', 'add transactionID');
+            if($input)
+            {
+                die(json_encode(['response' => 'OK', 'msg' => $config->actionMsg('c', 'transaction')]));
+            }else{
+                die(json_encode(['response' => 'ERROR', 'msg' => 'Failed!']));
+            }
         }
     }
 }
@@ -692,14 +765,30 @@ if($_GET['type'] == 'selectKurir'){
     $stmt = $config->runQuery($stmt);
     $stmt->execute();
     $tanggall = $config->getDate("Y-m-d H:m:s");
-    if($stmt){
-        $insert = "INSERT INTO kurir_jobs (TransactionNumber, KurirID, Created_date, Created_by) VALUES ('". $a ."', '". $b ."', '".$tanggall ."', '". $admin ."')";
-        $insert = $config->runQuery($insert);
-        $insert->execute();
-        echo $config->actionMsg('u', 'transaction_details');
-        $logs = $config->saveLogs($a, $admin, 'u', 'update kurir!');
-    }else{
-        echo 'Failed!';
+    
+    $cekdata = $config->getData('COUNT(*) as data', 'kurir_jobs', "TransactionNumber = '". $a ."'");
+    if($cekdata['data'] > 0) {
+        $updatejobs = "UPDATE kurir_jobs SET Status = 1 WHERE TransactionNumber = :a";
+        $updatejobs = $config->runQuery($updatejobs);
+        $updatejobs->execute(array(':a' => $a));
+
+        if($updatejobs) {
+            $insert = "INSERT INTO kurir_jobs (TransactionNumber, KurirID, Created_date, Created_by) VALUES ('". $a ."', '". $b ."', '".$tanggall ."', '". $admin ."')";
+            $insert = $config->runQuery($insert);
+            $insert->execute();
+            echo $config->actionMsg('u', 'transaction_details');
+            $logs = $config->saveLogs($a, $admin, 'u', 'update kurir!');
+        }
+    } else {
+        if($stmt){
+            $insert = "INSERT INTO kurir_jobs (TransactionNumber, KurirID, Created_date, Created_by) VALUES ('". $a ."', '". $b ."', '".$tanggall ."', '". $admin ."')";
+            $insert = $config->runQuery($insert);
+            $insert->execute();
+            echo $config->actionMsg('u', 'transaction_details');
+            $logs = $config->saveLogs($a, $admin, 'u', 'update kurir!');
+        }else{
+            echo 'Failed!';
+        }
     }
 }
 if($_GET['type'] == 'removecharges'){

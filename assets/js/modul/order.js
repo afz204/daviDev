@@ -150,20 +150,43 @@ function formValidate(id) {
 
     if (id == 0) {
 
+        var types = $('[name="typeform"]').val();
         var corp = $('#listCorporate option:selected').val();
         var cpic = $('#listPicCorp option:selected').val();
         var namepic = $('#listPicCorp option:selected').data('name');
-
-        $.ajax({
-            url: '../php/ajax/order.php?type=step1',
-            type: 'post',
-            data: { 'TransactionID': trx, 'CustomerID': corp, 'picID': cpic, 'namePic': namepic },
-
-            success: function(msg) {
-                console.log(msg);
-            }
-        });
-        return false;
+        var OrganicFirstName = $('[name="OrganicFirstName"]').val();
+        var OrganicLastName = $('[name="OrganicLastName"]').val();
+        var OrganicEmail = $('[name="OrganicEmail"]').val();
+        var OrganicMobileNumber = $('[name="OrganicMobileNumber"]').val();
+        var returns = false;
+        if (types == 'organic') {
+            $.ajax({
+                url: '../php/ajax/order.php?type=step1',
+                type: 'post',
+                data: { 'Types': types, 'TransactionID': trx, 'OrganicFirstName': OrganicFirstName, 'OrganicLastName': OrganicLastName, 'OrganicEmail': OrganicEmail, 'OrganicMobileNumber': OrganicMobileNumber },
+                success: function(msg) {
+                    var data = JSON.parse(msg);
+                    console.log(data);
+                    if (data['response'] == 'OK') {
+                        console.log(data['msg']);
+                    } else {
+                        alert(data['msg']);
+                        $('[name="OrganicEmail"]').addClass('is-invalid');
+                    }
+                }
+            });
+        } else {
+            $.ajax({
+                url: '../php/ajax/order.php?type=step1',
+                type: 'post',
+                data: { 'Types': types, 'TransactionID': trx, 'CustomerID': corp, 'picID': cpic, 'namePic': namepic },
+                success: function(msg) {
+                    var data = JSON.parse(msg);
+                    console.log(data['msg']);
+                }
+            });
+        }
+        return returns;
     };
     if (id == 1) {
         var receiveName = $('#nama_penerima').val();

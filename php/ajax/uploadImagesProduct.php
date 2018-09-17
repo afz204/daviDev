@@ -19,12 +19,12 @@ if (empty($_FILES['images'])) {
 }
 
 if(empty($_POST['imagesid'])){
-    echo json_encode(['error'=>'Images ID unset.']);
+    echo json_encode(['error'=>'Images Product Code unset.']);
     // or you can throw an exception
     return; // terminate
 }
 if(empty($_POST['imagesname'])){
-    echo json_encode(['error'=>'Images Name unset.']);
+    echo json_encode(['error'=>'Images Product Name unset.']);
     // or you can throw an exception
     return; // terminate
 }
