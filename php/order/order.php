@@ -97,9 +97,6 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                     if(!empty($rows['grandTotal'])){
                     	$grandTotal = $rows['grandTotal'];
                     }
-                    $button='<a href="'. URL .'order/?p=detailtrx&trx='. $rows['transactionID'] .'">
-                        <button type="button" class="btn btn-sm btn-info">Details</button></a>
-                    ';
                     $Kirim = Date('d-M-Y', strtotime($rows['delivery_date']));
                     $createorder = Date('d/M/Y', strtotime($rows['created_date']));
                     ?>
@@ -118,7 +115,10 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                         <td><?=$rows['admin']?></td>
                         <td><?=$florist?></td>
                         <td><?=$kurir?></td>
-                        <td><?=$button?> </td>
+                        <td>
+                            <a href="<?=URL?>order/?p=detailtrx&trx=<?=$rows["transactionID"]?>" target="_blank" ><button type="button" class="btn btn-sm btn-info">Details</button></a>
+                            <!-- <a href="javascript:;" onclick="window.open('<?=URL?>order/?p=detailtrx&trx=<?=$rows["transactionID"]?>', 'newwindow', 'width=1024,height=650');  return false;"><button type="button" class="btn btn-sm btn-info">Details</button></a> -->
+                        </td>
                     </tr>
                 <?php } ?>
                 </tbody>
