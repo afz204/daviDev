@@ -11,18 +11,18 @@ use Dompdf\Dompdf;
 // menggunakan class dompdf
 $dompdf = new Dompdf();
 
-$html = file_get_contents("print_invoice.php");
+$html = file_get_contents("print_spk.php");
 // $html = file_get_contents("print_amplop.php");
 $dompdf->loadHtml($html);
 
 // (Opsional) Mengatur ukuran kertas dan orientasi kertas
 // $dompdf->setPaper(array(0, 0, 400, 700), 'landscape'); //amplop
-$dompdf->setPaper(array(0, 0, 670, 450), 'potrait');
+$dompdf->setPaper(array(0, 0, 595.28, 841.89), 'potrait');
 
 // Menjadikan HTML sebagai PDF
 $dompdf->render();
 
 // Output akan menghasilkan PDF (1 = download dan 0 = preview)
-$dompdf->stream("Codingan",array("Attachment"=>0));
+$dompdf->stream("Card-SPK",array("Attachment"=>0));
 
 ?>

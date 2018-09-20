@@ -172,10 +172,10 @@
          </div>
          <div class="card-body">
             <div class="btn-group" role="group" aria-label="Basic example">
-               <button type="button" class="btn btn-outline-primary"><span class="fa fa-print"></span> SPK</button>
+               <button type="button" class="btn btn-outline-primary" onClick="window.open('<?=URL?>php/ajax/print_spk.php?transactionID=<?=$_GET['trx']?>');"><span class="fa fa-print"></span> SPK</button>
                <button type="button" class="btn btn-outline-danger" onClick="window.open('<?=URL?>php/ajax/print_do.php?transactionID=<?=$_GET['trx']?>');"><span class="fa fa-print"></span> DO</button>
                <button type="button" class="btn btn-outline-success" onClick="window.open('<?=URL?>php/ajax/print_invoice.php?transactionID=<?=$_GET['trx']?>');"><span class="fa fa-print"></span> Invoice</button>
-               <button type="button" class="btn btn-outline-warning"><span class="fa fa-print"></span> Card Messages</button>
+               <button type="button" class="btn btn-outline-warning"  onClick="window.open('<?=URL?>php/ajax/print_cardmsg.php?transactionID=<?=$_GET['trx']?>');"><span class="fa fa-print"></span> Card Messages</button>
                <button type="button" class="btn btn-outline-info"><span class="fa fa-paper-plane"></span> Send Email</button>
             </div>
          </div>
