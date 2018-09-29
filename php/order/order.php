@@ -58,7 +58,7 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                     <th scope="col">Total Payment</th>
                     <!-- <th scope="col">customer_name</th> -->
                     <th scope="col">delivery_date</th>
-                    <th scope="col">delivery_to</th>
+                    <!-- <th scope="col">delivery_to</th> -->
                     <!-- <th scope="col">grand_total</th> -->
                     <th scope="col">status_order</th>
                     <th scope="col">status_paid</th>
@@ -66,7 +66,7 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                     <th scope="col">created by</th>
                     <th scope="col">florist</th>
                     <th scope="col">kurir</th>
-                    <th scope="col">ACTION</th>
+                    <!-- <th scope="col">ACTION</th> -->
                 </tr>
                 </thead>
                 <tbody>
@@ -101,24 +101,20 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                     $createorder = Date('d/M/Y', strtotime($rows['created_date']));
                     ?>
                     <tr <?=Date('Y-m-d', strtotime($rows['delivery_date'])) == $config->getdate('Y-m-d') ? 'style="background-color:#dc3545 !important; color: #fff !important; font-weight: 500 !important;"' : '' ?> >
-                        <td><?=$rows['transactionID']?></td>
+                        <td><a href="<?=URL?>order/?p=detailtrx&trx=<?=$rows["transactionID"]?>" target="_blank" ><?=$rows['transactionID']?></a></td>
                         <td> <?php foreach($product as $val => $key) { echo '<span class="badge badge-info">'.$key.'</span></br>'; } ?> </td>
                         <td><?=$rows['CustomerName']?> <small class="badge badge-sm badge-info"><?=$type['nama']?></small></td>
                         <td> <?php foreach($price as $val => $key) { echo '<span class="badge badge-info">'.$config->formatprice($key).'</span></br>'; } ?> </td>
                         <td> <?php foreach($quantity as $val => $key) { echo '<span class="badge badge-info">'.$key.'</span></br>'; } ?> </td>
                         <td><?=$config->formatprice($rows['grandTotal'] + $rows['delivery_charge'] + $rows['delivery_charge_time'])?></td>
                         <td><?=$Kirim?> <span class="small"><?=$arrtime[$rows['delivery_time']]?></span></td>
-                        <td><?=$rows['kelurahan']?></td>
+                        <!-- <td><?=$rows['kelurahan']?></td> -->
                         <td><?=$btnchangestatus?></td>
                         <td><span class="badge badge-sm badge-<?=$rows['statusPaid'] == 1 ? 'success' : 'warning'?>"><?=$arrstatuspaid[$rows['statusPaid']]?></span></td>
                         <td><?=$createorder?></td>
                         <td><?=$rows['admin']?></td>
                         <td><?=$florist?></td>
                         <td><?=$kurir?></td>
-                        <td>
-                            <a href="<?=URL?>order/?p=detailtrx&trx=<?=$rows["transactionID"]?>" target="_blank" ><button type="button" class="btn btn-sm btn-info">Details</button></a>
-                            <!-- <a href="javascript:;" onclick="window.open('<?=URL?>order/?p=detailtrx&trx=<?=$rows["transactionID"]?>', 'newwindow', 'width=1024,height=650');  return false;"><button type="button" class="btn btn-sm btn-info">Details</button></a> -->
-                        </td>
                     </tr>
                 <?php } ?>
                 </tbody>

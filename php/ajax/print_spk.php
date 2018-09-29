@@ -60,6 +60,11 @@ while($row = $stmt->fetch(PDO::FETCH_LAZY)) {
             <td id="2">:</td>
             <td id="3">'. $arrtime[$row['delivery_time']] .'</td>
         </tr>
+        <tr>
+            <td id="1">Alamat lengkap</td>
+            <td id="2">:</td>
+            <td id="3"style="text-transform: capitalize;">'. $data['alamat_penerima'].', '. $data['Kelurahan']. ', '. $data['Kecamatan']. ', '. $data['KotaName']. ', '. $data['ProvinsiName'] .'</td>
+        </tr>
     </table>
 </div>    
 ';

@@ -262,12 +262,12 @@ $content = '
         <tr>
             <td id="1" >Invoice Name</td>
             <td id="2" >:</td>
-            <td id="3" style="text-transform: capitalize;">'. $data['nama_penerima'] .'</td>
+            <td id="3" style="text-transform: capitalize;">'. $data['invoice_name'] .'</td>
         </tr>
         <tr>
             <td id="1" >Recipient Name</td>
             <td id="2" >:</td>
-            <td id="3" style="text-transform: capitalize;">'. $data['invoice_name'] .'</td>
+            <td id="3" style="text-transform: capitalize;">'. $data['nama_penerima'] .'</td>
         </tr>
         <tr>
             <td id="1">Delivery Address</td>

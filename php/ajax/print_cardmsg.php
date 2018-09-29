@@ -11,6 +11,8 @@ $data = $config->getData('*', 'transaction', "transactionID = '". $transactionID
 $content = '
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>CARD MSG '. $transactionID .'</title>
 </head>
 <style type="text/css">
     *{

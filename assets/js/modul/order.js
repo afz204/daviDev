@@ -758,4 +758,21 @@ $(document).ready(function() {
         }
     });
 
+    $('#send-email').on('click', function(e) {
+        e.preventDefault();
+        var trx = $(this).data('trx');
+        $("#send-email").attr("disabled", true);
+        $.ajax({
+            url: '../php/ajax/order.php?type=sendInvoiceEmail',
+            type: 'post',
+            data: { 'transactionID': trx },
+
+            success: function(msg) {
+                var data = JSON.parse(msg);
+                alert(data['msg']);
+                location.reload();
+            }
+        });
+    });
+
 })

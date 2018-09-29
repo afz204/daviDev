@@ -11,6 +11,14 @@ $arrstatuspaid = array(
     0 => 'UNPAID',
     1 => 'PAID'
 );
+$arrtime = [
+    0 => '9am - 1pm',
+    1 => '2pm - 5pm',
+    2 => '6pm - 8pm',
+    3 => '9pm - 0am',
+    4 => '1am - 5am',
+    5 => '6am - 8am'
+];
 $order = $config->runQuery('SELECT 
 (select GROUP_CONCAT(transaction_details.product_name SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as product, 
 (select GROUP_CONCAT(transaction_details.product_price SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as price, 
@@ -50,7 +58,7 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                     <th scope="col">Total Payment</th>
                     <!-- <th scope="col">customer_name</th> -->
                     <th scope="col">delivery_date</th>
-                    <th scope="col">delivery_to</th>
+                    <!-- <th scope="col">delivery_to</th> -->
                     <!-- <th scope="col">grand_total</th> -->
                     <th scope="col">status_order</th>
                     <th scope="col">status_paid</th>
@@ -58,7 +66,7 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                     <th scope="col">created by</th>
                     <th scope="col">florist</th>
                     <th scope="col">kurir</th>
-                    <th scope="col">ACTION</th>
+                    <!-- <th scope="col">ACTION</th> -->
                 </tr>
                 </thead>
                 <tbody>
@@ -96,21 +104,21 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                     $createorder = Date('d/M/Y', strtotime($rows['created_date']));
                     ?>
                     <tr <?=Date('Y-m-d', strtotime($rows['delivery_date'])) == $config->getdate('Y-m-d') ? 'style="background-color:#dc3545 !important; color: #fff !important; font-weight: 500 !important;"' : '' ?> >
-                        <td><?=$rows['transactionID']?></td>
+                    <td><a href="<?=URL?>order/?p=detailtrx&trx=<?=$rows["transactionID"]?>" target="_blank" ><?=$rows['transactionID']?></a></td>
                         <td> <?php foreach($product as $val => $key) { echo '<span class="badge badge-info">'.$key.'</span></br>'; } ?> </td>
                         <td><?=$rows['CustomerName']?> <small class="badge badge-sm badge-info"><?=$type['nama']?></small></td>
                         <td> <?php foreach($price as $val => $key) { echo '<span class="badge badge-info">'.$config->formatprice($key).'</span></br>'; } ?> </td>
                         <td> <?php foreach($quantity as $val => $key) { echo '<span class="badge badge-info">'.$key.'</span></br>'; } ?> </td>
                         <td><?=$config->formatprice($rows['grandTotal'])?></td>
-                        <td><?=$Kirim?> <span class="small"><?=$rows['delivery_time']?></span></td>
-                        <td><?=$rows['kelurahan']?></td>
+                        <td><?=$Kirim?> <span class="small"><?=$arrtime[$rows['delivery_time']]?></span></td>
+                        <!-- <td><?=$rows['kelurahan']?></td> -->
                         <td><span class="badge badge-sm badge-info"><?=$arrstatusorder[$rows['statusOrder']]?></span></td>
                         <td><span class="badge badge-sm badge-<?=$rows['statusPaid'] == 1 ? 'success' : 'warning'?>"><?=$arrstatuspaid[$rows['statusPaid']]?></span></td>
                         <td><?=$createorder?></td>
                         <td><?=$rows['admin']?></td>
                         <td><?=$florist?></td>
                         <td><?=$kurir?></td>
-                        <td><?=$button?> </td>
+                        <!-- <td><?=$button?> </td> -->
                     </tr>
                 <?php } ?>
                 </tbody>
