@@ -250,7 +250,7 @@ $content = '
                         <tr>
                             <td class="invoice" style="font-size: 11px; padding: 2px; height:15px; vertical-align: top; font-weight: 500;">DELIVERY DATE</td>
                             <td class="invoice" style="font-size: 11px; padding: 2px; vertical-align: top; font-weight: 500;">:</td>
-                            <td class="invoice" style="font-size: 12px; padding: 2px; vertical-align: top; font-weight: 600;">'. $config->_formatdate($data['created_date']) .'</td>
+                            <td class="invoice" style="font-size: 12px; padding: 2px; vertical-align: top; font-weight: 600;">'. $config->_formatdate($data['delivery_date']) .'</td>
                         </tr>
                     </table>
                 </td>

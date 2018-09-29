@@ -60,12 +60,12 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                     <th scope="col">delivery_date</th>
                     <!-- <th scope="col">delivery_to</th> -->
                     <!-- <th scope="col">grand_total</th> -->
-                    <th scope="col">status_order</th>
+                    <!-- <th scope="col">status_order</th> -->
                     <th scope="col">status_paid</th>
                     <th scope="col">created order</th>
                     <th scope="col">created by</th>
                     <th scope="col">florist</th>
-                    <th scope="col">kurir</th>
+                    <!-- <th scope="col">kurir</th> -->
                     <!-- <th scope="col">ACTION</th> -->
                 </tr>
                 </thead>
@@ -109,12 +109,12 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                         <td><?=$config->formatprice($rows['grandTotal'] + $rows['delivery_charge'] + $rows['delivery_charge_time'])?></td>
                         <td><?=$Kirim?> <span class="small"><?=$arrtime[$rows['delivery_time']]?></span></td>
                         <!-- <td><?=$rows['kelurahan']?></td> -->
-                        <td><?=$btnchangestatus?></td>
+                        <!-- <td><span class="badge badge-sm badge-info"><?=$arrstatusorder[$rows['statusOrder']]?></span></td> -->
                         <td><span class="badge badge-sm badge-<?=$rows['statusPaid'] == 1 ? 'success' : 'warning'?>"><?=$arrstatuspaid[$rows['statusPaid']]?></span></td>
                         <td><?=$createorder?></td>
                         <td><?=$rows['admin']?></td>
                         <td><?=$florist?></td>
-                        <td><?=$kurir?></td>
+                        <!-- <td><?=$kurir?></td> -->
                     </tr>
                 <?php } ?>
                 </tbody>

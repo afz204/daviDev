@@ -22,6 +22,10 @@ function formatState(state) {
 };
 $(document).ready(function() {
 
+    $('[name="custom-remaks"]').keyup(function() {
+        $('[name="radio-remarks"]').val(this.value);
+    });
+
     $('#codeSearch').select2({
         width: '100%',
         theme: "bootstrap4",

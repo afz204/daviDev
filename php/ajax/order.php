@@ -175,10 +175,8 @@ if($_GET['type'] == 'addProducts')
                            <div class="note">
                               <form id="remarks_florist" data-parsley-validate="" novalidate="">
                                  <div class="form-group">
-                                    <textarea class="form-control" name="isi_remarks['. $id .']" rows="5" required="" placeholder="remarks florist"></textarea>
-
+                                    <textarea class="form-control remarks-florist-tambahan" name="isi_remarks['. $id .']" rows="5" required="" placeholder="remarks florist" data-id="'. $id .'"></textarea>
                                  </div>
-                                 <button class="btn btn-block btn-info isi_remarks_btn" type="button" data-id="isi_remarks['. $id .']">remarks</button>
                               </form>
                            </div>
                         </div>
@@ -260,10 +258,7 @@ if($_GET['type'] == 'addRemarksProduct'){
     $a = $_POST['id'];
     $b = $_POST['remarks'];
 
-    $a = explode('[', $a);
-    $a = explode(']', $a[1]);
-
-    $id = $a[0];
+    $id = $a;
     
     $update = $config->runQuery("UPDATE transaction_details SET florist_remarks ='". $b ."' WHERE id = '". $id ."' ");
     $update->execute();
@@ -746,13 +741,24 @@ if($_GET['type'] == 'selectFlorist'){
     $a = $_POST['transctionID'];
     $b = $_POST['floristID'];
 
-    $stmt = "UPDATE transaction SET id_florist = '". $b ."', updated_date = '". $config->getDate('Y-m-d H:m:s') ."', updated_by = '". $admin."' WHERE transactionID = '". $a ."'";
+    $stmt = "UPDATE transaction SET id_florist = '". $b ."', statusOrder = '1', updated_date = '". $config->getDate('Y-m-d H:m:s') ."', updated_by = '". $admin."' WHERE transactionID = '". $a ."'";
     $stmt = $config->runQuery($stmt);
     $stmt->execute();
 
     if($stmt){
         echo $config->actionMsg('u', 'transaction_details');
         $logs = $config->saveLogs($a, $admin, 'u', 'update florist!');
+
+        $transaction = "UPDATE transaction SET statusOrder = '1' WHERE transactionID = '". $b ."'";
+        $transaction = $config->runQuery($transaction);
+        $transaction->execute();
+
+        if($transaction) {
+            echo $config->actionMsg('u', 'transaction');
+            $logs = $config->saveLogs($a, $admin, 'u', 'update statusOrder');
+        } else {
+            echo 'Failed!';
+        }
     }else{
         echo 'Failed!';
     }
@@ -761,7 +767,7 @@ if($_GET['type'] == 'selectKurir'){
     $a = $_POST['transctionID'];
     $b = $_POST['KurirID'];
 
-    $stmt = "UPDATE transaction SET id_kurir = '". $b ."' WHERE transactionID = '". $a ."'";
+    $stmt = "UPDATE transaction SET id_kurir = '". $b ."', statusOrder = '2' WHERE transactionID = '". $a ."'";
     $stmt = $config->runQuery($stmt);
     $stmt->execute();
     $tanggall = $config->getDate("Y-m-d H:m:s");

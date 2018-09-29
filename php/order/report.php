@@ -7,6 +7,8 @@ $arrstatusorder = array(
     4 => 'Return',
     5 => 'Complain',
 );
+$badge = 'info';
+
 $arrstatuspaid = array(
     0 => 'UNPAID',
     1 => 'PAID'
@@ -44,18 +46,13 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                 <tr style="text-transform: lowercase;">
                     <th scope="col">Invoice</th>
                     <th scope="col">Product Name</th>
-                    <th scope="col">Sender Name</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Qty</th>
-                    <th scope="col">Total Payment</th>
-                    <!-- <th scope="col">customer_name</th> -->
                     <th scope="col">delivery_date</th>
                     <th scope="col">delivery_to</th>
                     <!-- <th scope="col">grand_total</th> -->
                     <th scope="col">status_order</th>
+                    <th scope="col">notes</th>
                     <th scope="col">status_paid</th>
                     <th scope="col">created order</th>
-                    <th scope="col">created by</th>
                     <th scope="col">florist</th>
                     <th scope="col">kurir</th>
                     <th scope="col">ACTION</th>
@@ -63,7 +60,9 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                 </thead>
                 <tbody>
                 <?php  while($rows = $order->fetch(PDO::FETCH_LAZY)){
-
+                    if(in_array($rows['statusOrder'], [4, 5])) {
+                        $badge = 'danger';
+                    }
                     $product = explode(',', $rows['product']);
                     $price = explode(',', $rows['price']);
                     $quantity = explode(',', $rows['quantity']);
@@ -98,16 +97,13 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                     <tr <?=Date('Y-m-d', strtotime($rows['delivery_date'])) == $config->getdate('Y-m-d') ? 'style="background-color:#dc3545 !important; color: #fff !important; font-weight: 500 !important;"' : '' ?> >
                         <td><?=$rows['transactionID']?></td>
                         <td> <?php foreach($product as $val => $key) { echo '<span class="badge badge-info">'.$key.'</span></br>'; } ?> </td>
-                        <td><?=$rows['CustomerName']?> <small class="badge badge-sm badge-info"><?=$type['nama']?></small></td>
-                        <td> <?php foreach($price as $val => $key) { echo '<span class="badge badge-info">'.$config->formatprice($key).'</span></br>'; } ?> </td>
-                        <td> <?php foreach($quantity as $val => $key) { echo '<span class="badge badge-info">'.$key.'</span></br>'; } ?> </td>
-                        <td><?=$config->formatprice($rows['grandTotal'])?></td>
+                        
                         <td><?=$Kirim?> <span class="small"><?=$rows['delivery_time']?></span></td>
                         <td><?=$rows['kelurahan']?></td>
-                        <td><span class="badge badge-sm badge-info"><?=$arrstatusorder[$rows['statusOrder']]?></span></td>
+                        <td><span class="badge badge-sm badge-<?=$badge?>"><?=$arrstatusorder[$rows['statusOrder']]?></span></td>
+                        <td><?=$rows['notes']?></td>
                         <td><span class="badge badge-sm badge-<?=$rows['statusPaid'] == 1 ? 'success' : 'warning'?>"><?=$arrstatuspaid[$rows['statusPaid']]?></span></td>
                         <td><?=$createorder?></td>
-                        <td><?=$rows['admin']?></td>
                         <td><?=$florist?></td>
                         <td><?=$kurir?></td>
                         <td><?=$button?> </td>

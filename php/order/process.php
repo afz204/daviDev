@@ -33,7 +33,7 @@ WHERE transaction.statusOrder = "1" GROUP BY transaction.transactionID');
 $order->execute();
 
 $Listflorist = $config->Products('ID, FloristName', 'florist');
-$listkurir = $config->Products('id, nama_kurir', 'kurirs');
+$listkurir = $config->Products('id, nama_kurir', 'kurirs WHERE status = 1');
 ?>
 <style>
     .card-body {
@@ -112,7 +112,7 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                         <td><?=$config->formatprice($rows['grandTotal'])?></td>
                         <td><?=$Kirim?> <span class="small"><?=$arrtime[$rows['delivery_time']]?></span></td>
                         <!-- <td><?=$rows['kelurahan']?></td> -->
-                        <td><?=$btnchangestatus?></td>
+                        <td><span class="badge badge-sm badge-info"><?=$arrstatusorder[$rows['statusOrder']]?></span></td>
                         <td><span class="badge badge-sm badge-<?=$rows['statusPaid'] == 1 ? 'success' : 'warning'?>"><?=$arrstatuspaid[$rows['statusPaid']]?></span></td>
                         <td><?=$createorder?></td>
                         <td><?=$rows['admin']?></td>
@@ -123,60 +123,6 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                 <?php } ?>
                 </tbody>
             </table>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="selectFlorist" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-<div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-
-            <div class="modal-body">
-                <form id="formSelectFlorist" method="post" data-parsley-validate="" class="needs-validation" novalidate="" autocomplete="off">
-                    <div class="form-group">
-                        <select class="form-control" name="ListSelectedFlorist" id="ListSelectedFlorist" required>
-                            <option value="">:: florist ::</option>
-                            <?php while ($row = $Listflorist->fetch(PDO::FETCH_LAZY)){ ?>
-                            <option value="<?=$row->ID?>"><?=$row->FloristName?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
-					<input type="hidden" name="IDSelectedFlorist">
-                    <button class="btn btn-success btn-sm btn-block" type="submit">Pilih Florist</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="chagestatusorder" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-<div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-            <div class="modal-body">
-                <form id="formChangeStatusOrder" method="post" data-parsley-validate="" class="needs-validation" novalidate="" autocomplete="off">
-                    <div class="form-group">
-                        <select class="form-control" name="listStatusOrder" id="listStatusOrder" required>
-                            <option value="">:: change status ::</option>
-                            <?php foreach ($arrstatusorder as $key => $val){ ?>
-                            <option value="<?=$key?>"><?=$val?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
-					<input type="hidden" name="NomorTransaction">
-					<input type="hidden" name="TypeStatus" value="kurir">
-                    <button class="btn btn-success btn-sm btn-block" type="submit">Change Status</button>
-                </form>
-            </div>
         </div>
     </div>
 </div>

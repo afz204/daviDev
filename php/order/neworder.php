@@ -237,14 +237,14 @@
                       </div>
                       <div class="col-md-6 mb-3 form-group">
                          <label for="lastName">email_penerima</label>
-                         <input type="email" class="form-control" id="email_penerima" value="<?=isset($trx[0]['email']) ? $trx[0]['email'] : '' ?>" autocomplete="email" required>
+                         <input type="email" class="form-control" id="email_penerima" value="<?=isset($trx[0]['email']) ? $trx[0]['email'] : '' ?>" autocomplete="email" >
                          <div class="help-block with-errors"></div>
                       </div>
                    </div>
                    <div class="row ">
                       <div class="col-md-6 mb-3 form-group">
                          <label for="firstName">provinsi</label>
-                         <select class="form-control" name="ProvinsiCorporate" id="ProvinsiCorporate" required>
+                         <select class="form-control" name="ProvinsiCorporate" id="ProvinsiCorporate">
                             <option value="">Choose...</option>
                             <?php while ($row = $provinsi->fetch(PDO::FETCH_LAZY)){ ?>
                             <option value="<?=$row->id?>" <?=isset($trx[0]['provinsi_id']) && $trx[0]['provinsi_id'] == $row->id ? 'selected' : '' ?>><?=$row->name?></option>
@@ -254,7 +254,7 @@
                       </div>
                       <div class="col-md-6 mb-3 form-group">
                          <label for="lastName">kota</label>
-                         <select class="form-control" name="KotaCorporate" id="KotaCorporate" required>
+                         <select class="form-control" name="KotaCorporate" id="KotaCorporate">
                             <option value="">Choose...</option>
                             <?php if(isset($trx) && $trx[0]['kota_id'] != '') { while ($k = $kota->fetch(PDO::FETCH_LAZY)){ ?>
                                <option value="<?=$k->id?>" <?=isset($trx[0]['kota_id']) && $trx[0]['kota_id']== $k->id ? 'selected' : '' ?> ><?=$k->name?></option>
@@ -264,7 +264,7 @@
                       </div>
                       <div class="col-md-6 mb-3 form-group">
                          <label for="lastName">Kecamatan</label>
-                         <select class="form-control" name="kecamatanCorporate" id="kecamatanCorporate" required>
+                         <select class="form-control" name="kecamatanCorporate" id="kecamatanCorporate">
                             <option value="">Choose...</option>
                             <?php if(isset($trx) && $trx[0]['kecamata_id'] != '') { while ($kec = $kecamatan->fetch(PDO::FETCH_LAZY)){ ?>
                               <option value="<?=$kec->id?>" <?=isset($trx[0]['kecamata_id']) && $trx[0]['kecamata_id'] == $kec->id ? 'selected' : '' ?> ><?=$kec->name?></option>
@@ -274,7 +274,7 @@
                       </div>
                       <div class="col-md-6 mb-3 form-group">
                          <label for="lastName">kelurahan</label>
-                         <select class="form-control" name="kelurahanCorporate" id="kelurahanCorporate" required>
+                         <select class="form-control" name="kelurahanCorporate" id="kelurahanCorporate">
                             <option value="">Choose...</option>
                             <?php if(isset($trx) && $trx[0]['kelurahan_id'] != '') { while ($kel = $kelurahan->fetch(PDO::FETCH_LAZY)){ ?>
                                <option value="<?=$kel->id?>" <?=isset($trx[0]['kelurahan_id']) && $trx[0]['kelurahan_id'] == $kel->id ? 'selected' : '' ?> ><?=$kel->name?></option>
@@ -358,6 +358,13 @@
                       <div class="custom-control custom-radio ">
                          <input type="radio" class="custom-control-input" value="Hubungi penerima sebelum pengiriman"  id="Hubungi penerima sebelum pengiriman" name="radio-remarks" <?=isset($trx[0]['delivery_marks']) && $trx[0]['delivery_marks'] == 'Hubungi penerima sebelum pengiriman' ? 'checked' : '' ?> required>
                          <label class="custom-control-label" for="Hubungi penerima sebelum pengiriman">Hubungi penerima sebelum pengiriman
+                         </label>
+                         <div class="help-block with-errors"></div>
+                      </div>
+                      <div class="custom-control custom-radio ">
+                         <input type="radio" class="custom-control-input" value="<?=isset($trx[0]['delivery_marks']) && $trx[0]['delivery_marks'] !='' ? $trx[0]['delivery_marks'] : 'custom-remarks-kurir' ?>"  id="<?=isset($trx[0]['delivery_marks']) && $trx[0]['delivery_marks'] !='' ? $trx[0]['delivery_marks'] : 'custom-remarks-kurir' ?>" name="radio-remarks" <?=isset($trx[0]['delivery_marks']) && $trx[0]['delivery_marks'] == $trx[0]['delivery_marks'] ? 'checked' : '' ?> required>
+                         <label class="custom-control-label" for="<?=isset($trx[0]['delivery_marks']) && $trx[0]['delivery_marks'] !='' ? $trx[0]['delivery_marks'] : 'custom-remarks-kurir' ?>">
+                            <input name="custom-remaks" type="text" class="form-control" id="<?=isset($trx[0]['delivery_marks']) && $trx[0]['delivery_marks'] !='' ? $trx[0]['delivery_marks'] : 'custom-remarks-kurir' ?>" value="<?=isset($trx[0]['delivery_marks']) && $trx[0]['delivery_marks'] !='' ? $trx[0]['delivery_marks'] : 'custom-remarks-kurir' ?>" >
                          </label>
                          <div class="help-block with-errors"></div>
                       </div>
@@ -499,10 +506,9 @@
                          <div class="note">
                             <form id="remarks_florist" data-parsley-validate="">
                                <div class="form-group">
-                                  <textarea class="form-control" name="isi_remarks[<?=$product['id']?>]" rows="5" required="" placeholder="remarks florist"><?=$product['florist_remarks']?></textarea>
+                                  <textarea class="form-control remarks-florist-tambahan" name="isi_remarks[<?=$product['id']?>]" data-id="<?=$product['id']?>" rows="5" required="" placeholder="remarks florist"><?=$product['florist_remarks']?></textarea>
 
                                </div>
-                               <button class="btn btn-block btn-info isi_remarks_btn" type="button" data-id="isi_remarks[<?=$product['id']?>]">remarks</button>
                             </form>
                          </div>
                       </div>

@@ -491,7 +491,7 @@ $(document).ready(function() {
         e.preventDefault();
         var trx = $('[name="IDSelectedFlorist"]').val();
         var id = $('#ListSelectedFlorist option:selected').val();
-        alert(id);
+
         $.ajax({
             url: '../php/ajax/order.php?type=selectFlorist',
             type: 'post',
@@ -613,6 +613,24 @@ $(document).ready(function() {
         // Ensure that it is a number and stop the keypress
         if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
             e.preventDefault();
+        }
+    });
+
+    $(document).on('keypress', '.remarks-florist-tambahan', function(e) {
+        if (e.which == 13) {
+            var id = $(this).data('id');
+            var text = this.value;
+            $.ajax({
+                url: '../php/ajax/order.php?type=addRemarksProduct',
+                type: 'post',
+                data: 'id=' + id + '&remarks=' + text,
+
+                success: function(msg) {
+                    alert(msg);
+                    //input.val(msg);
+                    //location.reload();
+                }
+            });
         }
     });
 
