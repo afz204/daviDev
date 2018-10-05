@@ -31,47 +31,22 @@ $provinsi = $config->Products('id, name', 'provinces');
                         <input type="hidden" name="typeFormCorporate" id="typeFormCorporate" value="<?=isset($data[0]) ? 'edit' : 'new' ?>" class="form-control" >
                     </div>
                     <div class="form-group">
-                        <label for="usernameAdmin">Bidang Usaha</label>
-                        <select class="form-control" name="bidangCorporate" id="bidangCorporate" required>
-                            <option value="">:: select ::</option>
-                            <?php while ($row = $bidang->fetch(PDO::FETCH_LAZY)){ ?>
-                            <option value="<?=$row['id']?>" <?=isset($data[0]['bidang']) ? 'selected' : '' ?> ><?=$row['category']?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                    <div class="form-group">
                         <label for="usernameAdmin">Nomor Telp</label>
                         <input type="text" name="telpCorporate"
                                data-parsley-minLength="5" value="<?=isset($data[0]['telp']) ? $data[0]['telp'] : '' ?>"
                                data-parsley-type="number" id="telpCorporate" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label for="usernameAdmin">Handphone</label>
-                        <input type="text" name="hpCorporate"
-                               data-parsley-minLength="5" value="<?=isset($data[0]['handphone']) ? $data[0]['handphone'] : '' ?>"
-                               data-parsley-type="number" id="hpCorporate" placeholder="hp contact person" class="form-control" required>
-                    </div>
-                    <div class="form-group">
                         <label for="usernameAdmin">Nomor Fax</label>
                         <input type="text" name="faxCorporate"
                                data-parsley-minLength="5" value="<?=isset($data[0]['fax']) ? $data[0]['fax'] : '' ?>"
-                               data-parsley-type="number" id="faxCorporate" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="usernameAdmin">Alamat Email</label>
-                        <input type="text" name="emailCorporate"
-                               data-parsley-minLength="5" value="<?=isset($data[0]['email']) ? $data[0]['email'] : '' ?>"
-                               data-parsley-type="email" id="emailCorporate" class="form-control" required>
+                               data-parsley-type="number" id="faxCorporate" class="form-control" >
                     </div>
                     <div class="form-group">
                         <label for="usernameAdmin">Alamat Website</label>
                         <input type="text" name="webCorporate"
                                data-parsley-minLength="5" value="<?=isset($data[0]['website']) ? $data[0]['website'] : '' ?>"
-                               data-parsley-type="url" id="webCorporate" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="usernameAdmin">Contact Person</label>
-                        <input type="text" data-parsley-minLength="5" name="cpCorporate" value="<?=isset($data[0]['cp']) ? $data[0]['cp'] : '' ?>" id="cpCorporate" class="form-control" required>
+                               data-parsley-type="url" id="webCorporate" class="form-control">
                     </div>
                     <div class="form-group">
                         <label for="usernameAdmin">Provinsi</label>

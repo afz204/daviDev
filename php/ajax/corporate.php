@@ -15,11 +15,8 @@ $admin = $config->adminID();
 if($_GET['type'] == 'new'){
     $t = $_POST['type'];
     $a = $_POST['nama'];
-    $b = $_POST['bidang'];
     $c = $_POST['telp'];
-    $d = $_POST['hp'];
     $e = $_POST['fax'];
-    $f = $_POST['email'];
     $g = $_POST['web'];
     $h = $_POST['prov'];
     $i = $_POST['kota'];
@@ -27,7 +24,6 @@ if($_GET['type'] == 'new'){
     $k = $_POST['kel'];
     $l = $_POST['alamat'];
     $m = $_POST['pos'];
-    $n = $_POST['cp'];
     $date = $config->getDate('Y-m-d H:m:s');
 
 //    $z = array($a, $b, $c, $d, $e, $f, $g, $h, $i, $j, $k, $l, $m);
@@ -39,19 +35,15 @@ if($_GET['type'] == 'new'){
     $unik = $unik. $tgl;
 
     if($t == 'new') {
-        $sql = "INSERT INTO corporates (nama, CorporateUniqueID, bidang, telp, handphone, fax, email, website, cp, alamat, kelurahan, kecamatan, kota, provinsi, kodepos, created_at)
-                VALUES (:a, :nen, :b, :c, :d, :e, :f, :g, :n, :l, :k, :j, :i, :h, :m, :date)";
+        $sql = "INSERT INTO corporates (nama, CorporateUniqueID, telp, fax, website,alamat, kelurahan, kecamatan, kota, provinsi, kodepos, created_at)
+                VALUES (:a, :nen, :c, :e, :g, :l, :k, :j, :i, :h, :m, :date)";
         $stmt = $config->runQuery($sql);
         $stmt->execute(array(
             ':a' => $a,
             ':nen' => $unik,
-            ':b' => $b,
             ':c' => $c,
-            ':d' => $d,
             ':e' => $e,
-            ':f' => $f,
             ':g' => $g,
-            ':n' => $n,
             ':l' => $l,
             ':k' => $k,
             ':j' => $j,

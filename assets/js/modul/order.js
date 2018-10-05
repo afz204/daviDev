@@ -63,7 +63,7 @@ function proccessOrder(trx) {
             $.ajax({
                 url: '../php/ajax/order.php?type=proccessOrder',
                 type: 'post',
-                data: { 'transctionID': trx, 'InvoiceName': namainvoice },
+                data: { 'transactionID': trx, 'InvoiceName': namainvoice },
 
                 success: function(msg) {
                     alert(msg);
@@ -655,7 +655,7 @@ $(document).ready(function() {
                 $('#codeSearch').select2("val", "");
                 $('#modalAddProducts').modal('hide');
                 var data = JSON.parse(msg);
-                // console.log(data);
+                console.log(data);
                 var count = parseInt(data.qty);
                 $('#listProductsData').hide().append(data.data).fadeIn('fast');
                 $('#countProduct').hide().html(count).fadeIn(800);

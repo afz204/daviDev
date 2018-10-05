@@ -1,4 +1,4 @@
-function changePaymentStatus(id, type){
+function changePaymentStatus(id, type) {
     $.ajax({
         url: '../php/ajax/management.php?type=changePaymentStatus',
         method: 'post',
@@ -10,11 +10,12 @@ function changePaymentStatus(id, type){
         }
     })
 }
-function formPaymentShow()
-{
+
+function formPaymentShow() {
     $('#showFormPayment').removeClass('hidden');
     $('#btnPayment').addClass('hidden');
 }
+
 function formPrevillage() {
     $('#form-previllage').removeClass('hidden');
     $('#listPrevillages').hide();
@@ -43,6 +44,7 @@ function formSatuan() {
 }
 $(document).ready(function() {
 
+    $('[name="listadmin"]').select2({ width: '100%', theme: "bootstrap4" });
     $('#tbListSatuan').DataTable();
     $('#tableLogs').DataTable();
 
@@ -56,6 +58,22 @@ $(document).ready(function() {
         $('#form-admin').removeClass('hidden');
     });
 
+    $('#token-form').on('submit', function(e) {
+        e.preventDefault();
+        var admin = $('[name="listadmin"] option:selected').val();
+        var password = $('[name="passwordtoken"]').val();
+
+        $.ajax({
+            url: '../php/ajax/management.php?type=addtoken',
+            method: 'post',
+            data: { 'AdminID': admin, 'Password': password },
+
+            success: function(msg) {
+                location.reload();
+                alert(msg);
+            }
+        })
+    });
     $('#admin-form').on('submit', function(e) {
         e.preventDefault();
 
@@ -271,7 +289,7 @@ $(document).ready(function() {
 
     });
 
-    $('#formPayment').on('submit', function(e){
+    $('#formPayment').on('submit', function(e) {
         e.preventDefault();
 
         var name = $('#paymentName').val();

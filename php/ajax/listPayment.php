@@ -119,15 +119,15 @@ if($_GET['type'] == 'pay-kurir')
         ';
         $remk = '
         <div class="btn-group">
-                                          <button style="text-transform: uppercase; font-size: 10px; font-weight: 500;" type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Remarks" '. $styleRemarks .'>
-                                            <span class="fa fa-tasks"></span>
-                                          </button>
-                                          <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#" onclick="remarks(1, '. $row['payChargeID'] .')">parking</a>
-                                            <a class="dropdown-item" href="#" onclick="remarks(2, '. $row['payChargeID'] .')">standing</a>
-                                            <a class="dropdown-item" href="#" onclick="remarks(3, '. $row['payChargeID'] .')">time remarks</a>
-                                          </div>
-                                        </div>
+            <button style="text-transform: uppercase; font-size: 10px; font-weight: 500;" type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip" data-placement="top" title="Remarks" '. $styleRemarks .'>
+            <span class="fa fa-tasks"></span>
+            </button>
+            <div class="dropdown-menu">
+            <a class="dropdown-item" href="#" onclick="remarks(1, '. $row['payChargeID'] .')">parking</a>
+            <a class="dropdown-item" href="#" onclick="remarks(2, '. $row['payChargeID'] .')">standing</a>
+            <a class="dropdown-item" href="#" onclick="remarks(3, '. $row['payChargeID'] .')">time remarks</a>
+            </div>
+        </div>
         ';
         $button = $remk . $pay . $del;
 

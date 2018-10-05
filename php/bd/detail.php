@@ -5,11 +5,13 @@ $d = $_GET['id'];
 
 	$product = $prod->fetch(PDO::FETCH_LAZY);
 
+    $datatags = '';
+    if($product['tags'] != '') $datatags = $product['tags'];
 	$category = $config->Category();
 	$cat = $config->Products('id, name', 'categories WHERE parent_id != 0 ');
     $province = $config->Products('id, name', "provinces WHERE id IN (". $product['available_on'] .") ");
-    $tags = $config->getData('id,name', "categories", "parent_id IN (". $product['tags'] .")");
-    print_r($tags);
+    // $tags = $config->getData('id,name', "categories", "parent_id IN (". $datatags .")");
+    // print_r($tags);
 ?>
 
 <div class="card" <?=$access['create']?>> 

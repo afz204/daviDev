@@ -41,7 +41,7 @@ class Mail
 		//Username to use for SMTP authentication
 		$mail->Username = "info@bungadavi.co.id";
 		//Password to use for SMTP authentication
-		$mail->Password = "P@ssw0rd";
+		$mail->Password = "admin123";
 		//Set who the message is to be sent from
 		$mail->setFrom('info@bungadavi.co.id', 'Bunga Davi Indonesia');
 		//Set an alternative reply-to address

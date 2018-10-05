@@ -82,6 +82,8 @@ Many operating systems, software frameworks, and programs include a logging syst
         <script src="<?=URL?>assets/js/modul/kurir.js"></script>
     <?php } if($menu == 'production'){?>
         <script src="<?=URL?>assets/js/modul/stocks.js"></script>
+    <?php } if($menu == 'pembukuan'){?>
+        <script src="<?=URL?>assets/js/modul/pembukuan.js"></script>
     
     <?php } ?>
 

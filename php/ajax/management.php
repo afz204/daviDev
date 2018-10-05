@@ -274,3 +274,28 @@ elseif ($_GET['type'] == 'changePaymentStatus') {
         echo 'Failed';
     }
 }
+
+if($_GET['type'] == 'addtoken') {
+    $a = $_POST['AdminID'];
+    $b = $_POST['Password'];
+    $newpassword = $config->newPassword($b);
+
+    $sql = "INSERT INTO token (AdminID, tokenkey, alias, CreatedBy) VALUES (:a, :b, :c, :d)";
+        $stmt = $config->runQuery($sql);
+        $stmt->execute(array(
+            ':a'      => $a,
+            ':b'  => $newpassword,
+            ':c' => $b,
+            ':d' => $admin
+        ));
+
+        $reff = $config->lastInsertId();
+        $logs = $config->saveLogs($reff, $admin, 'c', 'new token');
+
+        if($stmt)
+        {
+            echo $config->actionMsg('c', 'token');
+        }else{
+            echo 'Failed!';
+        }
+}

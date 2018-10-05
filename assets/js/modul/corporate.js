@@ -32,11 +32,8 @@ $(document).ready(function() {
         e.preventDefault();
         var type = $('#typeFormCorporate').val();
         var nama = $('#nameCorporate').val();
-        var bidang = $('#bidangCorporate option:selected').val();
         var telp = $('#telpCorporate').val();
-        var hp = $('#hpCorporate').val();
         var fax = $('#faxCorporate').val();
-        var email = $('#emailCorporate').val();
         var web = $('#webCorporate').val();
         var prov = $('#ProvinsiCorporate option:selected').val();
         var kota = $('#KotaCorporate option:selected').val();
@@ -44,13 +41,12 @@ $(document).ready(function() {
         var kel = $('#kelurahanCorporate option:selected').val();
         var addr = $('#alamatCorporate').val();
         var pos = $('#posCorporate').val();
-        var cp = $('#cpCorporate').val();
 
         $.ajax({
             url: '../php/ajax/corporate.php?type=new',
             type: 'post',
-            data: 'type=' + type + '&nama=' + nama + '&bidang=' + bidang + '&telp=' + telp + '&hp=' + hp + '&fax=' + fax + '&email=' + email + '&web=' + web + '&prov=' + prov + '&kota=' + kota +
-                '&kec=' + kec + '&kel=' + kel + '&alamat=' + addr + '&pos=' + pos + '&cp=' + cp,
+            data: 'type=' + type + '&nama=' + nama + '&telp=' + telp + '&fax=' + fax + '&web=' + web + '&prov=' + prov + '&kota=' + kota +
+                '&kec=' + kec + '&kel=' + kel + '&alamat=' + addr + '&pos=' + pos,
 
             success: function(msg) {
                 if (msg === '1') {

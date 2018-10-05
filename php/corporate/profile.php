@@ -1,8 +1,7 @@
 <?php
 $id = $_GET['id'];
-$stmt = $config->runQuery("SELECT corporates.id, corporates.CorporateUniqueID, corporates.nama, corporates.telp, corporates.handphone, corporates.fax, corporates.email, corporates.website, corporates.cp, corporates.alamat, corporates.kelurahan, 
-corporates.kecamatan, corporates.kodepos, corporates.created_at, bidang_usahas.category, states.lokasi_nama FROM corporates
-INNER JOIN bidang_usahas ON bidang_usahas.id = corporates.bidang
+$stmt = $config->runQuery("SELECT corporates.id, corporates.CorporateUniqueID, corporates.nama, corporates.telp, corporates.fax,  corporates.website, corporates.alamat, corporates.kelurahan, 
+corporates.kecamatan, corporates.kodepos, corporates.created_at, states.lokasi_nama FROM corporates
 INNER JOIN states ON states.lokasi_ID = corporates.provinsi WHERE corporates.id = :a");
 $stmt->execute(array(':a' => $id));
 $info = $stmt->fetch(PDO::FETCH_LAZY);
@@ -28,32 +27,16 @@ $provinsi = $config->Products('id, name', 'provinces');
                         <input style="text-transform: capitalize;" type="text" class="form-control" value="<?=$info['nama']?>" readonly>
                     </div>
                     <div class="form-group" >
-                        <label for="usernameAdmin">Bidang Usaha</label>
-                        <input style="text-transform: capitalize;" type="text" class="form-control" value="<?=$info['category']?>" readonly>
-                    </div>
-                    <div class="form-group" >
                         <label for="usernameAdmin">Nomor Telp</label>
                         <input style="text-transform: capitalize;" type="text" class="form-control" value="<?=$info['telp']?>" readonly>
-                    </div>
-                    <div class="form-group" >
-                        <label for="usernameAdmin">Handphone</label>
-                        <input style="text-transform: capitalize;" type="text" class="form-control" value="<?=$info['handphone']?>" readonly>
                     </div>
                     <div class="form-group" >
                         <label for="usernameAdmin">Nomor Fax</label>
                         <input style="text-transform: capitalize;" type="text" class="form-control" value="<?=$info['fax']?>" readonly>
                     </div>
                     <div class="form-group" >
-                        <label for="usernameAdmin">Alamat Email</label>
-                        <input style="text-transform: capitalize;" type="text" class="form-control" value="<?=$info['email']?>" readonly>
-                    </div>
-                    <div class="form-group" >
                         <label for="usernameAdmin">Alamat Website</label>
                         <input style="text-transform: capitalize;" type="text" class="form-control" value="<?=$info['website']?>" readonly>
-                    </div>
-                    <div class="form-group" >
-                        <label for="usernameAdmin">Contact Person</label>
-                        <input style="text-transform: capitalize;" type="text" class="form-control" value="<?=$info['cp']?>" readonly>
                     </div>
                     <div class="form-group" >
                         <label for="usernameAdmin">Alamat</label>

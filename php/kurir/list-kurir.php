@@ -1,6 +1,6 @@
 <?php 
 
-    $kurir = $config->Products('kurirs.id, kurirs.nama_kurir, kurirs.email, kurirs.phone, kurirs.wa, kurirs.alamat, kurirs.status,  kurirs.created_at', 'kurirs ORDER BY kurirs.created_at');
+    $kurir = $config->Products('kurirs.id, kurirs.nama_kurir, kurirs.email, kurirs.phone, kurirs.wa, kurirs.alamat, kurirs.status,  kurirs.created_at', 'kurirs WHERE kurirs.status = 1 ORDER BY kurirs.created_at');
 
 ?>
 <div class="card" <?=$access['read']?>>

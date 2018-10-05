@@ -76,13 +76,14 @@ if($_GET['type'] == 'addProducts')
     if($stmt->rowCount() > 0){
         $info = $stmt->fetch(PDO::FETCH_LAZY);
 
-        $cek = $config->runQuery("INSERT INTO transaction_details (id_trx, id_product, product_name, product_price, product_qty) VALUES (:a, :b, :c, :d, :e) ");
+        $cek = $config->runQuery("INSERT INTO transaction_details (id_trx, id_product, product_name, product_price, product_cost, product_qty) VALUES (:a, :b, :c, :d, :e, :f) ");
         $cek->execute(array(
             ':a' => $trx,
             ':b' => $id,
             ':c' => $info['name_product'],
             ':d' => $info['selling_price'],
-            ':e' => '1'
+            ':e' => $info['cost_price'],
+            ':f' => '1'
         ));
 
         $reff = $config->lastInsertId();
@@ -627,18 +628,22 @@ if($_GET['type'] == 'PaymentSelected'){
     }
 }
 if($_GET['type'] == 'proccessOrder'){
-    $a = $_POST['transctionID'];
+    $a = $_POST['transactionID'];
     $b = $_POST['InvoiceName'];
+    
     $delivery = $config->getData('delivery_charge', '  transaction', " transaction.transactionID = '". $a ."'");
+    $price = $config->getData('SUM(transaction_details.product_cost * transaction_details.product_qty) as costprice, SUM(transaction_details.product_price * transaction_details.product_qty) as sellingprice', 'transaction_details', " transaction_details.id_trx = '". $a ."'");
+
     $deliveryCharge = 0;
     if($delivery['delivery_charge'] > 0) { $deliveryCharge = $delivery['delivery_charge']; }
+
     $total = $config->getData('SUM(detail.product_qty * detail.product_price) as subtotal', '  transaction_details as detail', " detail.id_trx = '". $a ."'");
     $totalTransaction = $total['subtotal'];
 
     $grandTotal = $totalTransaction + $deliveryCharge;
 
 
-    $stmt = "UPDATE transaction SET invoice_name = '". $b ."', statusOrder = '0', grandTotal = '". $grandTotal ."', created_by = '". $admin ."' WHERE transactionID = :trx";
+    $stmt = "UPDATE transaction SET invoice_name = '". $b ."', statusOrder = '0', TotalCostPrice = '". $price['costprice'] ."', TotalSellingPrice = '". $price['sellingprice'] ."', grandTotal = '". $grandTotal ."', created_by = '". $admin ."' WHERE transactionID = :trx";
     $stmt = $config->runQuery($stmt);
     $stmt->execute(array(
         ':trx' => $a
@@ -764,7 +769,7 @@ if($_GET['type'] == 'selectFlorist'){
     }
 }
 if($_GET['type'] == 'selectKurir'){
-    $a = $_POST['transctionID'];
+    $a = $_POST['transactionID'];
     $b = $_POST['KurirID'];
 
     $stmt = "UPDATE transaction SET id_kurir = '". $b ."', statusOrder = '2' WHERE transactionID = '". $a ."'";
@@ -883,7 +888,7 @@ if($_GET['type'] == 'timeslotcharge'){
         die(json_encode(['response' => 'ERROR', 'msg' => $stmt]));
     }
 }
-if($_GET['type'] == 'sendInvoiceEmail'){
+if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
     
     $arrtime = [
         0 => '9am - 1pm',
@@ -912,6 +917,7 @@ if($_GET['type'] == 'sendInvoiceEmail'){
     if($data['statusPaid'] == 1) {
         $color = 'green';
     }
+    // die($arrpaid[$data['statusPaid']]);
     $dataproduct = [];
         while($row = $product->fetch(PDO::FETCH_LAZY)) {
         $dataproduct[] = '

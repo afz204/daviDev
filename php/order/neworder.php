@@ -43,7 +43,6 @@
       corporates.kecamatan, corporates.kodepos, corporates.created_at, 
       provinces.name as Provinsi, regencies.name as Kota,
   districts.name as Kec, villages.name as Kel, corporates.alamat FROM corporates
-      INNER JOIN bidang_usahas ON bidang_usahas.id = corporates.bidang
       LEFT JOIN provinces on provinces.id = corporates.provinsi
       LEFT JOIN regencies on regencies.id = corporates.kota
       LEFT JOIN districts on districts.id = corporates.kecamatan
