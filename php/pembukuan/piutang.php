@@ -69,6 +69,9 @@
       </div>
       <div class="modal-body">
             <div class="form-group">
+                <input type="text" name="paidDate" class="form-control" placeholder="tgl lunas" required>
+            </div>
+            <div class="form-group">
                 <input type="password" name="passwordpushtoken" autocomplete="off" data-parsley-minlength="2" class="form-control" id="exampleInputEmail1" placeholder="token" required>
                 <input type="hidden" name="transactionIDpush" data-parsley-minlength="2" class="form-control" id="exampleInputEmail2" required>
             </div>

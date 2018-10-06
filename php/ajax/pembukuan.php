@@ -125,6 +125,7 @@ if($_GET['type'] == 'revenue')
                 'UNPAID',
                 'PAID'
             ];
+            
             $subdata = array();
             // $subdata[]  = $row[0];
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
@@ -267,6 +268,9 @@ if($_GET['type'] == 'piutang')
                 'PAID'
             ];
             $subdata = array();
+
+            $datepaid = 'unset';
+            if(($row['PaidDate']) != '0000-00-00 00:00:00') $datepaid = $config->_formatdate($row['PaidDate']);
             // $subdata[]  = $row[0];
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
             $subdata[]  = $row['CustomerName'];
@@ -274,7 +278,7 @@ if($_GET['type'] == 'piutang')
             $subdata[]  = $config->_formatdate($row['created_date']);
             $subdata[]  = $config->_formatdate($row['delivery_date']);
             $subdata[]  = $statuspaid;
-            $subdata[]  = $config->_formatdate($row['updated_date']);
+            $subdata[]  = $datepaid;
             $subdata[]  = $config->formatPrice($row['TotalCostPrice']);
             $subdata[]  = $config->formatPrice($row['TotalSellingPrice']);
             $subdata[]  = ceil($row['MP']).'%';
@@ -300,6 +304,7 @@ if($_GET['type'] == 'piutang')
 if($_GET['type'] == 'changestatuspaid') {
     $a = $_POST['transactionID'];
     $b = $_POST['password'];
+    $c = $_POST['PaidDate'];
 
     $cekuser = $config->getData('ID, tokenkey', 'token', " AdminID = '". $admin ."' AND Status = 0 ");
     if($cekuser) {
@@ -309,7 +314,7 @@ if($_GET['type'] == 'changestatuspaid') {
             $insert->execute();
 
             if($insert) {
-                $update = $config->runQuery("UPDATE transaction SET statusPaid = 1 WHERE transactionID = '". $a ."'");
+                $update = $config->runQuery("UPDATE transaction SET statusPaid = 1, PaidDate = '".$c."', PaidBy = '".$admin."' WHERE transactionID = '". $a ."'");
                 $update->execute();
 
                 echo 'Success!';

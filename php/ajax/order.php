@@ -100,7 +100,7 @@ if($_GET['type'] == 'addProducts')
             $transaction->execute(array(':a' => $grandTotal, ':b' => $trx));
             //
 
-            $prod = $config->ProductsJoin('transaction_details.id, transaction_details.id_product,  transaction_details.product_price, transaction_details.product_qty, transaction_details.florist_remarks, products.product_id, products.name_product,
+            $prod = $config->ProductsJoin('transaction_details.id, transaction_details.id_product,  transaction_details.product_price, transaction_details.product_cost,  transaction_details.product_qty, transaction_details.florist_remarks, products.product_id, products.name_product,
       products.cost_price, products.selling_price, products.note, products.images, products.permalink',
       'transaction_details', 'LEFT JOIN products ON products.product_id = transaction_details.id_product', "WHERE transaction_details.id_trx = '". $trx ."'");
 
@@ -113,6 +113,7 @@ if($_GET['type'] == 'addProducts')
                 $qty = $row['qty'];
                 $cost = $config->formatPrice($row['cost_price']);
                 $selling = $config->formatPrice($row['selling_price']);
+                $costprice = $row['product_cost'];
                 $price = $row['product_price'];
                 $remarks = $row['florist_remarks'];
 
@@ -164,9 +165,19 @@ if($_GET['type'] == 'addProducts')
                                  <div class="input-group-prepend">
                                      <span class="input-group-text">Rp.</span>
                                    </div>
+                                <input type="text" data-parsley-type="number" class="form-control" name="cost_price_product['. $id .']" id="cost_price_product['. $id .']" value="'.$costprice.'" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                  <button class="btn btn-outline-info cost_price_btn" type="button" data-id="cost_price_product['. $id .']" data-trx="'. $trx .'">Cost Price</button>
+                                </div>
+                              </div>
+
+                              <div class="input-group mb-3">
+                                 <div class="input-group-prepend">
+                                     <span class="input-group-text">Rp.</span>
+                                   </div>
                                 <input type="text" data-parsley-type="number" class="form-control" name="selling_price_product['. $id .']" id="selling_price_product['. $id .']" value="'.$price.'" aria-describedby="basic-addon2">
                                 <div class="input-group-append">
-                                  <button class="btn btn-outline-info selling_price_btn" type="button" data-id="selling_price_product['. $id .']" data-trx="'. $trx .'">Change</button>
+                                  <button class="btn btn-outline-info selling_price_btn" type="button" data-id="selling_price_product['. $id .']" data-trx="'. $trx .'">Selling Price</button>
                                 </div>
                               </div>
                            
@@ -243,6 +254,33 @@ if($_GET['type'] == 'changePriceProduct'){
     if($update)
     {
         $logs = $config->saveLogs($id, $admin, 'u', 'update price checkout!');
+        
+        $data = array(
+            'msg' => $config->actionMsg('u', 'transaction_details'),
+            'price' => $b
+        );
+        $data = json_encode($data, true);
+        echo $data;
+    }else{
+        echo 'Failed!';
+    }
+}
+
+if($_GET['type'] == 'changeCostPriceProduct'){
+    $a = $_POST['id'];
+    $b = $_POST['new_price'];
+
+    $a = explode('[', $a);
+    $a = explode(']', $a[1]);
+
+    $id = $a[0];
+    
+    $update = $config->runQuery("UPDATE transaction_details SET product_cost ='". $b ."' WHERE id = '". $id ."' ");
+    $update->execute();
+
+    if($update)
+    {
+        $logs = $config->saveLogs($id, $admin, 'u', 'update cost price checkout!');
         
         $data = array(
             'msg' => $config->actionMsg('u', 'transaction_details'),
@@ -475,7 +513,7 @@ if($_GET['type'] == 'step1'){
         $data = $config->getDataTable('transactionID', 'transaction', " transactionID = '". $a ."' ");
         if($data->rowCount() > 0 ){
             //edit
-            $update = $config->runQuery("UPDATE transaction SET CustomerID = '". $b ."', CustomerName = '". $d ."' WHERE transactionID = '". $a ."' ");
+            $update = $config->runQuery("UPDATE transaction SET PIC = '". $c ."', CustomerID = '". $b ."', CustomerName = '". $d ."' WHERE transactionID = '". $a ."' ");
             $update->execute();
 
             if($update) {
@@ -630,8 +668,10 @@ if($_GET['type'] == 'PaymentSelected'){
 if($_GET['type'] == 'proccessOrder'){
     $a = $_POST['transactionID'];
     $b = $_POST['InvoiceName'];
-    
-    $delivery = $config->getData('delivery_charge', '  transaction', " transaction.transactionID = '". $a ."'");
+
+    $type = substr($b, 0, 4);
+
+    $delivery = $config->getData('delivery_charge, CustomerID, PIC', '  transaction', " transaction.transactionID = '". $a ."'");
     $price = $config->getData('SUM(transaction_details.product_cost * transaction_details.product_qty) as costprice, SUM(transaction_details.product_price * transaction_details.product_qty) as sellingprice', 'transaction_details', " transaction_details.id_trx = '". $a ."'");
 
     $deliveryCharge = 0;
@@ -654,6 +694,48 @@ if($_GET['type'] == 'proccessOrder'){
         $logs = $config->saveLogs($a, $admin, 'u', 'proccess order');
     }else{
         echo 'Failed!';
+    }
+
+    $Point = 0;
+    if($grandTotal > 0 && $grandTotal <= 500000) $Point = 2; 
+    if($grandTotal > 500001 && $grandTotal <= 750000) $Point = 3; 
+    if($grandTotal > 750001 && $grandTotal <= 1000000) $Point = 4; 
+    if($grandTotal > 1000001 && $grandTotal <= 1250000) $Point = 5; 
+    if($grandTotal > 1250001 && $grandTotal <= 1500000) $Point = 6; 
+    if($grandTotal > 1500001 && $grandTotal <= 1750000) $Point = 7; 
+    if($grandTotal > 1750001 && $grandTotal <= 2000000) $Point = 10; 
+    if($grandTotal > 2000001 && $grandTotal <= 2250000) $Point = 11; 
+    if($grandTotal > 2250001 && $grandTotal <= 2500000) $Point = 12; 
+    if($grandTotal > 2500001 && $grandTotal <= 2750000) $Point = 13; 
+    if($grandTotal > 2750001 && $grandTotal <= 3000000) $Point = 20; 
+    if($grandTotal > 3000001 && $grandTotal <= 3250000) $Point = 21; 
+    if($grandTotal > 3250001 && $grandTotal <= 3500000) $Point = 22; 
+    if($grandTotal > 3500001 && $grandTotal <= 3750000) $Point = 23; 
+    if($grandTotal > 3750001 && $grandTotal <= 4000000) $Point = 26; 
+    if($grandTotal > 4000001 && $grandTotal <= 4250000) $Point = 27; 
+    if($grandTotal > 4250001 && $grandTotal <= 4500000) $Point = 28; 
+    if($grandTotal > 4500001 && $grandTotal <= 4750000) $Point = 29; 
+    if($grandTotal > 4750001 && $grandTotal <= 5000000) $Point = 30; 
+    $customerID = $delivery['CustomerID'];
+    if($type == 'BD_CP') {
+        $oldpoint = $config->getData('Point', 'corporate_pics', "id = '".$delivery['PIC']."' AND corporate_id = '". $customerID ."' ");
+
+        $newPoint = $oldpoint + $Point;
+        $update = $config->runQuery("UPDATE corporate_pics SET corporate_pics.Point = :a WHERE id = :id and corporate_id = :cp");
+        $update->execute(array(
+            ':a'    => $newPoint,
+            ':id'    => $delivery['PIC'],
+            ':cp'  => $customerID
+        ));
+    } else {
+        $oldpoint = $config->getData('Point', 'customer', " CustomerUniqueID = '". $customerID ."' ");
+
+        $newPoint = $oldpoint + $Point;
+        $update = $config->runQuery("UPDATE customer SET customer.Point = :a WHERE CustomerUniqueID = :id ");
+        $update->execute(array(
+            ':a'    => $newPoint,
+            ':id'    => $customerID
+        ));
     }
 }
 
@@ -769,7 +851,7 @@ if($_GET['type'] == 'selectFlorist'){
     }
 }
 if($_GET['type'] == 'selectKurir'){
-    $a = $_POST['transactionID'];
+    $a = $_POST['transctionID'];
     $b = $_POST['KurirID'];
 
     $stmt = "UPDATE transaction SET id_kurir = '". $b ."', statusOrder = '2' WHERE transactionID = '". $a ."'";
@@ -906,7 +988,12 @@ if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
     
     $transactionID = $_POST['transactionID'];
     
-    $data = $config->getData('transaction.*, corporate_pics.name as CorporateName, corporate_pics.email as CorporateEmail, corporate_pics.nomor as CorporatePhone, customer.FullName as OrganicName, customer.Email as OrganicEmail, customer.Mobile as OrganicPhone, provinces.name as ProvinsiName, regencies.name as KotaName, districts.name as Kecamatan, villages.name as Kelurahan', 'transaction LEFT JOIN corporate_pics ON corporate_pics.corporate_id = transaction.CustomerID LEFT JOIN customer on customer.CustomerUniqueID = transaction.CustomerID LEFT JOIN provinces ON provinces.id = transaction.provinsi_id LEFT JOIN regencies on regencies.id = transaction.kota_id LEFT JOIN districts ON districts.id = transaction.kecamata_id LEFT JOIN villages on villages.id = transaction.kelurahan_id', "transactionID = '". $transactionID ."' ");
+    $data = $config->getData('transaction.*, customer.FullName as OrganicName, customer.Email as OrganicEmail, customer.Mobile as OrganicPhone, provinces.name as ProvinsiName, regencies.name as KotaName, districts.name as Kecamatan, villages.name as Kelurahan, corporate_pics.name as CorporateName, corporate_pics.nomor as CorporatePhone, corporate_pics.email as CorporateEmail', 
+    'transaction 
+    LEFT JOIN customer on customer.CustomerUniqueID = transaction.CustomerID LEFT JOIN provinces ON provinces.id = transaction.provinsi_id LEFT JOIN regencies on regencies.id = transaction.kota_id LEFT JOIN districts ON districts.id = transaction.kecamata_id 
+    LEFT JOIN villages on villages.id = transaction.kelurahan_id
+    LEFT JOIN corporate_pics on corporate_pics.id = transaction.PIC', 
+    "transactionID = '". $transactionID ."' ");
     // $config->_debugvar($data);
     $subtotal = $config->getData('SUM(product_price * product_qty) as Subtotal', 'transaction_details', "id_trx = '". $transactionID ."'");
     

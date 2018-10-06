@@ -668,6 +668,42 @@ $(document).ready(function() {
         // do something…
         formAddProduct();
     });
+    $(document).on('click', '.cost_price_btn', function(e) {
+        e.preventDefault();
+
+        var btnName = $(this).data('id');
+        var trx = $(this).data('trx');
+        var input = $("input[name='" + btnName + "']");
+        var currentVal = parseInt(input.val());
+        //alert(trx);
+        if ($.isNumeric(currentVal) == true) {
+
+            if (!confirm('Are you want to change cost price?')) {
+                return false;
+            } else {
+
+                $.ajax({
+                    url: '../php/ajax/order.php?type=changeCostPriceProduct',
+                    type: 'post',
+                    data: 'id=' + btnName + '&new_price=' + currentVal,
+
+                    success: function(msg) {
+                        var data = JSON.parse(msg);
+                        alert(data.msg);
+                        var price = parseInt(data.price);
+                        //location.reload();
+                        //console.log(price);
+                        input.attr('value', price);
+
+                        dataCheckout(trx);
+
+                    }
+                });
+            }
+        } else {
+            alert('Error!');
+        }
+    });
     $(document).on('click', '.selling_price_btn', function(e) {
         e.preventDefault();
 
@@ -703,24 +739,6 @@ $(document).ready(function() {
         } else {
             alert('Error!');
         }
-
-        // if(! confirm('Are you want to change price?')){
-        //     return false;
-        // }else{
-
-
-        //     $.ajax({
-        //         url: '../php/ajax/order.php?type=changePriceProduct',
-        //         type: 'post',
-        //         data: 'id=' + btnName + '&new_price=' + currentVal,
-
-        //         success: function(msg) {
-        //             alert(msg);
-        //             location.reload();
-        //         }
-        //     });
-        // }
-
     });
     $(document).on('click', '.isi_remarks_btn', function(e) {
         e.preventDefault();

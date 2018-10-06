@@ -26,18 +26,29 @@
         foreach ($catt as $parent_menu){
             if(in_array($menu, array($parent_menu['cat']))){
                 foreach ($category as $subcat){
-                    if(in_array($subcat['cat'], array($parent_menu['cat']))){
-            ?>
-            <a style="text-transform: capitalize;" class="nav-link <?=$footer == $subcat['subcat_link'] ? 'active' : ''?>" href="<?=URL?><?=$subcat['cat']?>/?p=<?=$subcat['subcat_link']?>">
-                <?=$subcat['subcat']?>
-                <?php if(in_array($subcat['subcat_link'], ['users'])){ ?>
-                    <span class="badge badge-pill bg-success align-text-bottom" style="color: #fff;"><?=$totalUser?></span>
-            <?php } 
-        } 
-        } 
-        }
-     } ?>
+                    if(in_array($subcat['cat'], array($parent_menu['cat']))) {
+                    ?>
+                        <a style="text-transform: capitalize;" class="nav-link <?=$footer == $subcat['subcat_link'] ? 'active' : ''?>" href="<?=URL?><?=$subcat['cat']?>/?p=<?=$subcat['subcat_link']?>">
+                            <?=$subcat['subcat']?>
+                        <?php if(in_array($subcat['subcat_link'], ['users'])) { ?>
+                                <span class="badge badge-pill bg-success align-text-bottom" style="color: #fff;"><?=$totalUser?></span>
+                        <?php } ?> 
+                        <?php if(in_array($subcat['subcat_link'], ['process'])) { ?>
+                                <span class="badge badge-pill bg-success align-text-bottom" style="color: #fff;"><?=$process?></span>
+                        <?php } ?> 
+                        <?php if(in_array($subcat['subcat_link'], ['delivery'])) { ?>
+                                <span class="badge badge-pill bg-success align-text-bottom" style="color: #fff;"><?=$delivery?></span>
+                        <?php } ?> 
+                        <?php if(in_array($subcat['subcat_link'], ['order'])) { ?>
+                                <span class="badge badge-pill bg-success align-text-bottom" style="color: #fff;"><?=$neworder?></span>
+                        <?php } ?> 
+                        <?php if(in_array($subcat['subcat_link'], ['report'])) { ?>
+                                <span class="badge badge-pill bg-success align-text-bottom" style="color: #fff;"><?=$report?></span>
+                        <?php } ?> 
+                   <?php } 
+                } 
+            }
+        } ?>
             </a>
-        <?php  ?>
     </nav>
 </div>

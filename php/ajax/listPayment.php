@@ -60,11 +60,17 @@ if($_GET['type'] == 'pay-kurir')
     $totalPerKurir = 0;
     if( $search != 'no' ){ //age
         $kurir = $_POST['kurir_id'];
+
+        if($kurir == 0) {
+            $kurir = '';
+        } else {
+            $kurir = 'AND pay_kurirs.kurir_id = '. $kurir;
+        }
         
         $rangeArray = explode("_",$daterange); 
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
-        $payCharge.="AND pay_kurirs.kurir_id = '". $kurir ."' AND ( pay_kurirs.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ) ";
+        $payCharge.= $kurir."AND ( pay_kurirs.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ) ";
         $stmt = $config->runQuery($payCharge);
         $stmt->execute(); 
         $totalFilter = $stmt->rowCount();

@@ -5,7 +5,9 @@ $.fn.onEnter = function(func) {
     return this;
 };
 $(document).ready(function() {
-
+    $('[name="paidDate"]').datetimepicker({
+        format: 'YYYY-MM-DD HH:mm:ss',
+    });
     getpembukuan('no');
     getpiutang('no');
 
@@ -39,13 +41,14 @@ $(document).ready(function() {
 });
 
 function submitgeneratepushtoken() {
+    var paiddate = $('[name="paidDate"]').val();
     var password = $('[name="passwordpushtoken"]').val();
     var trx = $('[name="transactionIDpush"]').val();
 
     $.ajax({
         url: '../php/ajax/pembukuan.php?type=changestatuspaid',
         method: 'post',
-        data: { 'transactionID': trx, 'password': password },
+        data: { 'transactionID': trx, 'password': password, 'PaidDate': paiddate },
 
         success: function(msg) {
             location.reload();

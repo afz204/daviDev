@@ -1,8 +1,8 @@
 <?php 
 
-    $kurir = $config->Products('id, nama_kurir', 'kurirs');
-    $kurirs = $config->Products('id, nama_kurir', 'kurirs');
-    $kurirss = $config->Products('id, nama_kurir', 'kurirs');
+    $kurir = $config->Products('id, nama_kurir', 'kurirs where status = 1');
+    $kurirs = $config->Products('id, nama_kurir', 'kurirs where status = 1');
+    $kurirss = $config->Products('id, nama_kurir', 'kurirs where status = 1');
     $charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, villages.name', 'delivery_charges',
     'INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan', '');
 
@@ -83,6 +83,7 @@
                                 <div class="col-12 col-sm-3 col-lg-3">
                                     <select class="custom-select mr-sm-2" id="selectKurirPay" required="">
                                         <option value="">Kurir Name...</option>
+                                        <option value="0">All Kurir</option>
                                         <?php while ($cols = $kurirs->fetch(PDO::FETCH_LAZY)){ ?>
                                         <option value="<?=$cols['id']?>"><?=$cols['nama_kurir']?></option>
                                         <?php } ?>

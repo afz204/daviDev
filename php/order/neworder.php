@@ -32,7 +32,7 @@
   $kelurahan = $config->ProductsJoin('delivery_charges.id_kelurahan, delivery_charges.price, villages.id, villages.name', 'delivery_charges', 
   'INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan', '');
 
-  $prod = $config->ProductsJoin('transaction_details.id, transaction_details.id_product,  transaction_details.product_price, transaction_details.product_qty, transaction_details.florist_remarks, products.product_id, products.name_product,
+  $prod = $config->ProductsJoin('transaction_details.id, transaction_details.id_product,  transaction_details.product_price, transaction_details.product_cost, transaction_details.product_qty, transaction_details.florist_remarks, products.product_id, products.name_product,
     products.cost_price, products.selling_price, products.images, products.permalink',
     'transaction_details', 'LEFT JOIN products ON products.product_id = transaction_details.id_product', "WHERE transaction_details.id_trx = '". $_GET['trx'] ."'");
   
@@ -493,9 +493,19 @@
                                <div class="input-group-prepend">
                                    <span class="input-group-text">Rp.</span>
                                  </div>
+                              <input type="text" data-parsley-type="number" class="form-control" name="cost_price_product[<?=$product['id']?>]" id="cost_price_product[<?=$product['id']?>]" value="<?=$product['product_cost']?>" aria-describedby="basic-addon2" data-transactionID = "<?=$_GET['trx']?>">
+                              <div class="input-group-append">
+                                <button class="btn btn-outline-info cost_price_btn" type="button" data-id="cost_price_product[<?=$product['id']?>]" data-trx="<?=$_GET['trx']?>">Cost Price</button>
+                              </div>
+                            </div>
+
+                            <div class="input-group mb-3">
+                               <div class="input-group-prepend">
+                                   <span class="input-group-text">Rp.</span>
+                                 </div>
                               <input type="text" data-parsley-type="number" class="form-control" name="selling_price_product[<?=$product['id']?>]" id="selling_price_product[<?=$product['id']?>]" value="<?=$product['product_price']?>" aria-describedby="basic-addon2" data-transactionID = "<?=$_GET['trx']?>">
                               <div class="input-group-append">
-                                <button class="btn btn-outline-info selling_price_btn" type="button" data-id="selling_price_product[<?=$product['id']?>]" data-trx="<?=$_GET['trx']?>">Change</button>
+                                <button class="btn btn-outline-info selling_price_btn" type="button" data-id="selling_price_product[<?=$product['id']?>]" data-trx="<?=$_GET['trx']?>">Selling Price</button>
                               </div>
                             </div>
                          

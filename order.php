@@ -7,6 +7,14 @@
  */
 
 require 'config/config.php';
+
+$totalUser = $config->CountTables('id', 'users');
+$neworder  = $config->CountTables('*', 'transaction where statusOrder = 0 ');
+$process  = $config->CountTables('*', 'transaction where statusOrder = 1 ');
+$delivery  = $config->CountTables('*', 'transaction where statusOrder = 2 ');
+$report  = $config->CountTables('*', 'transaction where statusOrder in (3, 4, 5) ');
+
+
 include 'php/header.php';
 
 $pages_dir = 'php/order/';

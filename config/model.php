@@ -50,9 +50,26 @@ if(isset($session_id)){
 
         array_push($admin, $adm);
     }
-
     
     if( !isset($admin[0]['user_name']) ) $admin[0]['user_name'] = '' ;
+
+    $cat = $config->Products('*', 'menus');
+    
+    $datamenu = [];
+    $datasubmenu = [];
+    $subcat = "SELECT staffs.id, menus.id, menus.menu, menus.links, sub_menus.submenu, sub_menus.link, previllages.weight FROM staffs
+    INNER JOIN menus ON menus.id = staffs.id_menu
+    INNER JOIN sub_menus ON sub_menus.id_menu = menus.id
+    INNER JOIN previllages ON previllages.id_submenu = sub_menus.id
+    WHERE previllages.id_admin = :adminID GROUP BY sub_menus.submenu DESC ORDER BY menus.id";
+
+    $subcat = $config->runQuery($subcat);
+    $subcat->execute(array(':adminID' => $session_id));
+    while($col = $subcat->fetch(PDO::FETCH_LAZY)) {
+        $datamenu[$col['link']] = $col['weight'];
+    }
+    
+    
     $adminName = $admin[0]['user_name'];
     $sql2 = "SELECT staffs.id, menus.id, menus.menu, menus.links, sub_menus.submenu, sub_menus.link, previllages.weight FROM staffs
     INNER JOIN menus ON menus.id = staffs.id_menu
@@ -75,8 +92,12 @@ if(isset($session_id)){
         );
     }
 
-     $catt = unique_multidim_array($category,'cat');
+    
 
+     $catt = unique_multidim_array($category,'cat');
+    // echo '<pre>';
+    // print_r($catt);
+    // echo '</pre>';
     foreach ($catt as $b){
        if(in_array($menu, array($b['cat']))){
         foreach ($category as $cc){
@@ -92,10 +113,12 @@ if(isset($session_id)){
        }
         
     }
-    if(isset($weight)){
-        $access = $config->weightPages($weight);
-    }else{
-        $access = $config->weightPages('0');
+    
+    $urlmenu = '';
+    $weight = 0;
+    if(isset($_GET['p'])) {
+        $urlmenu = $_GET['p'];
+        $weight = $datamenu[$urlmenu];
     }
-
+    $access = $config->weightPages($weight);
 }
