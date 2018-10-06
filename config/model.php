@@ -118,7 +118,7 @@ if(isset($session_id)){
     $weight = 0;
     if(isset($_GET['p'])) {
         $urlmenu = $_GET['p'];
-        $weight = $datamenu[$urlmenu];
+        if(isset($datamenu[$urlmenu])) $weight = $datamenu[$urlmenu]; 
     }
     $access = $config->weightPages($weight);
 }

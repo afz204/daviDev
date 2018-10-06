@@ -160,6 +160,7 @@ function formValidate(id) {
         var OrganicMobileNumber = $('[name="OrganicMobileNumber"]').val();
         var returns = false;
         if (types == 'organic') {
+            $('[name="NameInvoice"]').val(OrganicFirstName);
             $.ajax({
                 url: '../php/ajax/order.php?type=step1',
                 type: 'post',
@@ -176,6 +177,7 @@ function formValidate(id) {
                 }
             });
         } else {
+            $('[name="NameInvoice"]').val(namepic);
             $.ajax({
                 url: '../php/ajax/order.php?type=step1',
                 type: 'post',

@@ -310,7 +310,8 @@ if($_GET['type'] == 'changestatuspaid') {
     if($cekuser) {
         if(password_verify($b, $cekuser['tokenkey'])) {
 
-            $insert = $config->runQuery("INSERT INTO generatetoken (TransactionNumber, Status) VALUES ('".$a."', '0')");
+            $tokenid = $cekuser['ID'];
+            $insert = $config->runQuery("INSERT INTO generatetoken (TokenID, TransactionNumber, Status, GenerateBy) VALUES (".$tokenid.",'".$a."', '0', ".$admin.") ");
             $insert->execute();
 
             if($insert) {
