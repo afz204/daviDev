@@ -51,6 +51,9 @@ $CustomerPhone = isset($data['CorporatePhone']) && $data['CorporatePhone'] == ''
 $receivedEmail = $CustomerEmail;
 $receivedName = $CustomerName;
 $subject = 'Order Confirmation Bunga Davi-'.$data['transactionID'];
+$arraypaid = 'unset';
+    if($data['statusPaid']) $arraypaid = $arrpaid[$data['statusPaid']];
+ 
 $content = '
 <html>
    <head></head>
@@ -367,7 +370,7 @@ $content = '
                                                             </tr>
                                                             <tr>
                                                                <td width="110" class="w170" style="vertical-align: top;"><span class="content-body1" style="font-family:Arial;">Delivery Date :</span></td>
-                                                               <td width="170" class="w170" style="vertical-align: top;"><span class="content-body" style="font-family:Arial;">'. $config->_formatdate($data['delivery_date']). '</span> <span style="color: red; font-size: 12px; font-weight: 600;">'.$arrtime[$data['delivery_time']].'</span></td>
+                                                               <td width="170" class="w170" style="vertical-align: top;"><span class="content-body" style="font-family:Arial;">'. $config->_formatdate($data['delivery_date']). '</span> <span style="color: red; font-size: 12px; font-weight: 600;">'.$arraypaid.'</span></td>
                                                             </tr>
                                                             <tr>
                                                                <td width="110" class="w170" style="vertical-align: top;"><span class="content-body1" style="font-family:Arial;">Delivery Note :</span></td>
@@ -446,4 +449,4 @@ $content = '
 // echo $content;
 $cc = 'fiki@bungadavi.co.id';
 $config = new Mail();
-$email = $config->Mailler($receivedEmail, $receivedName, $cc, $subject, $content);
+$email = $config->Mailler('arfanazhari9@gmail.com', $receivedName, $cc, $subject, $content);

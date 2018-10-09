@@ -12,6 +12,557 @@ $config = new Admin();
 
 $admin = $config->adminID();
 
+if($_GET['type'] == 'tableNewOrder'){
+    $request = $_REQUEST;
+    $search = $_POST['is_date_search'];
+
+    $daterange ='';
+    $corporate ='';
+    $admin = '';
+    
+    if(isset($_POST['date_range'])) {
+        $daterange = $_POST['date_range'];
+        $corporate = $_POST['corporate'];
+        $admin = $_POST['admin'];
+    }
+
+    $Query = '
+    SELECT 
+    (select GROUP_CONCAT(transaction_details.product_name SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as product, 
+    (select GROUP_CONCAT(transaction_details.product_price SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as price, 
+    (select GROUP_CONCAT(transaction_details.product_cost SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as cost, 
+    (select GROUP_CONCAT(transaction_details.product_qty SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as quantity, 
+    transaction.*, transaction_details.*, villages.name as kelurahan, users.name as admin
+    FROM transaction 
+    LEFT JOIN transaction_details ON transaction_details.id_trx = transaction.transactionID 
+    LEFT JOIN villages ON villages.id = transaction.kelurahan_id 
+    LEFT JOIN users ON users.id = transaction.created_by WHERE ';
+
+    if($search == 'yes') { ECHO $admin;
+        $rangeArray = explode("_",$daterange); 
+
+        $startDate = $rangeArray[0]. ' 00:00:00';
+        $endsDate = $rangeArray[1]. ' 23:59:59';
+
+        $daterangequery = "transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
+        $corporatequery = " AND transaction.CustomerID = '".$corporate."'";
+        $adminquery = " AND transaction.created_by = '".$admin."'";
+
+        $Query .= $daterangequery.$corporatequery.$adminquery." AND transaction.statusOrder = '0' GROUP BY transaction.delivery_date DESC";
+
+        $stmt2 = $config->runQuery($Query);
+        $stmt2->execute();
+        $totalData = $stmt2->rowCount();
+        $totalFilter = $totalData;
+
+        $Data = $config->runQuery($Query);
+        $Data->execute();
+        $totalData = $Data->rowCount();
+        $totalFilter = $totalData;
+
+    } else {
+        $Query .=" transaction.statusOrder = '0' GROUP BY transaction.delivery_date DESC";
+        
+        $stmt2 = $config->runQuery($Query);
+        $stmt2->execute();
+        $totalData = $stmt2->rowCount();
+        $totalFilter = $totalData;
+
+        $Data = $config->runQuery($Query);
+        $Data->execute();
+        $totalData = $Data->rowCount();
+        $totalFilter = $totalData;
+    }
+    // var_dump($Data);
+
+    $colom = array(
+        0   => 'transactionID',
+        1   => 'ProductName',
+        2   => 'SenderName',
+        3   => 'Price',
+        4   => 'Quantity',
+        5   => 'GrandTotal',
+        6   => 'DeliveryDate',
+        7   => 'StatusPaid',
+        8   => 'CreatedOrder',
+        9   => 'CreatedBy',
+        10   => 'FloristName',
+        11   => 'Color',
+    );
+
+    $data = [];
+    $arrstatusorder = array(
+        0 => 'New order',
+        1 => 'On Production',
+        2 => 'On Delivery',
+        3 => 'Success',
+        4 => 'Return',
+        5 => 'Complain',
+    );
+    $arrstatuspaid = array(
+        0 => 'UNPAID',
+        1 => 'PAID'
+    );
+    $arrtime = [
+        0 => '9am - 1pm',
+        1 => '2pm - 5pm',
+        2 => '6pm - 8pm',
+        3 => '9pm - 0am',
+        4 => '1am - 5am',
+        5 => '6am - 8am'
+    ];
+
+    $tampung = array();
+    // print_r($Data);
+    if($totalData > 0 ) {
+        while ($row = $Data->fetch(PDO::FETCH_LAZY)){
+
+            $product = explode(',', $row['product']);
+            $price = explode(',', $row['price']);
+            $quantity = explode(',', $row['quantity']);
+            // print_r($product);
+            // echo $row['product'];
+            $dataproduct = [];
+            foreach($product as $key => $val) {
+                $dataproduct[] = '<span class="badge badge-info">'.$val.'</span></br>';
+            }
+            $dataprice = [];
+            foreach($price as $key => $val) {
+                $dataprice[] = '<span class="badge badge-info">'.$config->formatprice($val).'</span></br>';
+            }
+            $dataquantity = [];
+            foreach($quantity as $key => $val) {
+                $dataquantity[] = '<span class="badge badge-info">'.$val.'</span></br>';
+            }
+            
+            $type = [ 'nama' => 'ORGANIC' ]; 
+            if($row['type'] == 'BD_CP'){
+                $type = $config->getData('*', 'corporates', "CorporateUniqueID = '". $row['CustomerID'] ."'");
+            }
+            if(empty($row['id_florist'])){
+                $florist = '<button class="btn btn-sm btn-primary" onclick="selectFlorist(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select florist</button>';
+            }else{
+                $data = $config->getData('ID, FloristName', 'florist', "ID = '". $row['id_florist'] ."'");
+                $florist = '<a href="javascript:;" onclick="selectFlorist(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'. $data['FloristName'] .'</span></a>';
+            }
+            if(empty($row['id_kurir'])){
+                $kurir = '<button class="btn btn-sm btn-primary" onclick="pilihKurir(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select kurir</button>';
+            }else{
+                $data = $config->getData('id, nama_kurir', 'kurirs', "id = '". $row['id_kurir'] ."'");
+                $kurir = '<a href="javascript:;" onclick="pilihKurir(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'. $data['nama_kurir'] .'</span></a>';
+            }
+            $btnchangestatus = '<button class="btn btn-sm btn-primary" onclick="chagestatusordermodal(\''. $row['transactionID'] .'\')" style="font-size: 12px;">'. $arrstatusorder[$row['statusOrder']] .'</button>';
+            $grandTotal = '0';
+            if(!empty($row['grandTotal'])){
+                $grandTotal = $row['grandTotal'];
+            }
+            $Kirim = Date('d-M-Y', strtotime($row['delivery_date']));
+            $createorder = Date('d F Y', strtotime($row['created_date']));
+            $statuspaid = $row['statusPaid'] == 1 ? 'success' : 'warning';
+            $color = '';
+            if(Date('Y-m-d', strtotime($row['delivery_date'])) == $config->getdate('Y-m-d')) $color = 'yess';
+
+            $subdata = array();
+            $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
+            $subdata[]  = $dataproduct;
+            $subdata[]  = $row['CustomerName'] .'<small class="badge badge-sm badge-info">'.$type['nama'].'</small>';
+            $subdata[]  = $dataprice;
+            $subdata[]  = $dataquantity;
+            $subdata[]  = $config->formatprice($row['grandTotal']);
+            $subdata[]  = $Kirim . '<span class="small" style="color: red;"> '.$arrtime[$row['delivery_time']].'</span>';
+            // $subdata[]  = $row['kelurahan'];
+            // $subdata[]  = '<span class="badge badge-sm badge-info">'.$arrstatusorder[$row['statusOrder']].'</span>';
+            $subdata[]  = '<span class="badge badge-sm badge-'.$statuspaid.'">'.$arrstatuspaid[$row['statusPaid']].'</span>';
+            $subdata[]  = $createorder;
+            $subdata[]  = $row['admin'];
+            $subdata[]  = $florist;
+            $subdata[]  = $color;
+            array_push($tampung, $subdata);
+         }
+    }
+
+    $json_data = array(
+        'draw'              => intval($request['draw']),
+        'recordsTotal'      => intval($totalData),
+        'recordsFiltered'   => intval($totalFilter),
+        'data'              => $tampung
+    );
+    echo json_encode($json_data);
+}
+if($_GET['type'] == 'tableOnProccess'){
+    $request = $_REQUEST;
+    $search = $_POST['is_date_search'];
+
+    $daterange ='';
+    $corporate ='';
+    $admin = '';
+    
+    if(isset($_POST['date_range'])) {
+        $daterange = $_POST['date_range'];
+        $corporate = $_POST['corporate'];
+        $admin = $_POST['admin'];
+    }
+
+    $Query = '
+    SELECT 
+    (select GROUP_CONCAT(transaction_details.product_name SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as product, 
+    (select GROUP_CONCAT(transaction_details.product_price SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as price, 
+    (select GROUP_CONCAT(transaction_details.product_cost SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as cost, 
+    (select GROUP_CONCAT(transaction_details.product_qty SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as quantity, 
+    transaction.*, transaction_details.*, villages.name as kelurahan, users.name as admin
+    FROM transaction 
+    LEFT JOIN transaction_details ON transaction_details.id_trx = transaction.transactionID 
+    LEFT JOIN villages ON villages.id = transaction.kelurahan_id 
+    LEFT JOIN users ON users.id = transaction.created_by WHERE ';
+
+    if($search == 'yes') { ECHO $admin;
+        $rangeArray = explode("_",$daterange); 
+
+        $startDate = $rangeArray[0]. ' 00:00:00';
+        $endsDate = $rangeArray[1]. ' 23:59:59';
+
+        $daterangequery = "transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
+        $corporatequery = " AND transaction.CustomerID = '".$corporate."'";
+        $adminquery = " AND transaction.created_by = '".$admin."'";
+
+        $Query .= $daterangequery.$corporatequery.$adminquery." AND transaction.statusOrder = '1' GROUP BY transaction.delivery_date DESC";
+
+        $stmt2 = $config->runQuery($Query);
+        $stmt2->execute();
+        $totalData = $stmt2->rowCount();
+        $totalFilter = $totalData;
+
+        $Data = $config->runQuery($Query);
+        $Data->execute();
+        $totalData = $Data->rowCount();
+        $totalFilter = $totalData;
+
+    } else {
+        $Query .=" transaction.statusOrder = '1' GROUP BY transaction.delivery_date DESC";
+        
+        $stmt2 = $config->runQuery($Query);
+        $stmt2->execute();
+        $totalData = $stmt2->rowCount();
+        $totalFilter = $totalData;
+
+        $Data = $config->runQuery($Query);
+        $Data->execute();
+        $totalData = $Data->rowCount();
+        $totalFilter = $totalData;
+    }
+    // var_dump($Data);
+
+    $colom = array(
+        0   => 'transactionID',
+        1   => 'ProductName',
+        2   => 'SenderName',
+        3   => 'Price',
+        4   => 'Quantity',
+        5   => 'GrandTotal',
+        6   => 'DeliveryDate',
+        7   => 'StatusPaid',
+        8   => 'CreatedOrder',
+        9   => 'CreatedBy',
+        10   => 'FloristName',
+        10   => 'KurirName',
+        11   => 'Color',
+    );
+
+    $data = [];
+    $arrstatusorder = array(
+        0 => 'New order',
+        1 => 'On Production',
+        2 => 'On Delivery',
+        3 => 'Success',
+        4 => 'Return',
+        5 => 'Complain',
+    );
+    $arrstatuspaid = array(
+        0 => 'UNPAID',
+        1 => 'PAID'
+    );
+    $arrtime = [
+        0 => '9am - 1pm',
+        1 => '2pm - 5pm',
+        2 => '6pm - 8pm',
+        3 => '9pm - 0am',
+        4 => '1am - 5am',
+        5 => '6am - 8am'
+    ];
+
+    $tampung = array();
+    // print_r($Data);
+    if($totalData > 0 ) {
+        while ($row = $Data->fetch(PDO::FETCH_LAZY)){
+
+            $product = explode(',', $row['product']);
+            $price = explode(',', $row['price']);
+            $quantity = explode(',', $row['quantity']);
+            // print_r($product);
+            // echo $row['product'];
+            $dataproduct = [];
+            foreach($product as $key => $val) {
+                $dataproduct[] = '<span class="badge badge-info">'.$val.'</span></br>';
+            }
+            $dataprice = [];
+            foreach($price as $key => $val) {
+                $dataprice[] = '<span class="badge badge-info">'.$config->formatprice($val).'</span></br>';
+            }
+            $dataquantity = [];
+            foreach($quantity as $key => $val) {
+                $dataquantity[] = '<span class="badge badge-info">'.$val.'</span></br>';
+            }
+            
+            $type = [ 'nama' => 'ORGANIC' ]; 
+            if($row['type'] == 'BD_CP'){
+                $type = $config->getData('*', 'corporates', "CorporateUniqueID = '". $row['CustomerID'] ."'");
+            }
+            if(empty($row['id_florist'])){
+                $florist = '<button class="btn btn-sm btn-primary" onclick="selectFlorist(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select florist</button>';
+            }else{
+                $data = $config->getData('ID, FloristName', 'florist', "ID = '". $row['id_florist'] ."'");
+                $florist = '<a href="javascript:;" onclick="selectFlorist(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'. $data['FloristName'] .'</span></a>';
+            }
+            if(empty($row['id_kurir'])){
+                $kurir = '<button class="btn btn-sm btn-primary" onclick="pilihKurir(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select kurir</button>';
+            }else{
+                $data = $config->getData('id, nama_kurir', 'kurirs', "id = '". $row['id_kurir'] ."'");
+                $kurir = '<a href="javascript:;" onclick="pilihKurir(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'. $data['nama_kurir'] .'</span></a>';
+            }
+
+            if(empty($row['id_kurir'])){
+                $kurir = '<button class="btn btn-sm btn-primary" onclick="pilihKurir(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select kurir</button>';
+            }else{
+                $data = $config->getData('id, nama_kurir', 'kurirs', "id = '". $row['id_kurir'] ."'");
+                $kurir = '<a href="javascript:;" onclick="pilihKurir(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'. $data['nama_kurir'] .'</span></a>';
+            }
+
+            $btnchangestatus = '<button class="btn btn-sm btn-primary" onclick="chagestatusordermodal(\''. $row['transactionID'] .'\')" style="font-size: 12px;">'. $arrstatusorder[$row['statusOrder']] .'</button>';
+            $grandTotal = '0';
+            if(!empty($row['grandTotal'])){
+                $grandTotal = $row['grandTotal'];
+            }
+            $Kirim = Date('d-M-Y', strtotime($row['delivery_date']));
+            $createorder = Date('d F Y', strtotime($row['created_date']));
+            $statuspaid = $row['statusPaid'] == 1 ? 'success' : 'warning';
+            $color = '';
+            if(Date('Y-m-d', strtotime($row['delivery_date'])) == $config->getdate('Y-m-d')) $color = 'yess';
+
+            $subdata = array();
+            $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
+            $subdata[]  = $dataproduct;
+            $subdata[]  = $row['CustomerName'] .'<small class="badge badge-sm badge-info">'.$type['nama'].'</small>';
+            $subdata[]  = $dataprice;
+            $subdata[]  = $dataquantity;
+            $subdata[]  = $config->formatprice($row['grandTotal']);
+            $subdata[]  = $Kirim . '<span class="small" style="color: red;"> '.$arrtime[$row['delivery_time']].'</span>';
+            // $subdata[]  = $row['kelurahan'];
+            // $subdata[]  = '<span class="badge badge-sm badge-info">'.$arrstatusorder[$row['statusOrder']].'</span>';
+            $subdata[]  = '<span class="badge badge-sm badge-'.$statuspaid.'">'.$arrstatuspaid[$row['statusPaid']].'</span>';
+            $subdata[]  = $createorder;
+            $subdata[]  = $row['admin'];
+            $subdata[]  = $florist;
+            $subdata[]  = $kurir;
+            $subdata[]  = $color;
+            array_push($tampung, $subdata);
+         }
+    }
+
+    $json_data = array(
+        'draw'              => intval($request['draw']),
+        'recordsTotal'      => intval($totalData),
+        'recordsFiltered'   => intval($totalFilter),
+        'data'              => $tampung
+    );
+    echo json_encode($json_data);
+}
+if($_GET['type'] == 'tableOnDelivery'){
+    $request = $_REQUEST;
+    $search = $_POST['is_date_search'];
+
+    $daterange ='';
+    $corporate ='';
+    $admin = '';
+    
+    if(isset($_POST['date_range'])) {
+        $daterange = $_POST['date_range'];
+        $corporate = $_POST['corporate'];
+        $admin = $_POST['admin'];
+    }
+
+    $Query = '
+    SELECT 
+    (select GROUP_CONCAT(transaction_details.product_name SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as product, 
+    (select GROUP_CONCAT(transaction_details.product_price SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as price, 
+    (select GROUP_CONCAT(transaction_details.product_cost SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as cost, 
+    (select GROUP_CONCAT(transaction_details.product_qty SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as quantity, 
+    transaction.*, transaction_details.*, villages.name as kelurahan, users.name as admin
+    FROM transaction 
+    LEFT JOIN transaction_details ON transaction_details.id_trx = transaction.transactionID 
+    LEFT JOIN villages ON villages.id = transaction.kelurahan_id 
+    LEFT JOIN users ON users.id = transaction.created_by WHERE ';
+
+    if($search == 'yes') { ECHO $admin;
+        $rangeArray = explode("_",$daterange); 
+
+        $startDate = $rangeArray[0]. ' 00:00:00';
+        $endsDate = $rangeArray[1]. ' 23:59:59';
+
+        $daterangequery = "transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
+        $corporatequery = " AND transaction.CustomerID = '".$corporate."'";
+        $adminquery = " AND transaction.created_by = '".$admin."'";
+
+        $Query .= $daterangequery.$corporatequery.$adminquery." AND transaction.statusOrder = '2' GROUP BY transaction.delivery_date DESC";
+
+        $stmt2 = $config->runQuery($Query);
+        $stmt2->execute();
+        $totalData = $stmt2->rowCount();
+        $totalFilter = $totalData;
+
+        $Data = $config->runQuery($Query);
+        $Data->execute();
+        $totalData = $Data->rowCount();
+        $totalFilter = $totalData;
+
+    } else {
+        $Query .=" transaction.statusOrder = '2' GROUP BY transaction.delivery_date DESC";
+        
+        $stmt2 = $config->runQuery($Query);
+        $stmt2->execute();
+        $totalData = $stmt2->rowCount();
+        $totalFilter = $totalData;
+
+        $Data = $config->runQuery($Query);
+        $Data->execute();
+        $totalData = $Data->rowCount();
+        $totalFilter = $totalData;
+    }
+    // var_dump($Data);
+
+    $colom = array(
+        0   => 'transactionID',
+        1   => 'ProductName',
+        2   => 'SenderName',
+        3   => 'Price',
+        4   => 'Quantity',
+        5   => 'GrandTotal',
+        6   => 'DeliveryDate',
+        7   => 'StatusPaid',
+        8   => 'CreatedOrder',
+        9   => 'CreatedBy',
+        10   => 'FloristName',
+        10   => 'KurirName',
+        11   => 'Color',
+    );
+
+    $data = [];
+    $arrstatusorder = array(
+        0 => 'New order',
+        1 => 'On Production',
+        2 => 'On Delivery',
+        3 => 'Success',
+        4 => 'Return',
+        5 => 'Complain',
+    );
+    $arrstatuspaid = array(
+        0 => 'UNPAID',
+        1 => 'PAID'
+    );
+    $arrtime = [
+        0 => '9am - 1pm',
+        1 => '2pm - 5pm',
+        2 => '6pm - 8pm',
+        3 => '9pm - 0am',
+        4 => '1am - 5am',
+        5 => '6am - 8am'
+    ];
+
+    $tampung = array();
+    // print_r($Data);
+    if($totalData > 0 ) {
+        while ($row = $Data->fetch(PDO::FETCH_LAZY)){
+
+            $product = explode(',', $row['product']);
+            $price = explode(',', $row['price']);
+            $quantity = explode(',', $row['quantity']);
+            // print_r($product);
+            // echo $row['product'];
+            $dataproduct = [];
+            foreach($product as $key => $val) {
+                $dataproduct[] = '<span class="badge badge-info">'.$val.'</span></br>';
+            }
+            $dataprice = [];
+            foreach($price as $key => $val) {
+                $dataprice[] = '<span class="badge badge-info">'.$config->formatprice($val).'</span></br>';
+            }
+            $dataquantity = [];
+            foreach($quantity as $key => $val) {
+                $dataquantity[] = '<span class="badge badge-info">'.$val.'</span></br>';
+            }
+            
+            $type = [ 'nama' => 'ORGANIC' ]; 
+            if($row['type'] == 'BD_CP'){
+                $type = $config->getData('*', 'corporates', "CorporateUniqueID = '". $row['CustomerID'] ."'");
+            }
+            if(empty($row['id_florist'])){
+                $florist = '<button class="btn btn-sm btn-primary" onclick="selectFlorist(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select florist</button>';
+            }else{
+                $data = $config->getData('ID, FloristName', 'florist', "ID = '". $row['id_florist'] ."'");
+                $florist = '<a href="javascript:;" onclick="selectFlorist(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'. $data['FloristName'] .'</span></a>';
+            }
+            if(empty($row['id_kurir'])){
+                $kurir = '<button class="btn btn-sm btn-primary" onclick="pilihKurir(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select kurir</button>';
+            }else{
+                $data = $config->getData('id, nama_kurir', 'kurirs', "id = '". $row['id_kurir'] ."'");
+                $kurir = '<a href="javascript:;" onclick="pilihKurir(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'. $data['nama_kurir'] .'</span></a>';
+            }
+
+            if(empty($row['id_kurir'])){
+                $kurir = '<button class="btn btn-sm btn-primary" onclick="pilihKurir(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select kurir</button>';
+            }else{
+                $data = $config->getData('id, nama_kurir', 'kurirs', "id = '". $row['id_kurir'] ."'");
+                $kurir = '<a href="javascript:;" onclick="pilihKurir(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'. $data['nama_kurir'] .'</span></a>';
+            }
+
+            $btnchangestatus = '<button class="btn btn-sm btn-primary" onclick="chagestatusordermodal(\''. $row['transactionID'] .'\')" style="font-size: 12px;">'. $arrstatusorder[$row['statusOrder']] .'</button>';
+            $grandTotal = '0';
+            if(!empty($row['grandTotal'])){
+                $grandTotal = $row['grandTotal'];
+            }
+            $Kirim = Date('d-M-Y', strtotime($row['delivery_date']));
+            $createorder = Date('d F Y', strtotime($row['created_date']));
+            $statuspaid = $row['statusPaid'] == 1 ? 'success' : 'warning';
+            $color = '';
+            if(Date('Y-m-d', strtotime($row['delivery_date'])) == $config->getdate('Y-m-d')) $color = 'yess';
+
+            $subdata = array();
+            $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
+            $subdata[]  = $dataproduct;
+            $subdata[]  = $row['CustomerName'] .'<small class="badge badge-sm badge-info">'.$type['nama'].'</small>';
+            $subdata[]  = $dataprice;
+            $subdata[]  = $dataquantity;
+            $subdata[]  = $config->formatprice($row['grandTotal']);
+            $subdata[]  = $Kirim . '<span class="small" style="color: red;"> '.$arrtime[$row['delivery_time']].'</span>';
+            // $subdata[]  = $row['kelurahan'];
+            // $subdata[]  = '<span class="badge badge-sm badge-info">'.$arrstatusorder[$row['statusOrder']].'</span>';
+            $subdata[]  = '<span class="badge badge-sm badge-'.$statuspaid.'">'.$arrstatuspaid[$row['statusPaid']].'</span>';
+            $subdata[]  = $createorder;
+            $subdata[]  = $row['admin'];
+            $subdata[]  = $florist;
+            $subdata[]  = $kurir;
+            $subdata[]  = $color;
+            array_push($tampung, $subdata);
+         }
+    }
+
+    $json_data = array(
+        'draw'              => intval($request['draw']),
+        'recordsTotal'      => intval($totalData),
+        'recordsFiltered'   => intval($totalFilter),
+        'data'              => $tampung
+    );
+    echo json_encode($json_data);
+}
 if($_GET['type'] == 'generate'){
     $type = $_POST['type'];
     if($type == '1'){
@@ -187,7 +738,7 @@ if($_GET['type'] == 'addProducts')
                            <div class="note">
                               <form id="remarks_florist" data-parsley-validate="" novalidate="">
                                  <div class="form-group">
-                                    <textarea class="form-control remarks-florist-tambahan" name="isi_remarks['. $id .']" rows="5" required="" placeholder="remarks florist" data-id="'. $id .'"></textarea>
+                                    <textarea class="form-control remarks-florist-tambahan" name="isi_remarks['. $id .']" row="5" required="" placeholder="remarks florist" data-id="'. $id .'"></textarea>
                                  </div>
                               </form>
                            </div>
@@ -671,17 +1222,19 @@ if($_GET['type'] == 'proccessOrder'){
 
     $type = substr($b, 0, 4);
 
-    $delivery = $config->getData('delivery_charge, CustomerID, PIC', '  transaction', " transaction.transactionID = '". $a ."'");
+    $delivery = $config->getData('delivery_charge, delivery_charge_time, CustomerID, PIC', '  transaction', " transaction.transactionID = '". $a ."'");
     $price = $config->getData('SUM(transaction_details.product_cost * transaction_details.product_qty) as costprice, SUM(transaction_details.product_price * transaction_details.product_qty) as sellingprice', 'transaction_details', " transaction_details.id_trx = '". $a ."'");
 
     $deliveryCharge = 0;
     if($delivery['delivery_charge'] > 0) { $deliveryCharge = $delivery['delivery_charge']; }
 
+    $timeslotcharges = 0;
+    if($delivery['delivery_charge_time'] > 0) { $timeslotcharges = $delivery['delivery_charge_time']; }
+
     $total = $config->getData('SUM(detail.product_qty * detail.product_price) as subtotal', '  transaction_details as detail', " detail.id_trx = '". $a ."'");
     $totalTransaction = $total['subtotal'];
 
-    $grandTotal = $totalTransaction + $deliveryCharge;
-
+    $grandTotal = $totalTransaction + $deliveryCharge + $timeslotcharges;
 
     $stmt = "UPDATE transaction SET invoice_name = '". $b ."', statusOrder = '0', TotalCostPrice = '". $price['costprice'] ."', TotalSellingPrice = '". $price['sellingprice'] ."', grandTotal = '". $grandTotal ."', created_by = '". $admin ."' WHERE transactionID = :trx";
     $stmt = $config->runQuery($stmt);
@@ -1026,6 +1579,8 @@ if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
     $CustomerEmail = isset($data['CorporateEmail']) && $data['CorporateEmail'] == '' ? $data['OrganicEmail'] : $data['CorporateEmail'];
     $CustomerPhone = isset($data['CorporatePhone']) && $data['CorporatePhone'] == '' ? $data['OrganicPhone'] : $data['CorporatePhone'];
     
+    $arraypaid = 'unset';
+    if($data['statusPaid']) $arraypaid = $arrpaid[$data['statusPaid']];
     $receivedEmail = $CustomerEmail;
     $receivedName = $CustomerName;
     $subject = 'Order Confirmation Bunga Davi-'.$data['transactionID'];
@@ -1278,7 +1833,7 @@ if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
                                         <tr style="background-color: #ffffff;">
                                             <td style="border-bottom: 0.5px solid; font-weight: 600; font-size: 14px; padding: 8px 0px; text-align: center;" colspan="5">
                                             <div style="background-color: '.$color.'; width: 120px;padding: 8px;border: 1px solid '.$color.';border-radius: 5px; margin-left: 40%;">
-                                                <span>'.$arrpaid[$data['statusPaid']].'</span>
+                                                <span>'.$arraypaid.'</span>
                                             </div>
                                             </td>
                                         </tr>
@@ -1345,7 +1900,7 @@ if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
                                                                 </tr>
                                                                 <tr>
                                                                    <td width="110" class="w170" style="vertical-align: top;"><span class="content-body1" style="font-family:Arial;">Delivery Date :</span></td>
-                                                                   <td width="170" class="w170" style="vertical-align: top;"><span class="content-body" style="font-family:Arial;">'. $config->_formatdate($data['delivery_date']). '</span> <span style="color: red; font-size: 12px; font-weight: 600;">'.$arrtime[$data['delivery_time']].'</span></td>
+                                                                   <td width="170" class="w170" style="vertical-align: top;"><span class="content-body" style="font-family:Arial;">'. $config->_formatdate($data['delivery_date']). '</span> <span style="color: red; font-size: 12px; font-weight: 600;">'.$arraypaid.'</span></td>
                                                                 </tr>
                                                                 <tr>
                                                                    <td width="110" class="w170" style="vertical-align: top;"><span class="content-body1" style="font-family:Arial;">Delivery Note :</span></td>
@@ -1421,10 +1976,10 @@ if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
           </table>
        </body>
     </html>';
-    // echo $content;
+   
     $cc = 'fiki@bungadavi.co.id';
     $config = new Mail();
-    $email = $config->Mailler($receivedEmail, $receivedName, $cc, $subject, $content);
+    $email = $config->Mailler('ardinirianti@gmail.com', $receivedName, $cc, $subject, $content);
 
         die(json_encode(['response' => $email['response'], 'msg' => $email['msg']]));
         $logs = $config->saveLogs($a, $admin, 'f', 'send email!');

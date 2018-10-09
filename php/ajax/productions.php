@@ -152,7 +152,9 @@ if($_GET['type'] == 'addBelanja')
     $idKas = '1';
     $saldoAwal = $row['total'];
 
-    if($saldoAwal > 0 ){
+    $newtotal = $d * $e;
+
+    if($saldoAwal >= $newtotal ){
         //get id kas_ins
         $totalBelanja = $d * $e;
         
@@ -269,13 +271,26 @@ if($_GET['type'] == 'delBelanja')
     $a = $_POST['admin'];
     $b = $_POST['keterangan'];
 
-    $stmt = $config->delRecord('kas_outs', 'id', $b);
+    $data = $config->getData('*', 'kas_outs', 'where id ='.$b);
+    $oldprice = $data['qty'] * $data['harga'];
+
+    $insert = $config->runQuery("INSERT INTO kas_ins (parent_id, types, title, total, ket, admin_id, status) 
+    VALUES('0', 'debit', '".$data['nama']."', '".$oldprice."', '".$data['ket']."', '".$admin."', '1')");
+    $insert->execute();
+
+    if($insert) {
+        $stmt = $config->delRecord('kas_outs', 'id', $b);
             $logs = $config->saveLogs($b, $admin, 'd', 'hapus belanjaan');
-    if($stmt){
-        echo $config->actionMsg('d', 'kas_outs');
-    }else{
-        echo 'Failed!';
+        if($stmt){
+            echo $config->actionMsg('d', 'kas_outs');
+        }else{
+            echo 'Failed!';
+        }
+    } else {
+        echo 'Failed!!';
     }
+
+    
 }
 
 if($_GET['type'] == 'delStock')

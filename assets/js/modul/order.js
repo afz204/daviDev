@@ -279,13 +279,239 @@ $(window).load(function() {
     // Run code
     $('#SmartWizard').hide().fadeIn(1000);
 });
+
+function getNewOrder(is_date_search, date_range, corporate, admin) {
+
+    var tablePaymentKurir = $('#tableNewOrder').DataTable({
+        "scrollY": "300px",
+        "scrollX": true,
+        "scrollCollapse": true,
+        "paging": false,
+        "columnDefs": [{ "width": 200, "targets": 0 }],
+        "fixedColumns": true,
+        "processing": true,
+        "serverSide": true,
+        "searching": true,
+        "pagging": true,
+        'language': {
+            "loadingRecords": "&nbsp;",
+            "processing": ""
+        },
+        "ajax": {
+            url: "../php/ajax/order.php?type=tableNewOrder", // json datasource
+            type: "post", // method  , by default get
+            data: {
+                'is_date_search': is_date_search,
+                'date_range': date_range,
+                'corporate': corporate,
+                'admin': admin
+            },
+            error: function() { // error handling
+                $(".employee-grid-error").html("");
+                $("#tableNewOrder").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                $("#employee-grid_processing").css("display", "none");
+
+            }
+        },
+        'rowCallback': function(row, data, index) {
+            if (data[11].toUpperCase() != '') {
+                $(row).css({ 'background-color': '#9A0909', 'color': '#fff' });
+            }
+        },
+        drawCallback: function(settings) {
+            var data = this.api().ajax.json();
+            // $('#totalPayment').html(data['totalData']);
+            // $('#totalPerKurir').html(data['totalKurir']);
+            // $('#selisih').html(data['subtotal']);
+            // console.log(data);
+        },
+        "columns": [
+            { "data": "0", "orderable": true },
+            { "data": "1", "orderable": true },
+            { "data": "2", "orderable": true },
+            { "data": "3", "orderable": true },
+            { "data": "4", "orderable": true },
+            { "data": "5", "orderable": true },
+            { "data": "6", "orderable": true },
+            { "data": "7", "orderable": true },
+            { "data": "8", "orderable": true },
+            { "data": "9", "orderable": true },
+            { "data": "10", "orderable": true }
+        ],
+
+    });
+}
+
+function getOnProccess(is_date_search, date_range, corporate, admin) {
+
+    var tablePaymentKurir = $('#tableOnProccess').DataTable({
+        "scrollY": "300px",
+        "scrollX": true,
+        "scrollCollapse": true,
+        "paging": false,
+        "columnDefs": [{ "width": 200, "targets": 0 }],
+        "fixedColumns": true,
+        "processing": true,
+        "serverSide": true,
+        "searching": true,
+        "pagging": true,
+        'language': {
+            "loadingRecords": "&nbsp;",
+            "processing": ""
+        },
+        "ajax": {
+            url: "../php/ajax/order.php?type=tableOnProccess", // json datasource
+            type: "post", // method  , by default get
+            data: {
+                'is_date_search': is_date_search,
+                'date_range': date_range,
+                'corporate': corporate,
+                'admin': admin
+            },
+            error: function() { // error handling
+                $(".employee-grid-error").html("");
+                $("#tableOnProccess").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                $("#employee-grid_processing").css("display", "none");
+
+            }
+        },
+        'rowCallback': function(row, data, index) {
+            if (data[11].toUpperCase() != '') {
+                $(row).css({ 'background-color': '#9A0909', 'color': '#fff' });
+            }
+        },
+        drawCallback: function(settings) {
+            var data = this.api().ajax.json();
+            // $('#totalPayment').html(data['totalData']);
+            // $('#totalPerKurir').html(data['totalKurir']);
+            // $('#selisih').html(data['subtotal']);
+            // console.log(data);
+        },
+        "columns": [
+            { "data": "0", "orderable": true },
+            { "data": "1", "orderable": true },
+            { "data": "2", "orderable": true },
+            { "data": "3", "orderable": true },
+            { "data": "4", "orderable": true },
+            { "data": "5", "orderable": true },
+            { "data": "6", "orderable": true },
+            { "data": "7", "orderable": true },
+            { "data": "8", "orderable": true },
+            { "data": "9", "orderable": true },
+            { "data": "10", "orderable": true },
+            { "data": "11", "orderable": true }
+        ],
+
+    });
+}
+
+function getOnDelivery(is_date_search, date_range, corporate, admin) {
+
+    var tablePaymentKurir = $('#tableOnDelivery').DataTable({
+        "scrollY": "300px",
+        "scrollX": true,
+        "scrollCollapse": true,
+        "paging": false,
+        "columnDefs": [{ "width": 200, "targets": 0 }],
+        "fixedColumns": true,
+        "processing": true,
+        "serverSide": true,
+        "searching": true,
+        "pagging": true,
+        'language': {
+            "loadingRecords": "&nbsp;",
+            "processing": ""
+        },
+        "ajax": {
+            url: "../php/ajax/order.php?type=tableOnDelivery", // json datasource
+            type: "post", // method  , by default get
+            data: {
+                'is_date_search': is_date_search,
+                'date_range': date_range,
+                'corporate': corporate,
+                'admin': admin
+            },
+            error: function() { // error handling
+                $(".employee-grid-error").html("");
+                $("#tableOnDelivery").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                $("#employee-grid_processing").css("display", "none");
+
+            }
+        },
+        'rowCallback': function(row, data, index) {
+            if (data[11].toUpperCase() != '') {
+                $(row).css({ 'background-color': '#9A0909', 'color': '#fff' });
+            }
+        },
+        drawCallback: function(settings) {
+            var data = this.api().ajax.json();
+            // $('#totalPayment').html(data['totalData']);
+            // $('#totalPerKurir').html(data['totalKurir']);
+            // $('#selisih').html(data['subtotal']);
+            // console.log(data);
+        },
+        "columns": [
+            { "data": "0", "orderable": true },
+            { "data": "1", "orderable": true },
+            { "data": "2", "orderable": true },
+            { "data": "3", "orderable": true },
+            { "data": "4", "orderable": true },
+            { "data": "5", "orderable": true },
+            { "data": "6", "orderable": true },
+            { "data": "7", "orderable": true },
+            { "data": "8", "orderable": true },
+            { "data": "9", "orderable": true },
+            { "data": "10", "orderable": true },
+            { "data": "11", "orderable": true }
+        ],
+
+    });
+}
 $(document).ready(function() {
     // $('#delivery_charges').select2();
+    getNewOrder("no");
+    getOnProccess("no");
+    getOnDelivery("no");
 
+    $('#ListAdminNewOrder').select2({ width: '100%', theme: "bootstrap4" });
+    $('#ListCorporate').select2({ width: '100%', theme: "bootstrap4" });
     $('#template_level1').select2({ width: '100%', theme: "bootstrap4" });
     $('#template_level2').select2({ width: '100%', theme: "bootstrap4" });
     $('#ListSelectedFlorist').select2({ width: '100%', theme: "bootstrap4" });
     $('#ListSelectedKurir').select2({ width: '100%', theme: "bootstrap4" });
+
+    $('#NewOrder').on('submit', function(e) {
+        e.preventDefault();
+
+        var range = $('#daterangeneworder').val();
+        var corporate = $('[name="ListCorporate"] option:selected').val();
+        var admin = $('[name="ListAdminNewOrder"] option:selected').val();
+
+        $('#tableNewOrder').DataTable().destroy();
+        getNewOrder('yes', range, corporate, admin);
+    });
+
+    $('#OnProccess').on('submit', function(e) {
+        e.preventDefault();
+
+        var range = $('#daterangeneworder').val();
+        var corporate = $('[name="ListCorporate"] option:selected').val();
+        var admin = $('[name="ListAdminNewOrder"] option:selected').val();
+
+        $('#tableOnProccess').DataTable().destroy();
+        getOnProccess('yes', range, corporate, admin);
+    });
+    $('#OnDelivery').on('submit', function(e) {
+        e.preventDefault();
+
+        var range = $('#daterangeneworder').val();
+        var corporate = $('[name="ListCorporate"] option:selected').val();
+        var admin = $('[name="ListAdminNewOrder"] option:selected').val();
+
+        $('#tableOnDelivery').DataTable().destroy();
+        getOnDelivery('yes', range, corporate, admin);
+    });
+
     $('#tableOrder').removeAttr('width').DataTable({
         scrollY: "300px",
         scrollX: true,
@@ -814,3 +1040,30 @@ $(document).ready(function() {
     });
 
 })
+
+$(function() {
+
+    var start = moment().subtract(29, 'days');
+    var end = moment();
+
+    function cb(start, end) {
+        $('#dateneworder span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        $('#daterangeneworder').val(start.format('YYYY-MM-DD') + '_' + end.format('YYYY-MM-DD'));
+    }
+
+    $('#dateneworder').daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+
+    cb(start, end);
+
+});

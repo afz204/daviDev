@@ -2,11 +2,11 @@
 $id = $_GET['id'];
 $stmt = $config->runQuery("SELECT corporates.id, corporates.CorporateUniqueID, corporates.nama, corporates.telp, corporates.fax,  corporates.website, corporates.alamat, corporates.kelurahan, 
 corporates.kecamatan, corporates.kodepos, corporates.created_at, states.lokasi_nama FROM corporates
-INNER JOIN states ON states.lokasi_ID = corporates.provinsi WHERE corporates.id = :a");
+LEFT JOIN states ON states.lokasi_ID = corporates.provinsi WHERE corporates.id = :a");
 $stmt->execute(array(':a' => $id));
 $info = $stmt->fetch(PDO::FETCH_LAZY);
-
-$pic = $config->ProductsJoin('corporate_pics.id, corporate_pics.corporate_id, corporate_pics.name, corporate_pics.nomor, corporate_pics.created_at, provinces.name as Provinsi, regencies.name as Kota,
+    // $config->_debugvar($stmt);
+$pic = $config->ProductsJoin('corporate_pics.id, corporate_pics.corporate_id, corporate_pics.name, corporate_pics.email, corporate_pics.nomor, corporate_pics.created_at, provinces.name as Provinsi, regencies.name as Kota,
     districts.name as Kec, villages.name as Kel, corporate_pics.alamat', 'corporate_pics',
 'LEFT JOIN provinces on provinces.id = corporate_pics.province_id
 LEFT JOIN regencies on regencies.id = corporate_pics.city
@@ -60,7 +60,7 @@ $provinsi = $config->Products('id, name', 'provinces');
                     </div>
                     <div class="form-group" >
                         <label for="usernameAdmin">Bergabung Sejak</label>
-                        <input style="text-transform: capitalize;" type="text" class="form-control" value="<?=date('d M Y H:m:s', strtotime($info->created_at))?>" readonly>
+                        <input style="text-transform: capitalize;" type="text" class="form-control" value="<?=date('d M Y H:m:s', strtotime($info['created_at']))?>" readonly>
                     </div>
                     <button type="button" class="btn btn-block btn-outline-dark" onclick="location.href='<?=CORPORATE?>?p=newCP&edit=<?=$info['id']?>';" <?=$access['update']?>>Edit Profile</button>
 
@@ -80,13 +80,18 @@ $provinsi = $config->Products('id, name', 'provinces');
 
                         <div>
                             <h6 class="my-0"><?=$row['name']?></h6>
+                            <small class="text-muted"><?=$row['email']?></small><br>
                             <small class="text-muted"><?=$row['nomor']?></small>
                             <br>
                             <small class="text-muted" style="font-weight: 600;"><?=$row['alamat']?>, <?=$row['Kel']?>, <?=$row['Kec']?></small>
                             <small class="text-muted" style="font-weight: 600;"><?=$row['Kota']?>, <?=$row['Provinsi']?></small>
                         </div>
                         <span class="text-muted">
-                            <button <?=$access['delete']?> class="btn btn-sm btn-danger" style="font-size: 12px;" onclick = 'removePIC(<?=$row['id']?>)'> <span class="fa fa-trash"></span> </button>
+                            
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                                <button <?=$access['update']?> type="button" class="btn btn-warning"><span class="fa fa-pencil"></span></button>
+                                <button <?=$access['delete']?> class="btn btn-sm btn-danger" style="font-size: 12px;" onclick = "removePIC(<?=$row['id']?>)"> <span class="fa fa-trash"></span> </button>
+                            </div>
                         </span>
 
                     </li>

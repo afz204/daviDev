@@ -1,14 +1,26 @@
+<?php 
+$kurir = $config->Products('*', 'users where status = 1');
+?>
 <div class="card card-body">
 <div class="card-body" style="padding: 1%;">
 <br>
-        <form id="Revenue" methods="post" data-parsley-validate="">
+    <form id="Bonus" methods="post" data-parsley-validate="">
             <div class="row">
                 <div class="form-group mx-sm-3 mb-2">
-                    <div id="daterevenue" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                    <div id="datebonus" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
                         <i class="fa fa-calendar"></i>&nbsp;
                         <span></span> <i class="fa fa-caret-down"></i>
                     </div>
-                    <input type="hidden" id='dataPayKurirFilter'>
+                    <input type="hidden" id='daterangebonus'>
+                </div>
+                <div class="form-group">
+                    <select class="form-control" name="adminbonus" id="adminbonus" required>
+                        <option value="">:: Admin ::</option>
+                        <option value="0">:: All Admin ::</option>
+                        <?php while ($row = $kurir->fetch(PDO::FETCH_LAZY)){ ?>
+                        <option value="<?=$row->id?>"><?=$row->name?></option>
+                        <?php } ?>
+                    </select>
                 </div>
                 <div class="col-12 col-sm-3 col-lg-3">
                     <div class="input-group-append">
@@ -17,7 +29,7 @@
                 </div>
             </div>
         </form>
-        <table id="tablePayKurir" class="table table-bordered  <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
+        <table id="tableBonus" class="table table-bordered  <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
             <thead class="thead-light">
             <tr style="text-transform: lowercase;">
                 <th scope="col" width="10%">invoice</th>

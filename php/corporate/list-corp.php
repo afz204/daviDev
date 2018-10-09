@@ -15,9 +15,8 @@ $stmt->execute();
                 <th scope="col">#</th>
                 <th scope="col">Nama Perusahaan</th>
                 <th scope="col">Telphone</th>
-                <th scope="col">Handphone</th>
-                <th scope="col">Email</th>
-                <th scope="col">contact person</th>
+                <th scope="col">Website</th>
+                <th scope="col">Alamat</th>
                 <th scope="col">join at</th>
                 <th scope="col">action</th>
             </tr>
@@ -28,9 +27,8 @@ $stmt->execute();
                     <td><?=$i++?></td>
                     <td><?=$row['nama']?></td>
                     <td><?=$row['telp']?></td>
-                    <td><?=$row['handphone']?></td>
-                    <td><?=$row['email']?></td>
-                    <td><?=$row['cp']?></td>
+                    <td><?=$row['website']?></td>
+                    <td><?=$row['alamat']?></td>
                     <td><?=date('d M Y H:m', strtotime($row['created_at']))?></td>
                     <td >
                         <a href="<?=CORPORATE?>?p=profile&id=<?=$row['id']?>" <?=$access['read']?>>

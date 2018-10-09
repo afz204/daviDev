@@ -50,26 +50,30 @@ $(document).ready(function() {
 
             success: function(msg) {
                 if (msg === '1') {
-                    $(':input', '#newCorporate')
-                        .not(':button, :submit, :reset, :hidden')
-                        .val('')
-                        .removeAttr('checked')
-                        .removeAttr('selected');
-                    message.addClass('alert-success');
-                    $('#isiPesan').append('<strong>Done!</strong> New Corporate Success input to Database.');
-                    message.show();
+                    alert(msg);
+                    location.reload();
+                    // $(':input', '#newCorporate')
+                    //     .not(':button, :submit, :reset, :hidden')
+                    //     .val('')
+                    //     .removeAttr('checked')
+                    //     .removeAttr('selected');
+                    // message.addClass('alert-success');
+                    // $('#isiPesan').append('<strong>Done!</strong> New Corporate Success input to Database.');
+                    // message.show();
 
                 } else {
-                    $(':input', '#newCorporate')
-                        .not(':button, :submit, :reset, :hidden')
-                        .val('')
-                        .removeAttr('checked')
-                        .removeAttr('selected');
-                    message.addClass('success');
-                    message.addClass('alert-danger');
-                    $('#isiPesan').append('<strong>OOops!</strong> Something wrong with this page.');
-                    message.show();
-                    console.log(msg);
+                    // $(':input', '#newCorporate')
+                    //     .not(':button, :submit, :reset, :hidden')
+                    //     .val('')
+                    //     .removeAttr('checked')
+                    //     .removeAttr('selected');
+                    // message.addClass('success');
+                    // message.addClass('alert-danger');
+                    // $('#isiPesan').append('<strong>OOops!</strong> Something wrong with this page.');
+                    // message.show();
+                    // console.log(msg);
+                    alert(msg);
+                    location.reload();
                 }
 
             }

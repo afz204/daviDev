@@ -54,7 +54,8 @@ if($_GET['type'] == 'new'){
         ));
         $reff = $config->lastInsertId();
         $logs = $config->saveLogs($reff, $admin, 'c', 'new corporate');
-    }else { echo 'mabok';}
+        echo 'Success';
+    }else { echo 'Error';}
 
 }
 
@@ -120,7 +121,7 @@ if($_GET['type'] == 'saveCustomer'){
     $h = $config->newPassword($_POST['password']);
     $z = $a. ' ' . $b;
 
-    $stmt = $config->runQuery("INSERT INTO customer (FirstName, LastName, FullName, Email, Gender, Mobile, Phone, DOB, Username, Password, IsActive, CreatedDate, CreatedBy) VALUES (:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l)");
+    $stmt = $config->runQuery("INSERT INTO customer (FirstName, LastName, FullName, Email, Gender, Mobile, Phone, DOB, Username, Password, IsActive, CreatedDate, CreatedBy) VALUES (:a, :b, :z, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l)");
     $stmt->execute(array(
         ':a'    => $a,
         ':b'    => $b,

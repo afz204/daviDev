@@ -73,13 +73,15 @@
   //total transaction
   $delivery = $config->getData('delivery_charge, delivery_charge_time', '  transaction', " transaction.transactionID = '". $_GET['trx'] ."'");
   $deliveryCharge = 0;
+
   if($delivery['delivery_charge'] > 0) { $deliveryCharge = $delivery['delivery_charge']; }
   $timeslotcharges = 0;
   if($delivery['delivery_charge_time'] > 0) { $timeslotcharges = $delivery['delivery_charge_time']; }
+
   $total = $config->getData('SUM(detail.product_qty * detail.product_price) as subtotal', '  transaction_details as detail', " detail.id_trx = '". $_GET['trx'] ."'");
   $totalTransaction = $total['subtotal'];
 
-  $grandTotal = $totalTransaction + $deliveryCharge;
+  $grandTotal = $totalTransaction + $deliveryCharge + $timeslotcharges;
   // /var_dump($card);
 
   $paymentList = $config->Products('ID, PaymentName, AccountName, AccountNumber, PaymentImages', 'payment WHERE Status = 1 ');

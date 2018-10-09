@@ -25,6 +25,7 @@
                 </div>
             </div>
         </form>
+        
         <table id="TablePiutang" class="table table-bordered  <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
             <thead class="thead-light">
             <tr style="text-transform: lowercase;">
@@ -43,6 +44,13 @@
             <tbody>
             </tbody>
         </table>
+        <div class="col-auto my-1">
+          <div class="custom-control custom-checkbox mr-sm-2">
+            <input type="checkbox" class="custom-control-input" id="allpaid">
+            <label class="custom-control-label" for="allpaid">For All Paid</label>
+            <button type="button" onClick="allpaid()" class="btn btn-sm btn-primary">PAID</button>
+          </div>
+        </div>
             <div class="col-6 col-sm-3 col-lg-3 text-right">
                 <ul class="list-group mb-3">
                     
@@ -74,6 +82,30 @@
             <div class="form-group">
                 <input type="password" name="passwordpushtoken" autocomplete="off" data-parsley-minlength="2" class="form-control" id="exampleInputEmail1" placeholder="token" required>
                 <input type="hidden" name="transactionIDpush" data-parsley-minlength="2" class="form-control" id="exampleInputEmail2" required>
+            </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="generatepushtokenmultiple" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Password</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <div class="form-group">
+                <input type="text" name="paidDatemultiple" class="form-control" placeholder="tgl lunas" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="passwordpushtokenmultiple" autocomplete="off" data-parsley-minlength="2" class="form-control" id="exampleInputEmail1" placeholder="token" required>
+                <input type="hidden" name="transactionIDpush[]" data-parsley-minlength="2" class="form-control" id="exampleInputEmail2" required>
             </div>
       </div>
       <div class="modal-footer">
