@@ -19,28 +19,12 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs WHERE status = 1');
             <form id="OnProccess" class="form-inline" methods="post" data-parsley-validate="" style="    padding-left: 1.2222222%;">
                 <div class="row">
                     <div class="form-group mx-sm-3">
-                    <label for="dateneworder">Created Date</label>
+                    <label for="dateneworder">Delivery Date</label>
                         <div id="dateneworder" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%;">
                             <i class="fa fa-calendar"></i>&nbsp;
                             <span></span> <i class="fa fa-caret-down"></i>
                         </div>
                         <input type="hidden" id='daterangeneworder'>
-                    </div> 
-                    <div class="form-group">
-                        <label for="ListCorporate">Corporate</label>
-                        <select class="form-control" id="ListCorporate" name="ListCorporate">
-                        <?php while($row = $Listcorporate->fetch(PDO::FETCH_LAZY)) { ?>
-                        <option value="<?=$row['CorporateUniqueID']?>"><?=$row['nama']?></option>
-                        <?php } ?>
-                        </select>
-                    </div>
-                    <div class="form-group" style="padding-left: 1px;">
-                        <label for="ListAdminNewOrder">Admin</label>
-                        <select class="form-control" id="ListAdminNewOrder" name="ListAdminNewOrder">
-                        <?php while($row = $ListAdmin->fetch(PDO::FETCH_LAZY)) { ?>
-                        <option value="<?=$row['id']?>"><?=$row['name']?></option>
-                        <?php } ?>
-                        </select>
                     </div>
                     <div class="form-group" style="padding-left: 3px; padding-top: 24px">
                     <button class="btn btn-outline-secondary" type="submit"><span class="fa fa-search"></span> filter</button>

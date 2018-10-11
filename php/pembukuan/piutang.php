@@ -56,7 +56,7 @@
                     
                     <li class="list-group-item d-flex justify-content-between" style="padding: .25rem .75rem !important;">
                         <span>Total Selling </span>
-                        <strong id="totalPayment">$20</strong>
+                        <strong id="GrandTotalpayment">$20</strong>
                     </li>
                 </ul>
             </div>

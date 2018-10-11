@@ -162,7 +162,7 @@ function getpembukuan(is_date_search, date_range, statuspaid) {
     var tablePaymentKurir = $('#TableRevenue').DataTable({
         "processing": true,
         "serverSide": true,
-        "searching": false,
+        "searching": true,
         "pagging": true,
         "ajax": {
             url: "../php/ajax/pembukuan.php?type=revenue", // json datasource
@@ -207,7 +207,7 @@ function getpiutang(is_date_search, date_range, statuspaid) {
     var TablePiutang = $('#TablePiutang').DataTable({
         "processing": true,
         "serverSide": true,
-        "searching": false,
+        "searching": true,
         "pagging": true,
         "ajax": {
             url: "../php/ajax/pembukuan.php?type=piutang", // json datasource
@@ -226,9 +226,7 @@ function getpiutang(is_date_search, date_range, statuspaid) {
         },
         drawCallback: function(settings) {
             var data = this.api().ajax.json();
-            $('#totalPayment').html(data['totalKurir']);
-            $('#totalPerKurir').html(data['totalKurir']);
-            $('#selisih').html(data['subtotal']);
+            $('#GrandTotalpayment').html(data['subtotal']);
             console.log(data);
         },
         "columns": [
@@ -252,7 +250,7 @@ function getbonus(is_date_search, date_range, admin) {
     var TablePiutang = $('#tableBonus').DataTable({
         "processing": true,
         "serverSide": true,
-        "searching": false,
+        "searching": true,
         "pagging": true,
         "ajax": {
             url: "../php/ajax/pembukuan.php?type=bonus", // json datasource

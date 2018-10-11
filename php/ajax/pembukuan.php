@@ -35,11 +35,17 @@ if($_GET['type'] == 'revenue')
         // $month = 'AND DATE(pay_kurirs.created_at) = DATE(NOW())';
     }
 
-    $DataQuery = " SELECT transaction.* , (transaction.grandTotal - (transaction_details.product_cost * transaction_details.product_qty)) / transaction.grandTotal as MP, users.name as AdminName FROM transaction
-    LEFT JOIN transaction_details on transaction_details.id_trx = transaction.transactionID
-    LEFT JOIN users on users.id = transaction.created_by ";
+    $databox = '';
+    if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
+        // echo $_POST['search']['value'];
+        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") AND ';
+    }
 
-    $price = 'SELECT TotalCostPrice as costprice, TotalSellingPrice as sellingprice, grandTotal as GrandTotal from transaction';
+    $DataQuery = " SELECT transaction.* , (transaction.grandTotal - transaction.TotalCostPrice) / transaction.grandTotal as MP, users.name as AdminName FROM transaction
+    LEFT JOIN transaction_details on transaction_details.id_trx = transaction.transactionID
+    LEFT JOIN users on users.id = transaction.created_by WHERE transaction.statusOrder != 6 AND ";
+
+    $price = 'SELECT SUM(TotalCostPrice) as costprice, SUM(TotalSellingPrice) as sellingprice, SUM(grandTotal) as GrandTotal from transaction WHERE transaction.statusOrder != 6 AND';
 
     //print_r($request);
     $colom = array(
@@ -56,14 +62,14 @@ if($_GET['type'] == 'revenue')
         10   => 'MP',
     );
 
-
+    $DataQuery .= $databox;
     if( $search != 'no' ) { //age
         $rangeArray = explode("_",$daterange); 
 
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
 
-        $DataQuery .=" WHERE transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
+        $DataQuery .=" transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
         
 
         $price .=" WHERE transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $status_paid;
@@ -87,7 +93,7 @@ if($_GET['type'] == 'revenue')
 
     } else {
         
-        $price .=' WHERE MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
+        $price .=' MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
         AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE())';
         $submitprice = $config->runQuery($price);
         $submitprice->execute();
@@ -98,7 +104,7 @@ if($_GET['type'] == 'revenue')
         $sellingprice = $price['sellingprice'];
         $GrandTotal = $price['GrandTotal'];
 
-        $DataQuery.=" WHERE MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
+        $DataQuery.=" MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
         AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE()) GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
         $stmt = $config->runQuery($DataQuery);
         $stmt->execute();
@@ -125,7 +131,10 @@ if($_GET['type'] == 'revenue')
                 'UNPAID',
                 'PAID'
             ];
-            
+            $paydate = $config->_formatdate($row['PaidDate']);
+            if(strtotime($row['PaidDate']) == false) {
+                $paydate = '<span class="badge badge-secondary">unset</span>';
+            }
             $subdata = array();
             // $subdata[]  = $row[0];
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
@@ -134,7 +143,7 @@ if($_GET['type'] == 'revenue')
             $subdata[]  = $config->_formatdate($row['created_date']);
             $subdata[]  = $config->_formatdate($row['delivery_date']);
             $subdata[]  = $statuspaid;
-            $subdata[]  = $config->_formatdate($row['updated_date']);
+            $subdata[]  = $paydate;
             $subdata[]  = $config->formatPrice($row['TotalCostPrice']);
             $subdata[]  = $config->formatPrice($row['TotalSellingPrice']);
             $subdata[]  = ceil($row['MP']).'%';
@@ -152,7 +161,7 @@ if($_GET['type'] == 'revenue')
         'data'              => $data,
         'totalData'         => $config->formatPrice($costprice),
         'totalKurir'        => $config->formatPrice($sellingprice),
-        'subtotal'          => $selisihPembayaran
+        'subtotal'          => ceil($selisihPembayaran).'%'
     );
     echo json_encode($json_data);
 }
@@ -175,11 +184,17 @@ if($_GET['type'] == 'piutang')
         // $month = 'AND DATE(pay_kurirs.created_at) = DATE(NOW())';
     }
 
+    $databox = '';
+    if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
+        // echo $_POST['search']['value'];
+        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") AND ';
+    }
+
     $DataQuery = " SELECT transaction.* , (transaction.grandTotal - (transaction_details.product_cost * transaction_details.product_qty)) / transaction.grandTotal as MP, users.name as AdminName FROM transaction
     LEFT JOIN transaction_details on transaction_details.id_trx = transaction.transactionID
-    LEFT JOIN users on users.id = transaction.created_by ";
+    LEFT JOIN users on users.id = transaction.created_by WHERE ";
 
-    $price = 'SELECT TotalCostPrice as costprice, TotalSellingPrice as sellingprice, grandTotal as GrandTotal from transaction';
+    $price = 'SELECT SUM(transaction.grandTotal) as TotalSelling from transaction WHERE transaction.statusPaid = 0 ';
 
     //print_r($request);
     $colom = array(
@@ -197,24 +212,23 @@ if($_GET['type'] == 'piutang')
     );
 
 
+    $DataQuery .= $databox;
     if( $search != 'no' ) { //age
         $rangeArray = explode("_",$daterange); 
 
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
         $status_paid = 'AND transaction.statusPaid = '.$statuspaid;
-        $DataQuery .=" WHERE transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
+        $DataQuery .="  transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
         
 
-        $price .=" WHERE transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $status_paid;
+        $price .="  AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $status_paid;
         $submitprice = $config->runQuery($price);
         $submitprice->execute();
 
         $price = $submitprice->fetch(PDO::FETCH_LAZY);
 
-        $costprice = $price['costprice'];
-        $sellingprice = $price['sellingprice'];
-        $GrandTotal = $price['GrandTotal'];
+        $GrandTotalPayment = $price['TotalSelling'];
 
         $stmt = $config->runQuery($DataQuery);
         $stmt->execute();
@@ -227,18 +241,16 @@ if($_GET['type'] == 'piutang')
 
     } else {
         $status_paid = 'AND transaction.statusPaid = 0';
-        $price .=' WHERE MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
+        $price .=' AND MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
         AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE())';
         $submitprice = $config->runQuery($price);
         $submitprice->execute();
 
         $price = $submitprice->fetch(PDO::FETCH_LAZY);
         
-        $costprice = $price['costprice'];
-        $sellingprice = $price['sellingprice'];
-        $GrandTotal = $price['GrandTotal'];
+        $GrandTotalPayment = $price['TotalSelling'];
 
-        $DataQuery.=" WHERE MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
+        $DataQuery.=" MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
         AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE()) GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
         $stmt = $config->runQuery($DataQuery);
         $stmt->execute();
@@ -252,7 +264,7 @@ if($_GET['type'] == 'piutang')
     }
     
     
-   //var_dump($stmt);
+   // var_dump($price);
     $data = [];
     // 9 1 11 4 10 12 7frecordsTotal
     if($totalData > 0 ) {
@@ -285,16 +297,13 @@ if($_GET['type'] == 'piutang')
         }
     }
     
-    $selisihPembayaran = 0;
-    if($GrandTotal > 0) $selisihPembayaran = ($GrandTotal - $costprice) / $GrandTotal;
+    
     $json_data = array(
         'draw'              => intval($request['draw']),
         'recordsTotal'      => intval($totalData),
         'recordsFiltered'   => intval($totalFilter),
         'data'              => $data,
-        'totalData'         => $config->formatPrice($costprice),
-        'totalKurir'        => $config->formatPrice($sellingprice),
-        'subtotal'          => $selisihPembayaran
+        'subtotal'          => $config->formatPrice( $GrandTotalPayment)
     );
     echo json_encode($json_data);
 }
@@ -320,13 +329,18 @@ if($_GET['type'] == 'bonus')
         // $month = 'AND DATE(pay_kurirs.created_at) = DATE(NOW())';
     }
 
+    $databox = '';
+    if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
+        // echo $_POST['search']['value'];
+        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") AND ';
+    }
     
 
-    $DataQuery = " SELECT transaction.* , (transaction.grandTotal - (transaction_details.product_cost * transaction_details.product_qty)) / transaction.grandTotal as MP, users.name as AdminName FROM transaction
-    LEFT JOIN transaction_details on transaction_details.id_trx = transaction.transactionID
-    LEFT JOIN users on users.id = transaction.created_by ";
+    $DataQuery = " SELECT transaction.* , (transaction.grandTotal - transaction.TotalCostPrice) / transaction.grandTotal as MP, users.name as AdminName FROM transaction 
+        LEFT JOIN transaction_details on transaction_details.id_trx = transaction.transactionID 
+        LEFT JOIN users on users.id = transaction.created_by WHERE transaction.statusOrder != 6 AND ";
 
-    $price = 'SELECT TotalCostPrice as costprice, TotalSellingPrice as sellingprice, grandTotal as GrandTotal from transaction';
+    $price = 'SELECT TotalCostPrice as costprice, TotalSellingPrice as sellingprice, grandTotal as GrandTotal from transaction WHERE transaction.statusOrder != 6 AND transaction.statusPaid = 1 ';
 
     //print_r($request);
     $colom = array(
@@ -351,10 +365,10 @@ if($_GET['type'] == 'bonus')
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
 
-        $DataQuery .=" WHERE transaction.statusPaid = 1 AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
+        $DataQuery .=" transaction.statusPaid = 1 AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
         
 
-        $price .=" WHERE transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $status_paid;
+        $price .=" AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $status_paid;
         $submitprice = $config->runQuery($price);
         $submitprice->execute();
 
@@ -375,7 +389,7 @@ if($_GET['type'] == 'bonus')
 
     } else {
         $status_paid = 'AND transaction.created_by = 0';
-        $price .=' WHERE MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
+        $price .=' AND MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
         AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE())';
         $submitprice = $config->runQuery($price);
         $submitprice->execute();
@@ -386,7 +400,7 @@ if($_GET['type'] == 'bonus')
         $sellingprice = $price['sellingprice'];
         $GrandTotal = $price['GrandTotal'];
 
-        $DataQuery.=" WHERE transaction.statusPaid = 1 AND MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
+        $DataQuery.=" transaction.statusPaid = 1 AND MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
         AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE()) GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
         $stmt = $config->runQuery($DataQuery);
         $stmt->execute();
@@ -401,7 +415,7 @@ if($_GET['type'] == 'bonus')
     
     
 //    var_dump($status_paid);
-//    var_dump($stmt);
+   // var_dump($stmt);
     $data = [];
     // 9 1 11 4 10 12 7frecordsTotal
     if($totalData > 0 ) {

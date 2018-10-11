@@ -1,3 +1,19 @@
+function cancelOrder(trx) {
+    if (!confirm('Are you sure want Cancel?')) {
+            return false;
+    } else {
+        $.ajax({
+            url: '../php/ajax/order.php?type=cancelOrder',
+            type: 'post',
+            data: { 'transactionID': trx },
+
+            success: function(msg) {
+                alert(msg);
+                location.reload();
+            }
+        });
+    }
+}
 function timeslotcharge(trx) {
     var data = $('[name="time_slot"] option:selected').val();
 
@@ -280,7 +296,7 @@ $(window).load(function() {
     $('#SmartWizard').hide().fadeIn(1000);
 });
 
-function getNewOrder(is_date_search, date_range, corporate, admin) {
+function getNewOrder(is_date_search, date_range) {
 
     var tablePaymentKurir = $('#tableNewOrder').DataTable({
         "scrollY": "300px",
@@ -302,9 +318,7 @@ function getNewOrder(is_date_search, date_range, corporate, admin) {
             type: "post", // method  , by default get
             data: {
                 'is_date_search': is_date_search,
-                'date_range': date_range,
-                'corporate': corporate,
-                'admin': admin
+                'date_range': date_range
             },
             error: function() { // error handling
                 $(".employee-grid-error").html("");
@@ -314,9 +328,11 @@ function getNewOrder(is_date_search, date_range, corporate, admin) {
             }
         },
         'rowCallback': function(row, data, index) {
-            if (data[11].toUpperCase() != '') {
+            if (data[12].toUpperCase() != '') {
                 $(row).css({ 'background-color': '#9A0909', 'color': '#fff' });
             }
+            console.log(data);
+
         },
         drawCallback: function(settings) {
             var data = this.api().ajax.json();
@@ -336,13 +352,14 @@ function getNewOrder(is_date_search, date_range, corporate, admin) {
             { "data": "7", "orderable": true },
             { "data": "8", "orderable": true },
             { "data": "9", "orderable": true },
-            { "data": "10", "orderable": true }
+            { "data": "10", "orderable": true },
+            { "data": "11", "orderable": true }
         ],
 
     });
 }
 
-function getOnProccess(is_date_search, date_range, corporate, admin) {
+function getOnProccess(is_date_search, date_range) {
 
     var tablePaymentKurir = $('#tableOnProccess').DataTable({
         "scrollY": "300px",
@@ -364,9 +381,7 @@ function getOnProccess(is_date_search, date_range, corporate, admin) {
             type: "post", // method  , by default get
             data: {
                 'is_date_search': is_date_search,
-                'date_range': date_range,
-                'corporate': corporate,
-                'admin': admin
+                'date_range': date_range
             },
             error: function() { // error handling
                 $(".employee-grid-error").html("");
@@ -376,9 +391,10 @@ function getOnProccess(is_date_search, date_range, corporate, admin) {
             }
         },
         'rowCallback': function(row, data, index) {
-            if (data[11].toUpperCase() != '') {
+            if (data[12].toUpperCase() != '') {
                 $(row).css({ 'background-color': '#9A0909', 'color': '#fff' });
             }
+            console.log(data);
         },
         drawCallback: function(settings) {
             var data = this.api().ajax.json();
@@ -405,7 +421,7 @@ function getOnProccess(is_date_search, date_range, corporate, admin) {
     });
 }
 
-function getOnDelivery(is_date_search, date_range, corporate, admin) {
+function getOnDelivery(is_date_search, date_range) {
 
     var tablePaymentKurir = $('#tableOnDelivery').DataTable({
         "scrollY": "300px",
@@ -427,9 +443,7 @@ function getOnDelivery(is_date_search, date_range, corporate, admin) {
             type: "post", // method  , by default get
             data: {
                 'is_date_search': is_date_search,
-                'date_range': date_range,
-                'corporate': corporate,
-                'admin': admin
+                'date_range': date_range
             },
             error: function() { // error handling
                 $(".employee-grid-error").html("");
@@ -439,9 +453,10 @@ function getOnDelivery(is_date_search, date_range, corporate, admin) {
             }
         },
         'rowCallback': function(row, data, index) {
-            if (data[11].toUpperCase() != '') {
+            if (data[12].toUpperCase() != '') {
                 $(row).css({ 'background-color': '#9A0909', 'color': '#fff' });
             }
+            console.log(data);
         },
         drawCallback: function(settings) {
             var data = this.api().ajax.json();
@@ -467,11 +482,131 @@ function getOnDelivery(is_date_search, date_range, corporate, admin) {
 
     });
 }
+function getHistory(is_date_search, date_range) {
+
+    var tablePaymentKurir = $('#tableHistory').DataTable({
+        "scrollY": "300px",
+        "scrollX": true,
+        "scrollCollapse": true,
+        "paging": false,
+        "columnDefs": [{ "width": 200, "targets": 0 }],
+        "fixedColumns": true,
+        "processing": true,
+        "serverSide": true,
+        "searching": true,
+        "pagging": true,
+        'language': {
+            "loadingRecords": "&nbsp;",
+            "processing": ""
+        },
+        "ajax": {
+            url: "../php/ajax/order.php?type=tableHistory", // json datasource
+            type: "post", // method  , by default get
+            data: {
+                'is_date_search': is_date_search,
+                'date_range': date_range
+            },
+            error: function() { // error handling
+                $(".employee-grid-error").html("");
+                $("#tableHistory").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                $("#employee-grid_processing").css("display", "none");
+
+            }
+        },
+        'rowCallback': function(row, data, index) {
+            if (data[10].toUpperCase() != '') {
+                $(row).css({ 'background-color': '#9A0909', 'color': '#fff' });
+            }
+            console.log(data);
+        },
+        drawCallback: function(settings) {
+            var data = this.api().ajax.json();
+            // $('#totalPayment').html(data['totalData']);
+            // $('#totalPerKurir').html(data['totalKurir']);
+            // $('#selisih').html(data['subtotal']);
+            // console.log(data);
+        },
+        "columns": [
+            { "data": "0", "orderable": true },
+            { "data": "1", "orderable": true },
+            { "data": "2", "orderable": true },
+            { "data": "3", "orderable": true },
+            { "data": "4", "orderable": true },
+            { "data": "5", "orderable": true },
+            { "data": "6", "orderable": true },
+            { "data": "7", "orderable": true },
+            { "data": "8", "orderable": true },
+            { "data": "9", "orderable": true }
+        ],
+
+    });
+}
+function getCancel(is_date_search, date_range) {
+
+    var tablePaymentKurir = $('#tableCancelOrder').DataTable({
+        "scrollY": "300px",
+        "scrollX": true,
+        "scrollCollapse": true,
+        "paging": false,
+        "columnDefs": [{ "width": 200, "targets": 0 }],
+        "fixedColumns": true,
+        "processing": true,
+        "serverSide": true,
+        "searching": true,
+        "pagging": true,
+        'language': {
+            "loadingRecords": "&nbsp;",
+            "processing": ""
+        },
+        "ajax": {
+            url: "../php/ajax/order.php?type=tableCancelOrder", // json datasource
+            type: "post", // method  , by default get
+            data: {
+                'is_date_search': is_date_search,
+                'date_range': date_range
+            },
+            error: function() { // error handling
+                $(".employee-grid-error").html("");
+                $("#tableCancelOrder").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                $("#employee-grid_processing").css("display", "none");
+
+            }
+        },
+        'rowCallback': function(row, data, index) {
+            if (data[10].toUpperCase() != '') {
+                $(row).css({ 'background-color': '#9A0909', 'color': '#fff' });
+            }
+            console.log(data);
+        },
+        drawCallback: function(settings) {
+            var data = this.api().ajax.json();
+            // $('#totalPayment').html(data['totalData']);
+            // $('#totalPerKurir').html(data['totalKurir']);
+            // $('#selisih').html(data['subtotal']);
+            // console.log(data);
+        },
+        "columns": [
+            { "data": "0", "orderable": true },
+            { "data": "1", "orderable": true },
+            { "data": "2", "orderable": true },
+            { "data": "3", "orderable": true },
+            { "data": "4", "orderable": true },
+            { "data": "5", "orderable": true },
+            { "data": "6", "orderable": true },
+            { "data": "7", "orderable": true },
+            { "data": "8", "orderable": true },
+            { "data": "9", "orderable": true }
+        ],
+
+    });
+}
 $(document).ready(function() {
     // $('#delivery_charges').select2();
     getNewOrder("no");
     getOnProccess("no");
     getOnDelivery("no");
+    getHistory("no");
+    getCancel("no");
 
     $('#ListAdminNewOrder').select2({ width: '100%', theme: "bootstrap4" });
     $('#ListCorporate').select2({ width: '100%', theme: "bootstrap4" });
@@ -480,6 +615,22 @@ $(document).ready(function() {
     $('#ListSelectedFlorist').select2({ width: '100%', theme: "bootstrap4" });
     $('#ListSelectedKurir').select2({ width: '100%', theme: "bootstrap4" });
 
+    $('#CancelOrder').on('submit', function(e) {
+        e.preventDefault();
+
+        var range = $('#daterangeneworder').val();
+
+        $('#tableCancelOrder').DataTable().destroy();
+        getCancel('yes', range);
+    });
+    $('#History').on('submit', function(e) {
+        e.preventDefault();
+
+        var range = $('#daterangeneworder').val();
+
+        $('#tableHistory').DataTable().destroy();
+        getHistory('yes', range);
+    });
     $('#NewOrder').on('submit', function(e) {
         e.preventDefault();
 

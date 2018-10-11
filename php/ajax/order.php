@@ -22,33 +22,36 @@ if($_GET['type'] == 'tableNewOrder'){
     
     if(isset($_POST['date_range'])) {
         $daterange = $_POST['date_range'];
-        $corporate = $_POST['corporate'];
-        $admin = $_POST['admin'];
+    }
+
+    $databox = '';
+    if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
+        // echo $_POST['search']['value'];
+        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") AND ';
     }
 
     $Query = '
     SELECT 
-    (select GROUP_CONCAT(transaction_details.product_name SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as product, 
-    (select GROUP_CONCAT(transaction_details.product_price SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as price, 
-    (select GROUP_CONCAT(transaction_details.product_cost SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as cost, 
-    (select GROUP_CONCAT(transaction_details.product_qty SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as quantity, 
-    transaction.*, transaction_details.*, villages.name as kelurahan, users.name as admin
-    FROM transaction 
-    LEFT JOIN transaction_details ON transaction_details.id_trx = transaction.transactionID 
-    LEFT JOIN villages ON villages.id = transaction.kelurahan_id 
-    LEFT JOIN users ON users.id = transaction.created_by WHERE ';
+        (select GROUP_CONCAT(transaction_details.product_name SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as product, 
+        (select GROUP_CONCAT(transaction_details.product_price SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as price, 
+        (select GROUP_CONCAT(transaction_details.product_cost SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as cost, 
+        (select GROUP_CONCAT(transaction_details.product_qty SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as quantity, 
+        transaction.*, transaction_details.*, villages.name as kelurahan, users.name as admin
+        FROM transaction 
+        LEFT JOIN transaction_details ON transaction_details.id_trx = transaction.transactionID 
+        LEFT JOIN villages ON villages.id = transaction.kelurahan_id 
+        LEFT JOIN users ON users.id = transaction.created_by WHERE ';
 
-    if($search == 'yes') { ECHO $admin;
+    $Query .= $databox;
+    if($search == 'yes') { 
         $rangeArray = explode("_",$daterange); 
 
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
 
         $daterangequery = "transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
-        $corporatequery = " AND transaction.CustomerID = '".$corporate."'";
-        $adminquery = " AND transaction.created_by = '".$admin."'";
 
-        $Query .= $daterangequery.$corporatequery.$adminquery." AND transaction.statusOrder = '0' GROUP BY transaction.delivery_date DESC";
+        $Query .= $daterangequery." AND transaction.statusOrder = '0' GROUP BY transaction.delivery_date DESC";
 
         $stmt2 = $config->runQuery($Query);
         $stmt2->execute();
@@ -87,7 +90,8 @@ if($_GET['type'] == 'tableNewOrder'){
         8   => 'CreatedOrder',
         9   => 'CreatedBy',
         10   => 'FloristName',
-        11   => 'Color',
+        11   => 'Action',
+        12   => 'Color',
     );
 
     $data = [];
@@ -156,11 +160,18 @@ if($_GET['type'] == 'tableNewOrder'){
             if(!empty($row['grandTotal'])){
                 $grandTotal = $row['grandTotal'];
             }
+
+            $cancelorder = '<a href="javascript:;" onclick="cancelOrder(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-info">Cancel</span></a>';
             $Kirim = Date('d-M-Y', strtotime($row['delivery_date']));
             $createorder = Date('d F Y', strtotime($row['created_date']));
             $statuspaid = $row['statusPaid'] == 1 ? 'success' : 'warning';
-            $color = '';
-            if(Date('Y-m-d', strtotime($row['delivery_date'])) == $config->getdate('Y-m-d')) $color = 'yess';
+            $delivarydatess = strtotime(Date('Y-m-d', strtotime($row['delivery_date'])));
+            $datenow = strtotime($config->getdate('Y-m-d'));
+            if($delivarydatess <= $datenow) {
+                $color = $delivarydatess.' = '.$datenow;
+            } else {
+                $color =   '';
+            }
 
             $subdata = array();
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
@@ -176,6 +187,7 @@ if($_GET['type'] == 'tableNewOrder'){
             $subdata[]  = $createorder;
             $subdata[]  = $row['admin'];
             $subdata[]  = $florist;
+            $subdata[]  = $cancelorder;
             $subdata[]  = $color;
             array_push($tampung, $subdata);
          }
@@ -199,8 +211,11 @@ if($_GET['type'] == 'tableOnProccess'){
     
     if(isset($_POST['date_range'])) {
         $daterange = $_POST['date_range'];
-        $corporate = $_POST['corporate'];
-        $admin = $_POST['admin'];
+    }
+    $databox = '';
+    if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
+        // echo $_POST['search']['value'];
+        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") AND ';
     }
 
     $Query = '
@@ -215,17 +230,16 @@ if($_GET['type'] == 'tableOnProccess'){
     LEFT JOIN villages ON villages.id = transaction.kelurahan_id 
     LEFT JOIN users ON users.id = transaction.created_by WHERE ';
 
-    if($search == 'yes') { ECHO $admin;
+    $Query .= $databox;
+    if($search == 'yes') {
         $rangeArray = explode("_",$daterange); 
 
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
 
         $daterangequery = "transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
-        $corporatequery = " AND transaction.CustomerID = '".$corporate."'";
-        $adminquery = " AND transaction.created_by = '".$admin."'";
 
-        $Query .= $daterangequery.$corporatequery.$adminquery." AND transaction.statusOrder = '1' GROUP BY transaction.delivery_date DESC";
+        $Query .= $daterangequery." AND transaction.statusOrder = '1' GROUP BY transaction.transactionID DESC";
 
         $stmt2 = $config->runQuery($Query);
         $stmt2->execute();
@@ -238,7 +252,7 @@ if($_GET['type'] == 'tableOnProccess'){
         $totalFilter = $totalData;
 
     } else {
-        $Query .=" transaction.statusOrder = '1' GROUP BY transaction.delivery_date DESC";
+        $Query .=" transaction.statusOrder = '1' GROUP BY transaction.transactionID DESC";
         
         $stmt2 = $config->runQuery($Query);
         $stmt2->execute();
@@ -266,6 +280,8 @@ if($_GET['type'] == 'tableOnProccess'){
         10   => 'FloristName',
         10   => 'KurirName',
         11   => 'Color',
+        12   => 'Color',
+        13   => 'Color',
     );
 
     $data = [];
@@ -337,7 +353,6 @@ if($_GET['type'] == 'tableOnProccess'){
                 $kurir = '<a href="javascript:;" onclick="pilihKurir(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'. $data['nama_kurir'] .'</span></a>';
             }
 
-            $btnchangestatus = '<button class="btn btn-sm btn-primary" onclick="chagestatusordermodal(\''. $row['transactionID'] .'\')" style="font-size: 12px;">'. $arrstatusorder[$row['statusOrder']] .'</button>';
             $grandTotal = '0';
             if(!empty($row['grandTotal'])){
                 $grandTotal = $row['grandTotal'];
@@ -345,10 +360,18 @@ if($_GET['type'] == 'tableOnProccess'){
             $Kirim = Date('d-M-Y', strtotime($row['delivery_date']));
             $createorder = Date('d F Y', strtotime($row['created_date']));
             $statuspaid = $row['statusPaid'] == 1 ? 'success' : 'warning';
-            $color = '';
-            if(Date('Y-m-d', strtotime($row['delivery_date'])) == $config->getdate('Y-m-d')) $color = 'yess';
-
+            
+            $delivarydatess = strtotime(Date('Y-m-d', strtotime($row['delivery_date'])));
+            $datenow = strtotime($config->getdate('Y-m-d'));
+            if($delivarydatess <= $datenow) {
+                $color = $delivarydatess.' = '.$datenow;
+            } else {
+                $color =   '';
+            }
+            // var_dump(strtotime(Date('Y-m-d', strtotime($row['delivery_date']))));
+            // var_dump(strtotime($config->getdate('Y-m-d')));
             $subdata = array();
+
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
             $subdata[]  = $dataproduct;
             $subdata[]  = $row['CustomerName'] .'<small class="badge badge-sm badge-info">'.$type['nama'].'</small>';
@@ -386,8 +409,12 @@ if($_GET['type'] == 'tableOnDelivery'){
     
     if(isset($_POST['date_range'])) {
         $daterange = $_POST['date_range'];
-        $corporate = $_POST['corporate'];
-        $admin = $_POST['admin'];
+    }
+
+    $databox = '';
+    if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
+        // echo $_POST['search']['value'];
+        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") AND ';
     }
 
     $Query = '
@@ -402,7 +429,8 @@ if($_GET['type'] == 'tableOnDelivery'){
     LEFT JOIN villages ON villages.id = transaction.kelurahan_id 
     LEFT JOIN users ON users.id = transaction.created_by WHERE ';
 
-    if($search == 'yes') { ECHO $admin;
+    $Query .= $databox;
+    if($search == 'yes') {
         $rangeArray = explode("_",$daterange); 
 
         $startDate = $rangeArray[0]. ' 00:00:00';
@@ -412,7 +440,7 @@ if($_GET['type'] == 'tableOnDelivery'){
         $corporatequery = " AND transaction.CustomerID = '".$corporate."'";
         $adminquery = " AND transaction.created_by = '".$admin."'";
 
-        $Query .= $daterangequery.$corporatequery.$adminquery." AND transaction.statusOrder = '2' GROUP BY transaction.delivery_date DESC";
+        $Query .= $daterangequery." AND transaction.statusOrder = '2' GROUP BY transaction.delivery_date DESC";
 
         $stmt2 = $config->runQuery($Query);
         $stmt2->execute();
@@ -532,8 +560,14 @@ if($_GET['type'] == 'tableOnDelivery'){
             $Kirim = Date('d-M-Y', strtotime($row['delivery_date']));
             $createorder = Date('d F Y', strtotime($row['created_date']));
             $statuspaid = $row['statusPaid'] == 1 ? 'success' : 'warning';
-            $color = '';
-            if(Date('Y-m-d', strtotime($row['delivery_date'])) == $config->getdate('Y-m-d')) $color = 'yess';
+            
+            $delivarydatess = strtotime(Date('Y-m-d', strtotime($row['delivery_date'])));
+            $datenow = strtotime($config->getdate('Y-m-d'));
+            if($delivarydatess <= $datenow) {
+                $color = $delivarydatess.' = '.$datenow;
+            } else {
+                $color =   '';
+            }
 
             $subdata = array();
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
@@ -551,6 +585,405 @@ if($_GET['type'] == 'tableOnDelivery'){
             $subdata[]  = $florist;
             $subdata[]  = $kurir;
             $subdata[]  = $color;
+            array_push($tampung, $subdata);
+         }
+    }
+
+    $json_data = array(
+        'draw'              => intval($request['draw']),
+        'recordsTotal'      => intval($totalData),
+        'recordsFiltered'   => intval($totalFilter),
+        'data'              => $tampung
+    );
+    echo json_encode($json_data);
+}
+if($_GET['type'] == 'tableHistory'){
+    $request = $_REQUEST;
+    $search = $_POST['is_date_search'];
+
+    $daterange ='';
+    $corporate ='';
+    $admin = '';
+    
+    if(isset($_POST['date_range'])) {
+        $daterange = $_POST['date_range'];
+    }
+
+    $databox = '';
+    if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
+        // echo $_POST['search']['value'];
+        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") AND ';
+    }
+
+    $Query = '
+    SELECT 
+    (select GROUP_CONCAT(transaction_details.product_name SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as product, 
+    (select GROUP_CONCAT(transaction_details.product_price SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as price, 
+    (select GROUP_CONCAT(transaction_details.product_cost SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as cost, 
+    (select GROUP_CONCAT(transaction_details.product_qty SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as quantity, 
+    transaction.*, transaction_details.*, villages.name as kelurahan, users.name as admin, kurirs.nama_kurir as NamaKurir
+    FROM transaction 
+    LEFT JOIN transaction_details ON transaction_details.id_trx = transaction.transactionID 
+    LEFT JOIN villages ON villages.id = transaction.kelurahan_id 
+    LEFT JOIN users ON users.id = transaction.created_by 
+    LEFT JOIN kurirs ON kurirs.id = transaction.id_kurir
+    WHERE ';
+
+    $Query .= $databox;
+    if($search == 'yes') {
+        $rangeArray = explode("_",$daterange); 
+
+        $startDate = $rangeArray[0]. ' 00:00:00';
+        $endsDate = $rangeArray[1]. ' 23:59:59';
+
+        $daterangequery = "transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
+        $corporatequery = " AND transaction.CustomerID = '".$corporate."'";
+        $adminquery = " AND transaction.created_by = '".$admin."'";
+
+        $Query .= $daterangequery." AND transaction.statusOrder IN (3, 4, 5) GROUP BY transaction.delivery_date DESC";
+
+        $stmt2 = $config->runQuery($Query);
+        $stmt2->execute();
+        $totalData = $stmt2->rowCount();
+        $totalFilter = $totalData;
+
+        $Data = $config->runQuery($Query);
+        $Data->execute();
+        $totalData = $Data->rowCount();
+        $totalFilter = $totalData;
+
+    } else {
+        $Query .=" transaction.statusOrder IN (3, 4, 5) GROUP BY transaction.delivery_date DESC";
+        
+        $stmt2 = $config->runQuery($Query);
+        $stmt2->execute();
+        $totalData = $stmt2->rowCount();
+        $totalFilter = $totalData;
+
+        $Data = $config->runQuery($Query);
+        $Data->execute();
+        $totalData = $Data->rowCount();
+        $totalFilter = $totalData;
+    }
+    // var_dump($Data);
+
+    $colom = array(
+        0   => 'transactionID',
+        1   => 'ProductName',
+        2   => 'SenderName',
+        3   => 'Price',
+        4   => 'Quantity',
+        5   => 'GrandTotal',
+        6   => 'DeliveryDate',
+        7   => 'StatusPaid',
+        8   => 'CreatedOrder',
+        9   => 'CreatedBy',
+        10   => 'CreatedBy',
+        11   => 'Color',
+    );
+
+    $data = [];
+    $arrstatusorder = array(
+        0 => 'New order',
+        1 => 'On Production',
+        2 => 'On Delivery',
+        3 => 'Success',
+        4 => 'Return',
+        5 => 'Complain',
+    );
+    $arrstatuspaid = array(
+        0 => 'UNPAID',
+        1 => 'PAID'
+    );
+    $arrtime = [
+        0 => '9am - 1pm',
+        1 => '2pm - 5pm',
+        2 => '6pm - 8pm',
+        3 => '9pm - 0am',
+        4 => '1am - 5am',
+        5 => '6am - 8am'
+    ];
+
+    $tampung = array();
+    // print_r($Data);
+    if($totalData > 0 ) {
+        while ($row = $Data->fetch(PDO::FETCH_LAZY)){
+
+            $product = explode(',', $row['product']);
+            $price = explode(',', $row['price']);
+            $quantity = explode(',', $row['quantity']);
+            // print_r($product);
+            // echo $row['product'];
+            $dataproduct = [];
+            foreach($product as $key => $val) {
+                $dataproduct[] = '<span class="badge badge-info">'.$val.'</span></br>';
+            }
+            $dataprice = [];
+            foreach($price as $key => $val) {
+                $dataprice[] = '<span class="badge badge-info">'.$config->formatprice($val).'</span></br>';
+            }
+            $dataquantity = [];
+            foreach($quantity as $key => $val) {
+                $dataquantity[] = '<span class="badge badge-info">'.$val.'</span></br>';
+            }
+            
+            $type = [ 'nama' => 'ORGANIC' ]; 
+            if($row['type'] == 'BD_CP'){
+                $type = $config->getData('*', 'corporates', "CorporateUniqueID = '". $row['CustomerID'] ."'");
+            }
+            if(empty($row['id_florist'])){
+                $florist = '<button class="btn btn-sm btn-primary" onclick="selectFlorist(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select florist</button>';
+            }else{
+                $data = $config->getData('ID, FloristName', 'florist', "ID = '". $row['id_florist'] ."'");
+                $florist = '<a href="javascript:;" onclick="selectFlorist(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'. $data['FloristName'] .'</span></a>';
+            }
+            if(empty($row['id_kurir'])){
+                $kurir = '<button class="btn btn-sm btn-primary" onclick="pilihKurir(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select kurir</button>';
+            }else{
+                $data = $config->getData('id, nama_kurir', 'kurirs', "id = '". $row['id_kurir'] ."'");
+                $kurir = '<a href="javascript:;" onclick="pilihKurir(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'. $data['nama_kurir'] .'</span></a>';
+            }
+
+            if(empty($row['id_kurir'])){
+                $kurir = '<button class="btn btn-sm btn-primary" onclick="pilihKurir(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select kurir</button>';
+            }else{
+                $datakurir = $config->getData('id, nama_kurir', 'kurirs', "id = '". $row['id_kurir'] ."'");
+                $kurir = '<a href="javascript:;" onclick="pilihKurir(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'.$row['NamaKurir'].'</span></a>';
+            }
+
+            $btnchangestatus = '<button class="btn btn-sm btn-primary" onclick="chagestatusordermodal(\''. $row['transactionID'] .'\')" style="font-size: 12px;">'. $arrstatusorder[$row['statusOrder']] .'</button>';
+            $grandTotal = '0';
+            if(!empty($row['grandTotal'])){
+                $grandTotal = $row['grandTotal'];
+            }
+            $Kirim = Date('d-M-Y', strtotime($row['delivery_date']));
+            $createorder = Date('d F Y', strtotime($row['created_date']));
+            $statuspaid = $row['statusPaid'] == 1 ? 'PAID' : 'UNPAID';
+            
+            $delivarydatess = strtotime(Date('Y-m-d', strtotime($row['delivery_date'])));
+            $datenow = strtotime($config->getdate('Y-m-d'));
+            if($delivarydatess <= $datenow) {
+                $color = '';
+            } else {
+                $color =   '';
+            }
+
+            $subdata = array();
+
+            $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
+            $subdata[]  = $dataproduct;
+            $subdata[]  = Date('d-M-Y', strtotime($row['delivery_date']));
+            $subdata[]  = $row['kelurahan'];
+            $subdata[]  = $arrstatusorder[$row['statusOrder']];
+            $subdata[]  = $row['notes'] != '' ? $row['notes'] : '<span class="badge badge-sm badge-info">unset</span>';
+            $subdata[]  = $statuspaid;
+            $subdata[]  = Date('d-M-Y', strtotime($row['created_date']));;
+            $subdata[]  = $florist;
+            $subdata[]  = $row['NamaKurir'];
+            // $subdata[]  = $florist;
+            // $subdata[]  = $kurir;
+            $subdata[]  = $color;
+
+            array_push($tampung, $subdata);
+         }
+    }
+
+    $json_data = array(
+        'draw'              => intval($request['draw']),
+        'recordsTotal'      => intval($totalData),
+        'recordsFiltered'   => intval($totalFilter),
+        'data'              => $tampung
+    );
+    echo json_encode($json_data);
+}
+if($_GET['type'] == 'tableCancelOrder'){
+    $request = $_REQUEST;
+    $search = $_POST['is_date_search'];
+
+    $daterange ='';
+    $corporate ='';
+    $admin = '';
+    
+    if(isset($_POST['date_range'])) {
+        $daterange = $_POST['date_range'];
+    }
+
+    $databox = '';
+    if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
+        // echo $_POST['search']['value'];
+        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") AND ';
+    }
+
+    $Query = '
+    SELECT 
+    (select GROUP_CONCAT(transaction_details.product_name SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as product, 
+    (select GROUP_CONCAT(transaction_details.product_price SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as price, 
+    (select GROUP_CONCAT(transaction_details.product_cost SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as cost, 
+    (select GROUP_CONCAT(transaction_details.product_qty SEPARATOR ",") from transaction_details where transaction_details.id_trx = transaction.transactionID) as quantity, 
+    transaction.*, transaction_details.*, villages.name as kelurahan, users.name as admin, kurirs.nama_kurir as NamaKurir
+    FROM transaction 
+    LEFT JOIN transaction_details ON transaction_details.id_trx = transaction.transactionID 
+    LEFT JOIN villages ON villages.id = transaction.kelurahan_id 
+    LEFT JOIN users ON users.id = transaction.created_by 
+    LEFT JOIN kurirs ON kurirs.id = transaction.id_kurir
+    WHERE ';
+
+    $Query .= $databox;
+    if($search == 'yes') {
+        $rangeArray = explode("_",$daterange); 
+
+        $startDate = $rangeArray[0]. ' 00:00:00';
+        $endsDate = $rangeArray[1]. ' 23:59:59';
+
+        $daterangequery = "transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
+        $corporatequery = " AND transaction.CustomerID = '".$corporate."'";
+        $adminquery = " AND transaction.created_by = '".$admin."'";
+
+        $Query .= $daterangequery." AND transaction.statusOrder = 6 GROUP BY transaction.delivery_date DESC";
+
+        $stmt2 = $config->runQuery($Query);
+        $stmt2->execute();
+        $totalData = $stmt2->rowCount();
+        $totalFilter = $totalData;
+
+        $Data = $config->runQuery($Query);
+        $Data->execute();
+        $totalData = $Data->rowCount();
+        $totalFilter = $totalData;
+
+    } else {
+        $Query .=" transaction.statusOrder = 6 GROUP BY transaction.delivery_date DESC";
+        
+        $stmt2 = $config->runQuery($Query);
+        $stmt2->execute();
+        $totalData = $stmt2->rowCount();
+        $totalFilter = $totalData;
+
+        $Data = $config->runQuery($Query);
+        $Data->execute();
+        $totalData = $Data->rowCount();
+        $totalFilter = $totalData;
+    }
+    // var_dump($Data);
+
+    $colom = array(
+        0   => 'transactionID',
+        1   => 'ProductName',
+        2   => 'SenderName',
+        3   => 'Price',
+        4   => 'Quantity',
+        5   => 'GrandTotal',
+        6   => 'DeliveryDate',
+        7   => 'StatusPaid',
+        8   => 'CreatedOrder',
+        9   => 'CreatedBy',
+        10   => 'CreatedBy',
+        11   => 'Color',
+    );
+
+    $data = [];
+    $arrstatusorder = array(
+        0 => 'New order',
+        1 => 'On Production',
+        2 => 'On Delivery',
+        3 => 'Success',
+        4 => 'Return',
+        5 => 'Complain',
+        6 => 'Cancel'
+    );
+    $arrstatuspaid = array(
+        0 => 'UNPAID',
+        1 => 'PAID'
+    );
+    $arrtime = [
+        0 => '9am - 1pm',
+        1 => '2pm - 5pm',
+        2 => '6pm - 8pm',
+        3 => '9pm - 0am',
+        4 => '1am - 5am',
+        5 => '6am - 8am'
+    ];
+
+    $tampung = array();
+    // print_r($Data);
+    if($totalData > 0 ) {
+        while ($row = $Data->fetch(PDO::FETCH_LAZY)){
+
+            $product = explode(',', $row['product']);
+            $price = explode(',', $row['price']);
+            $quantity = explode(',', $row['quantity']);
+            // print_r($product);
+            // echo $row['product'];
+            $dataproduct = [];
+            foreach($product as $key => $val) {
+                $dataproduct[] = '<span class="badge badge-info">'.$val.'</span></br>';
+            }
+            $dataprice = [];
+            foreach($price as $key => $val) {
+                $dataprice[] = '<span class="badge badge-info">'.$config->formatprice($val).'</span></br>';
+            }
+            $dataquantity = [];
+            foreach($quantity as $key => $val) {
+                $dataquantity[] = '<span class="badge badge-info">'.$val.'</span></br>';
+            }
+            
+            $type = [ 'nama' => 'ORGANIC' ]; 
+            if($row['type'] == 'BD_CP'){
+                $type = $config->getData('*', 'corporates', "CorporateUniqueID = '". $row['CustomerID'] ."'");
+            }
+            if(empty($row['id_florist'])){
+                $florist = '<button class="btn btn-sm btn-primary" onclick="selectFlorist(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select florist</button>';
+            }else{
+                $data = $config->getData('ID, FloristName', 'florist', "ID = '". $row['id_florist'] ."'");
+                $florist = '<a href="javascript:;" onclick="selectFlorist(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'. $data['FloristName'] .'</span></a>';
+            }
+            if(empty($row['id_kurir'])){
+                $kurir = '<button class="btn btn-sm btn-primary" onclick="pilihKurir(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select kurir</button>';
+            }else{
+                $data = $config->getData('id, nama_kurir', 'kurirs', "id = '". $row['id_kurir'] ."'");
+                $kurir = '<a href="javascript:;" onclick="pilihKurir(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'. $data['nama_kurir'] .'</span></a>';
+            }
+
+            if(empty($row['id_kurir'])){
+                $kurir = '<button class="btn btn-sm btn-primary" onclick="pilihKurir(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select kurir</button>';
+            }else{
+                $datakurir = $config->getData('id, nama_kurir', 'kurirs', "id = '". $row['id_kurir'] ."'");
+                $kurir = '<a href="javascript:;" onclick="pilihKurir(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'.$row['NamaKurir'].'</span></a>';
+            }
+
+            $btnchangestatus = '<button class="btn btn-sm btn-primary" onclick="chagestatusordermodal(\''. $row['transactionID'] .'\')" style="font-size: 12px;">'. $arrstatusorder[$row['statusOrder']] .'</button>';
+            $grandTotal = '0';
+            if(!empty($row['grandTotal'])){
+                $grandTotal = $row['grandTotal'];
+            }
+            $Kirim = Date('d-M-Y', strtotime($row['delivery_date']));
+            $createorder = Date('d F Y', strtotime($row['created_date']));
+            $statuspaid = $row['statusPaid'] == 1 ? 'PAID' : 'UNPAID';
+            
+            $delivarydatess = strtotime(Date('Y-m-d', strtotime($row['delivery_date'])));
+            $datenow = strtotime($config->getdate('Y-m-d'));
+            if($delivarydatess <= $datenow) {
+                $color ='';
+            } else {
+                $color =   '';
+            }
+
+            $subdata = array();
+
+            $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
+            $subdata[]  = $dataproduct;
+            $subdata[]  = Date('d-M-Y', strtotime($row['delivery_date']));
+            $subdata[]  = $row['kelurahan'];
+            $subdata[]  = $arrstatusorder[$row['statusOrder']];
+            $subdata[]  = $row['notes'] != '' ? $row['notes'] : '<span class="badge badge-sm badge-info">unset</span>';
+            $subdata[]  = $statuspaid;
+            $subdata[]  = Date('d-M-Y', strtotime($row['created_date']));;
+            $subdata[]  = $florist;
+            $subdata[]  = $row['NamaKurir'];
+            // $subdata[]  = $florist;
+            // $subdata[]  = $kurir;
+            $subdata[]  = $color;
+
             array_push($tampung, $subdata);
          }
     }
@@ -1535,8 +1968,8 @@ if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
     ];
     
     $arrpaid = [
-        'UNPAID',
-        'PAID'
+        0 => 'UNPAID',
+        1 => 'PAID'
     ];
     
     $transactionID = $_POST['transactionID'];
@@ -1579,10 +2012,11 @@ if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
     $CustomerEmail = isset($data['CorporateEmail']) && $data['CorporateEmail'] == '' ? $data['OrganicEmail'] : $data['CorporateEmail'];
     $CustomerPhone = isset($data['CorporatePhone']) && $data['CorporatePhone'] == '' ? $data['OrganicPhone'] : $data['CorporatePhone'];
     
-    $arraypaid = 'unset';
-    if($data['statusPaid']) $arraypaid = $arrpaid[$data['statusPaid']];
+    $arraypaid = 'UNPAID';
+    if($data['statusPaid'] == 1) $arraypaid = 'PAID';
     $receivedEmail = $CustomerEmail;
     $receivedName = $CustomerName;
+    $receivedPhone = $CustomerPhone;
     $subject = 'Order Confirmation Bunga Davi-'.$data['transactionID'];
     $content = '
     <html>
@@ -1781,9 +2215,9 @@ if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
                                               <table align="center" width="642" cellspacing="5" cellpadding="0" border="0" class="w642">
                                                  <tbody>
                                                     <tr>
-                                                       <td align="center" width="200" class="w325"><span align="center" class="content-body">'. $CustomerName.'</span></td>
-                                                       <td align="center" width="200" class="w325"><span align="center" class="content-body">'. $CustomerEmail.'</span></td>
-                                                       <td align="center" width="200" class="w325"><span align="center" class="content-body">'.$CustomerPhone.'</span></td>
+                                                       <td align="center" width="200" class="w325"><span align="center" class="content-body">'. $receivedName.'</span></td>
+                                                       <td align="center" width="200" class="w325"><span align="center" class="content-body">'. $receivedEmail.'</span></td>
+                                                       <td align="center" width="200" class="w325"><span align="center" class="content-body">'.$receivedPhone.'</span></td>
                                                     </tr>
                                                  </tbody>
                                               </table>
@@ -1979,8 +2413,22 @@ if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
    
     $cc = 'fiki@bungadavi.co.id';
     $config = new Mail();
-    $email = $config->Mailler('ardinirianti@gmail.com', $receivedName, $cc, $subject, $content);
+    $email = $config->Mailler($receivedEmail, $receivedName, $cc, $subject, $content);
 
         die(json_encode(['response' => $email['response'], 'msg' => $email['msg']]));
         $logs = $config->saveLogs($a, $admin, 'f', 'send email!');
+}
+if($_GET['type'] == 'cancelOrder'){
+    $a = $_POST['transactionID'];
+
+    $update = $config->runQuery("UPDATE transaction SET statusOrder = 6 WHERE transactionID = '".$a."' ");
+    $update->execute();
+
+    if($update)
+    {
+        echo $config->actionMsg('u', 'transaction');
+        $logs = $config->saveLogs($a, $admin, 'u', 'cancel order');
+    }else{
+        echo 'Failed';
+    }
 }

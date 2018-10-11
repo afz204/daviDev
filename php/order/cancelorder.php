@@ -40,7 +40,7 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
         List Order
     </div>
     <div class="card-body">
-            <form id="History" class="form-inline" methods="post" data-parsley-validate="" style="    padding-left: 1.2222222%;">
+            <form id="CancelOrder" class="form-inline" methods="post" data-parsley-validate="" style="    padding-left: 1.2222222%;">
                 <div class="row">
                     <div class="form-group mx-sm-3">
                     <label for="dateneworder">Delivery Date</label>
@@ -55,8 +55,8 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                     </div>
                 </div>
             </form>
-        <div id="listOrder">
-            <table id="tableHistory" class="table table-hover<?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover">
+        <div id="TableCancelOrder">
+            <table id="tableCancelOrder" class="table table-hover<?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover">
                 <thead class="thead-light">
                 <tr style="text-transform: lowercase;">
                     <th scope="col">Invoice</th>
@@ -98,7 +98,7 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                             <?php } ?>
                         </select>
                     </div>
-					<input type="hidden" name="IDSelectedFlorist">
+                    <input type="hidden" name="IDSelectedFlorist">
                     <button class="btn btn-success btn-sm btn-block" type="submit">Pilih Florist</button>
                 </form>
             </div>
@@ -124,8 +124,8 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                             <?php } ?>
                         </select>
                     </div>
-					<input type="hidden" name="NomorTransaction">
-					<input type="hidden" name="TypeStatus" value="florist">
+                    <input type="hidden" name="NomorTransaction">
+                    <input type="hidden" name="TypeStatus" value="florist">
                     <button class="btn btn-success btn-sm btn-block" type="submit">Change Status</button>
                 </form>
             </div>
@@ -151,7 +151,7 @@ $listkurir = $config->Products('id, nama_kurir', 'kurirs');
                             <?php } ?>
                         </select>
                     </div>
-					<input type="hidden" name="TransactionNumberKurir">
+                    <input type="hidden" name="TransactionNumberKurir">
                     <button class="btn btn-success btn-sm btn-block" type="submit">Pilih Kurir</button>
                 </form>
             </div>
