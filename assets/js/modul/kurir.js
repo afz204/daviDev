@@ -32,6 +32,27 @@ $(document).ready(function() {
         })
 
     });
+    $('#udpatekurir').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: '../php/ajax/kurir.php?type=udpatekurir',
+            method: 'post',
+            data: {
+                'id': $('#idKurir').val(),
+                'nama_kurir': $('#nameKurir').val(),
+                'email': $('#emailKurir').val(),
+                'phone': $('#phoneKurir').val(),
+                'wa': $('#waKurir').val(),
+                'alamat': $('#alamatKurir').val()
+            },
+
+            success: function(msg) {
+
+                alert(msg);
+                window.history.back();
+            }
+        })
+    });
     $('#listDelivCharge').on('click', '.addDeliveryCharge', function() {
         listCharge.hide();
         $('#formDelivCharge').removeClass('hidden');

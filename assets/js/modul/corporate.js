@@ -254,7 +254,7 @@ $(document).ready(function() {
             data: {
                 'id': $('#kodePIC').val(),
                 'corporate_id': $('#kodePerusahaan').val(),
-                'type': $('#typePIC').val(),
+                'type': $('#typePIC option:selected').val(),
                 'name': $('#namaPIC').val(),
                 'InvoiceReferensi': $('#ReferensiInvoice').val(),
                 'email': $('#emailPIC').val(),

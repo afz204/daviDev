@@ -37,7 +37,9 @@
                     <td><?=$status?></td>
                     <td style="font-size: 12px; font-weight: 600;"><?=$rows['created_at']?></td>                    
                     <td>
-                        <button class="btn btn-sm btn-info">details</button>
+                    <a href="<?=KURIR?>?p=profilekurir&id=<?=$rows['id']?>" <?=$access['read']?>>
+                        <button class="btn btn-sm btn-primary" ><span class="fa fa-fw fa-eye"></span></button>
+                    </a>
                     </td>
                 </tr> 
             <?php } ?>

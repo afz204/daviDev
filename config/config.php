@@ -11,6 +11,7 @@ define('ORDER', URL.'order/');
 define('MANAGEMENT', URL.'management/');
 define('PAYMENT', URL.'payment/');
 define('BD', URL.'bd/');
+define('KURIR', URL.'kurir/');
 
 
 require 'api.php';

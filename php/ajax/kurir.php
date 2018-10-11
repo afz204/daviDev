@@ -26,12 +26,16 @@ if($_GET['type'] == 'newKurir'){
     $k  = $config->getDate('Y-m-d H:m:s');
     $l  = '1';
 
-    $sql = "INSERT INTO kurirs (nama_kurir, email, phone, wa, alamat, kel, kec, kota, province, status, created_at)
-    VALUES (:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k)";
+    $tmpemail = explode('@', $c);
+    $password = $config->newPassword($tmpemail[0].'123');
+
+    $sql = "INSERT INTO kurirs (nama_kurir, email, password, phone, wa, alamat, kel, kec, kota, province, status, created_at)
+    VALUES (:a, :b, :password, :c, :d, :e, :f, :g, :h, :i, :j, :k)";
     $stmt = $config->runQuery($sql);
     $stmt->execute(array(
         ':a'    => $b,
         ':b'    => $c,
+        ':password'    => $password,
         ':c'    => $d,
         ':d'    => $e,
         ':e'    => $j,
@@ -48,6 +52,27 @@ if($_GET['type'] == 'newKurir'){
         echo "Berhasil menambahkan Kurir baru!";
     }else{
         echo "Failed";
+    }
+}
+if($_GET['type'] == 'udpatekurir') {
+    $id = $_POST['id'];
+    $nama_kurir = $_POST['nama_kurir'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $wa = $_POST['wa'];
+    $alamat = $_POST['alamat'];
+
+    $tmpemail = explode('@', $email);
+    $password = $config->newPassword($tmpemail[0].'123');
+
+    $stmt = $config->runQuery("UPDATE kurirs SET nama_kurir = '".$nama_kurir."', email = '".$email."', phone = '".$phone."', wa = '".$wa."', alamat = '".$alamat."' WHERE id = '".$id."'");
+    $stmt->execute();
+
+    if($stmt) {
+        echo $config->actionMsg('u', 'kurirs');
+        $logs = $config->saveLogs($id, $admin, 'u', 'update kurirs');
+    } else {
+        echo 'Failed!';
     }
 }
 if($_GET['type'] == 'addCharge'){
