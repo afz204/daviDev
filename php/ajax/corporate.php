@@ -58,6 +58,29 @@ if($_GET['type'] == 'new'){
     }else { echo 'Error';}
 
 }
+if($_GET['type'] == 'updatepic') {
+    $id = $_POST['id'];
+    $corporate_id = $_POST['corporate_id'];
+    $type = $_POST['type'];
+    $name = $_POST['name'];
+    $InvoiceReferensi = $_POST['InvoiceReferensi'];
+    $email = $_POST['email'];
+    $nomor = $_POST['nomor'];
+    $alamat = $_POST['alamat'];
+    
+    $tmpemail = explode('@', $email);
+    $password = $config->newPassword($tmpemail[0]);
+
+    $stmt = $config->runQuery("UPDATE corporate_pics SET type = '".$type."', name = '".$name."', InvoiceReferensi = '".$InvoiceReferensi."', password = '".$password."', email = '".$email."', alamat = '".$alamat."' WHERE id = '".$id."' AND corporate_id = '".$corporate_id."' ");
+    $stmt->execute();
+
+    if($stmt) {
+        echo $config->actionMsg('u', 'corporate_pics');
+        $logs = $config->saveLogs($id, $admin, 'u', 'update PIC');
+    } else {
+        echo 'Failed';
+    }
+}
 
 if($_GET['type'] == 'savePIC'){
     $a = $_POST['kode_perusahaan'];
@@ -70,13 +93,19 @@ if($_GET['type'] == 'savePIC'){
     $h = $_POST['alamat'];
     $i = $_POST['typePIC'];
     $j = $_POST['emailPIC'];
+    $ReferensiInvoice = $_POST['ReferensiInvoice'];
 
-    $stmt = $config->runQuery("INSERT INTO corporate_pics (corporate_id, type, name, email, nomor, province_id, city, kecamatan, kelurahan, alamat) VALUES (:a, :i, :b, :j, :c, :d, :e, :f, :g, :h)");
+    $tmpemail = explode('@', $j);
+    $password = $config->newPassword($tmpemail[0]);
+
+    $stmt = $config->runQuery("INSERT INTO corporate_pics (corporate_id, type, name, ReferensiInvoice, email, password, nomor, province_id, city, kecamatan, kelurahan, alamat) VALUES (:a, :i, :b, :ReferensiInvoice, :j, :password, :c, :d, :e, :f, :g, :h)");
     $stmt->execute(array(
         ':a'    => $a,
         ':i'    => $i,
         ':b'    => $b,
+        ':ReferensiInvoice'    => $ReferensiInvoice,
         ':j'    => $j,
+        ':password'    => $password,
         ':c'    => $c,
         ':d'    => $d,
         ':e'    => $e,

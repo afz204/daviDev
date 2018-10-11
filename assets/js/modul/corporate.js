@@ -106,6 +106,7 @@ $(document).ready(function() {
 
         var id = $('#kodePerusahaan').val();
         var name = $('#namaPIC').val();
+        var ReferensiInvoice = $('#ReferensiInvoice').val();
         var typePIC = $('#typePIC').val();
         var emailPIC = $('#emailPIC').val();
         var nomor = $('#nomorPIC').val();
@@ -121,6 +122,7 @@ $(document).ready(function() {
             data: {
                 'kode_perusahaan': id,
                 'nama_pic': name,
+                'ReferensiInvoice': ReferensiInvoice,
                 'typePIC': typePIC,
                 'emailPIC': emailPIC,
                 'nomor_hp': nomor,
@@ -240,6 +242,29 @@ $(document).ready(function() {
             success: function(msg) {
                 alert(msg);
                 location.reload();
+            }
+        });
+    });
+
+    $('#updatePIC').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: '../php/ajax/corporate.php?type=updatepic',
+            type: 'post',
+            data: {
+                'id': $('#kodePIC').val(),
+                'corporate_id': $('#kodePerusahaan').val(),
+                'type': $('#typePIC').val(),
+                'name': $('#namaPIC').val(),
+                'InvoiceReferensi': $('#ReferensiInvoice').val(),
+                'email': $('#emailPIC').val(),
+                'nomor': $('#nomorPIC').val(),
+                'alamat': $('#alamatCorporate').val()
+            },
+
+            success: function(msg) {
+                alert(msg);
+                window.history.back();
             }
         });
     });

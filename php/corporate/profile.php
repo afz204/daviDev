@@ -89,7 +89,7 @@ $provinsi = $config->Products('id, name', 'provinces');
                         <span class="text-muted">
                             
                             <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-                                <button <?=$access['update']?> type="button" class="btn btn-warning"><span class="fa fa-pencil"></span></button>
+                                <button <?=$access['update']?> onclick="window.location.href='?p=editcp&ID=<?=$row['id']?>'" type="button" class="btn btn-warning"><span class="fa fa-pencil"></span></button>
                                 <button <?=$access['delete']?> class="btn btn-sm btn-danger" style="font-size: 12px;" onclick = "removePIC(<?=$row['id']?>)"> <span class="fa fa-trash"></span> </button>
                             </div>
                         </span>
@@ -111,7 +111,7 @@ $provinsi = $config->Products('id, name', 'provinces');
 </div>
 
 
-<div class="modal fade" id="modalPIC" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="modalPIC" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
 
@@ -124,6 +124,10 @@ $provinsi = $config->Products('id, name', 'provinces');
                             <input type="hidden" id="kodePerusahaan" value="<?=$info['CorporateUniqueID']?>">
 
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Referensi Invoice Name</label>
+                        <input type="text" class="form-control" id="ReferensiInvoice" placeholder="" value="" required="">
                     </div>
                     <div class="form-group">
                         <label for="usernameAdmin">Type Document</label>
@@ -177,7 +181,7 @@ $provinsi = $config->Products('id, name', 'provinces');
                         <textarea style="text-transform: capitalize;" data-parsley-minLength="5" name="alamatCorporate" id="alamatCorporate" class="form-control" cols="5" required></textarea>
                     </div>
                     <br>
-                    <button class="btn btn-success btn-sm btn-block" type="submit">Submit kebutuhan</button>
+                    <button class="btn btn-success btn-sm btn-block" type="submit">Add PIC</button>
                 </form>
             </div>
         </div>
