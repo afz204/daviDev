@@ -1,6 +1,49 @@
+// $('#customproductform').on('submit', function(e) {
+//     e.preventDefault();
+
+//     var product_id = $('#codeProduct').val();
+//     var name_product = $('#nameProduct').val();
+//     var cost_price = $('#costProduct').val();
+//     var selling_price = $('#sellProduct').val();
+//     var full_desc = $('#shortDesc').val();
+//     var remkarsfloris = $('#remkarsfloris').val();
+//     // alert(product_id + name_product);
+//     $.ajax({
+//         url: '../php/ajax/customproduct.php?type=customproduct',
+//         type: 'post',
+//         data: {
+//             product_id: product_id,
+//             name_product: name_product,
+//             cost_price: cost_price,
+//             selling_price: selling_price,
+//             full_desc: full_desc,
+//             remkarsfloris: remkarsfloris,
+//             transactionID: transactionID
+//         },
+//         success: function(msg) {
+//             if (msg == '0') {
+//                 dataCheckout(trx);
+//                 $('#codeSearch').select2("val", "");
+//                 $('#modalAddProducts').modal('hide');
+//                 var data = JSON.parse(msg);
+//                 console.log(data);
+//                 var count = parseInt(data.qty);
+//                 $('#listProductsData').hide().append(data.data).fadeIn('fast');
+//                 $('#countProduct').hide().html(count).fadeIn(800);
+//             } else {
+//                 alert('error');
+//             }
+
+//             // $('#ImagesProductID').val(title);
+//             // $('#imagesProduct').removeClass('hidden');
+//             // $('#detailProduct').addClass('hidden');
+//         }
+//     });
+// });
+
 function cancelOrder(trx) {
     if (!confirm('Are you sure want Cancel?')) {
-            return false;
+        return false;
     } else {
         $.ajax({
             url: '../php/ajax/order.php?type=cancelOrder',
@@ -14,6 +57,7 @@ function cancelOrder(trx) {
         });
     }
 }
+
 function timeslotcharge(trx) {
     var data = $('[name="time_slot"] option:selected').val();
 
@@ -214,6 +258,7 @@ function formValidate(id) {
         var receiveKec = $('#kecamatanCorporate').val();
         var receiveKel = $('#kelurahanCorporate').val();
         var receiveAlamat = $('#alamat_lengkap').val();
+        var hp_penerima = $('#hp_penerima').val();
 
         $.ajax({
             url: '../php/ajax/order.php?type=step2',
@@ -226,6 +271,7 @@ function formValidate(id) {
                 Kec: receiveKec,
                 Kel: receiveKel,
                 Alamat: receiveAlamat,
+                hp_penerima: hp_penerima,
                 TransactionID: trx
             },
 
@@ -482,6 +528,7 @@ function getOnDelivery(is_date_search, date_range) {
 
     });
 }
+
 function getHistory(is_date_search, date_range) {
 
     var tablePaymentKurir = $('#tableHistory').DataTable({
@@ -541,6 +588,7 @@ function getHistory(is_date_search, date_range) {
 
     });
 }
+
 function getCancel(is_date_search, date_range) {
 
     var tablePaymentKurir = $('#tableCancelOrder').DataTable({
@@ -600,7 +648,108 @@ function getCancel(is_date_search, date_range) {
 
     });
 }
+
+function showcustomproduct() {
+    $.ajax({
+        url: '../php/ajax/order.php?type=getcodecustomproduct',
+        type: 'post',
+        data: { 'data': 1 },
+
+        success: function(msg) {
+            var data = JSON.parse(msg);
+            if (data['msg'] == 'OK') {
+                $('#codeProduct').val(data['code']);
+                $('#nameProduct').val(data['title']);
+                $('#modalAddProducts').modal('hide');
+                $('#modalCustomProduct').modal({ show: true, backdrop: 'static', keyboard: false });
+            } else {
+                alert(data['msg']);
+            }
+        }
+    });
+}
+
+function submitformcustomproduct() {
+    $.ajax({
+        url: '../php/ajax/customproduct.php?type=customproduct',
+        type: 'post',
+        data: {
+            product_id: product_id,
+            name_product: name_product,
+            cost_price: cost_price,
+            selling_price: selling_price,
+            full_desc: full_desc,
+            remkarsfloris: remkarsfloris,
+            transactionID: transactionID
+        },
+        success: function(msg) {
+            if (msg == '0') {
+                dataCheckout(trx);
+                $('#codeSearch').select2("val", "");
+                $('#modalAddProducts').modal('hide');
+                var data = JSON.parse(msg);
+                console.log(data);
+                var count = parseInt(data.qty);
+                $('#listProductsData').html('');
+                $('#listProductsData').hide().append(data.data).fadeIn('fast');
+                $('#countProduct').hide().html(count).fadeIn(800);
+            } else {
+                alert('error');
+            }
+
+            // $('#ImagesProductID').val(title);
+            // $('#imagesProduct').removeClass('hidden');
+            // $('#detailProduct').addClass('hidden');
+        }
+    });
+}
 $(document).ready(function() {
+
+    $('#customproductform').on('submit', function(e) {
+        e.preventDefault();
+
+        var product_id = $('#codeProduct').val();
+        var name_product = $('#nameProduct').val();
+        var cost_price = $('#costProduct').val();
+        var selling_price = $('#sellProduct').val();
+        var full_desc = $('#shortDesc').val();
+        var remkarsfloris = $('#remkarsfloris').val();
+
+        $.ajax({
+            url: '../php/ajax/customproduct.php?type=cekimagesid',
+            type: 'post',
+            data: { 'product_id': product_id },
+
+            success: function(msg) {
+                if (msg == 'OK') {
+                    $.ajax({
+                        url: '../php/ajax/customproduct.php?type=customproduct',
+                        type: 'post',
+                        data: { 'product_id': product_id, 'name_product': name_product, 'cost_price': cost_price, 'selling_price': selling_price, 'full_desc': full_desc, 'remkarsfloris': remkarsfloris, 'transactionID': transactionID },
+
+                        success: function(msg) {
+                            $('#customproductform')[0].reset();
+                            $('.fileinput-remove-button').click();
+                            var data = JSON.parse(msg);
+                            console.log(data);
+                            dataCheckout(transactionID);
+                            $('#modalCustomProduct').modal('hide');
+                            var data = JSON.parse(msg);
+                            console.log(data);
+                            var count = parseInt(data.qty);
+                            location.reload();
+                            $('#listProductsData').html('');
+                            $('#textproductkosong').remove();
+                            $('#listProductsData').hide().append(data.data).fadeIn('fast');
+                            $('#countProduct').hide().html(count).fadeIn(800);
+                        }
+                    });
+                } else {
+                    alert('Upload Images!');
+                }
+            }
+        });
+    });
     // $('#delivery_charges').select2();
     getNewOrder("no");
     getOnProccess("no");
@@ -1036,6 +1185,7 @@ $(document).ready(function() {
                 var data = JSON.parse(msg);
                 console.log(data);
                 var count = parseInt(data.qty);
+                location.reload();
                 $('#listProductsData').hide().append(data.data).fadeIn('fast');
                 $('#countProduct').hide().html(count).fadeIn(800);
 

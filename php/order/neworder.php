@@ -93,6 +93,9 @@
   width: 100%;
   padding-top: 3%;
   }
+  .modal {
+  overflow-y:auto;
+}
   </style>
 <div class="row">
  <div class="col-md-4 order-md-2 mb-4">
@@ -239,6 +242,11 @@
                       <div class="col-md-6 mb-3 form-group">
                          <label for="lastName">email_penerima</label>
                          <input type="email" class="form-control" id="email_penerima" value="<?=isset($trx[0]['email']) ? $trx[0]['email'] : '' ?>" autocomplete="email" >
+                         <div class="help-block with-errors"></div>
+                      </div>
+                      <div class="col-md-6 mb-3 form-group">
+                         <label for="lastName">hp_penerima</label>
+                         <input type="text" class="form-control" id="hp_penerima" data-parsley-type="number" value="<?=isset($trx[0]['hp_penerima']) ? $trx[0]['hp_penerima'] : '' ?>" autocomplete="number" >
                          <div class="help-block with-errors"></div>
                       </div>
                    </div>
@@ -526,7 +534,7 @@
                    </div>
                 </div>
             </li>
-            <?php } } else{ echo '<li class="list-group-item"><span class="badge badge-success">Produk kosong!</span></li>';} ?>
+            <?php } } else{ echo '<li id="textproductkosong" class="list-group-item"><span class="badge badge-success">Produk kosong!</span></li>';} ?>
           </ul>
           
           
@@ -542,7 +550,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalProductAdd">List Product</h5>
+        <h5 class="modal-title" id="modalProductAdd">List Product <a href="javascript:;" onclick="showcustomproduct()"><span class="badge badge-sm badge-success">Custom Product</span></a></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -566,6 +574,76 @@
                     <button type="submit"  class="btn btn-block btn-primary ">submit</button>
                 </div>
             </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade bd-example-modal-lg" tabindex="-1" id="modalCustomProduct" role="dialog" aria-labelledby="customProduct" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="customProduct">Custom Product</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row justify-content-center card-body">
+            <div id="imagesProduct" class="col-12 col-md-6 col-lg-6">
+                <form id="uploadImagesProduct" method="post" enctype="multipart/form-data" >
+                    <div class="form-group">
+                        <input type="hidden" id="ImagesProductID" name="ImagesProductID">
+                        <input type="hidden" id="ImagesName" name="ImagesName">
+                        <div class="file-loading">
+                            <input type="file" id="images" name="images[]" multiple>
+                        </div>
+                        <br>
+                    </div>
+                </form>
+              <div id="kv-success-2" class="alert alert-success" style="margin-top:10px;display:none"></div>
+            </div>
+            <div id="detailProduct" class="col-12 col-md-6 col-lg-6">
+              <form  method="post" id="customproductform" data-parsley-validate="" autocomplete="off">
+
+                <div class="form-group">
+                    <label for="codeProduct">Code Product</label>
+                    <input type="text" name="codeProduct" id="codeProduct" placeholder="BDxxxxxx" class="form-control" data-parsley-minLength="3" required="" readonly="readonly">
+                    <input type="hidden" name="transactionID" id="transactionID" value="<?=$_GET['trx']?>" placeholder="BDxxxxxx" class="form-control" data-parsley-minLength="3" required="" readonly="readonly">
+                </div>
+
+                <div class="form-group">
+                    <label for="nameProduct">Nama Product</label>
+                    <input type="text" name="nameProduct" id="nameProduct" class="form-control" data-parsley-minLength="3" required="" readonly="readonly">
+                </div>
+
+                <div class="form-group">
+                    <label for="tagsProduct">Cost Price Product</label>
+                    <input type="text" name="costProduct" id="costProduct" data-parsley-type="number" class="form-control" data-parsley-minLength="3" required="">
+                </div>
+
+                <div class="form-group">
+                    <label for="tagsProduct">Selling Price Product</label>
+                    <input type="text" name="sellProduct" id="sellProduct" data-parsley-type="number" class="form-control" data-parsley-minLength="3" required="">
+                </div>
+
+                <div class="form-group">
+                    <label for="shortDesc">Description Product</label>
+                    <textarea style="text-transform: capitalize;" data-parsley-minLength="5" data-parsley-maxLength="255" name="sort" id="shortDesc" class="form-control" rows="2" required=""></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="shortDesc">Remarks Florist</label>
+                    <textarea style="text-transform: capitalize;" data-parsley-minLength="5" data-parsley-maxLength="255" name="sort" id="remkarsfloris" class="form-control" rows="2" required=""></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-block btn-outline-primary">submit</button>
+
+              </form>
+            </div>
+        </div>
       </div>
     </div>
   </div>

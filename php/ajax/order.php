@@ -12,6 +12,16 @@ $config = new Admin();
 
 $admin = $config->adminID();
 
+if($_GET['type'] == 'getcodecustomproduct'){
+    $data = $_POST['data'];
+    
+    $tgl = $config->getDate('ymhms');
+    $dd = $config->getDate('hs');
+    $new_code = $tgl;
+    $tilte = 'CUSTOMIZEPRODUCT'.$dd;
+
+    die(json_encode(['msg' => 'OK', 'code' => $new_code, 'title' => $tilte], JSON_FORCE_OBJECT));
+}
 if($_GET['type'] == 'tableNewOrder'){
     $request = $_REQUEST;
     $search = $_POST['is_date_search'];
@@ -46,10 +56,10 @@ if($_GET['type'] == 'tableNewOrder'){
     if($search == 'yes') { 
         $rangeArray = explode("_",$daterange); 
 
-        $startDate = $rangeArray[0]. ' 00:00:00';
-        $endsDate = $rangeArray[1]. ' 23:59:59';
+        $startDate = $rangeArray[0];
+        $endsDate = $rangeArray[1];
 
-        $daterangequery = "transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
+        $daterangequery = "transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
 
         $Query .= $daterangequery." AND transaction.statusOrder = '0' GROUP BY transaction.delivery_date DESC";
 
@@ -234,10 +244,10 @@ if($_GET['type'] == 'tableOnProccess'){
     if($search == 'yes') {
         $rangeArray = explode("_",$daterange); 
 
-        $startDate = $rangeArray[0]. ' 00:00:00';
-        $endsDate = $rangeArray[1]. ' 23:59:59';
+        $startDate = $rangeArray[0];
+        $endsDate = $rangeArray[1];
 
-        $daterangequery = "transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
+        $daterangequery = "transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
 
         $Query .= $daterangequery." AND transaction.statusOrder = '1' GROUP BY transaction.transactionID DESC";
 
@@ -362,6 +372,7 @@ if($_GET['type'] == 'tableOnProccess'){
             $statuspaid = $row['statusPaid'] == 1 ? 'success' : 'warning';
             
             $delivarydatess = strtotime(Date('Y-m-d', strtotime($row['delivery_date'])));
+            
             $datenow = strtotime($config->getdate('Y-m-d'));
             if($delivarydatess <= $datenow) {
                 $color = $delivarydatess.' = '.$datenow;
@@ -433,10 +444,10 @@ if($_GET['type'] == 'tableOnDelivery'){
     if($search == 'yes') {
         $rangeArray = explode("_",$daterange); 
 
-        $startDate = $rangeArray[0]. ' 00:00:00';
-        $endsDate = $rangeArray[1]. ' 23:59:59';
+        $startDate = $rangeArray[0];
+        $endsDate = $rangeArray[1];
 
-        $daterangequery = "transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
+        $daterangequery = "transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
         $corporatequery = " AND transaction.CustomerID = '".$corporate."'";
         $adminquery = " AND transaction.created_by = '".$admin."'";
 
@@ -633,10 +644,10 @@ if($_GET['type'] == 'tableHistory'){
     if($search == 'yes') {
         $rangeArray = explode("_",$daterange); 
 
-        $startDate = $rangeArray[0]. ' 00:00:00';
-        $endsDate = $rangeArray[1]. ' 23:59:59';
+        $startDate = $rangeArray[0];
+        $endsDate = $rangeArray[1];
 
-        $daterangequery = "transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
+        $daterangequery = "transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
         $corporatequery = " AND transaction.CustomerID = '".$corporate."'";
         $adminquery = " AND transaction.created_by = '".$admin."'";
 
@@ -832,10 +843,10 @@ if($_GET['type'] == 'tableCancelOrder'){
     if($search == 'yes') {
         $rangeArray = explode("_",$daterange); 
 
-        $startDate = $rangeArray[0]. ' 00:00:00';
-        $endsDate = $rangeArray[1]. ' 23:59:59';
+        $startDate = $rangeArray[0];
+        $endsDate = $rangeArray[1];
 
-        $daterangequery = "transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
+        $daterangequery = "transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
         $corporatequery = " AND transaction.CustomerID = '".$corporate."'";
         $adminquery = " AND transaction.created_by = '".$admin."'";
 
@@ -1466,12 +1477,13 @@ if($_GET['type'] == 'step1'){
                     //new
                     $namecustomer = $b. ' ' . $c;
 
-                    $input = $config->runQuery("INSERT INTO transaction (transactionID, type, CustomerID, CustomerName) VALUES (:a, :b, :c, :d)");
+                    $input = $config->runQuery("INSERT INTO transaction (transactionID, type, CustomerID, CustomerName, statusOrder) VALUES (:a, :b, :c, :d, :e)");
                     $input->execute(array(
                         ':a'    => $a,
                         ':b'    => 'BD_OG',
                         ':c'    => $new_code,
-                        ':d'    => $namecustomer
+                        ':d'    => $namecustomer,
+                        ':e'    => 99
                     ));
                     $reff = $config->lastInsertId();
                     $logs = $config->saveLogs($reff, $admin, 'c', 'add transactionID');
@@ -1509,12 +1521,14 @@ if($_GET['type'] == 'step1'){
             }
         }else{
             //new
-            $input = $config->runQuery("INSERT INTO transaction (transactionID, type, CustomerID, CustomerName) VALUES (:a, :b, :c, :d)");
+            $input = $config->runQuery("INSERT INTO transaction (PIC, transactionID, type, CustomerID, CustomerName, statusOrder) VALUES (:pic, :a, :b, :c, :d, :e)");
             $input->execute(array(
+                ':pic'    => $c,
                 ':a'    => $a,
                 ':b'    => $type,
                 ':c'    => $b,
-                ':d'    => $d
+                ':d'    => $d,
+                ':e'    => 99
             ));
             $reff = $config->lastInsertId();
             $logs = $config->saveLogs($reff, $admin, 'c', 'add transactionID');
@@ -1535,15 +1549,17 @@ if($_GET['type'] == 'step2'){
     $e = $_POST['Kec'];
     $f = $_POST['Kel'];
     $g = $_POST['Alamat'];
+    $hh = $_POST['hp_penerima'];
     $trx = $_POST['TransactionID'];
 
    
     $data = $config->getDataTable('transactionID', 'transaction', " transactionID = '". $trx ."' ");
     if($data->rowCount() > 0 ){
         //edit
-        $update = $config->runQuery("UPDATE transaction SET nama_penerima = :a, email = :b, provinsi_id = :c, kota_id = :d, kecamata_id = :e, kelurahan_id = :f, alamat_penerima = :g WHERE transactionID = :trx");
+        $update = $config->runQuery("UPDATE transaction SET nama_penerima = :a, hp_penerima = :hh, email = :b, provinsi_id = :c, kota_id = :d, kecamata_id = :e, kelurahan_id = :f, alamat_penerima = :g WHERE transactionID = :trx");
         $update->execute(array(
             ':a'    => $a,
+            ':hh'    => $hh,
             ':b'    => $b,
             ':c'    => $c,
             ':d'    => $d,
@@ -1669,7 +1685,7 @@ if($_GET['type'] == 'proccessOrder'){
 
     $grandTotal = $totalTransaction + $deliveryCharge + $timeslotcharges;
 
-    $stmt = "UPDATE transaction SET invoice_name = '". $b ."', statusOrder = '0', TotalCostPrice = '". $price['costprice'] ."', TotalSellingPrice = '". $price['sellingprice'] ."', grandTotal = '". $grandTotal ."', created_by = '". $admin ."' WHERE transactionID = :trx";
+    $stmt = "UPDATE transaction SET statusOrder = '0', invoice_name = '". $b ."', statusOrder = '0', TotalCostPrice = '". $price['costprice'] ."', TotalSellingPrice = '". $price['sellingprice'] ."', grandTotal = '". $grandTotal ."', created_by = '". $admin ."' WHERE transactionID = :trx";
     $stmt = $config->runQuery($stmt);
     $stmt->execute(array(
         ':trx' => $a
@@ -1683,25 +1699,25 @@ if($_GET['type'] == 'proccessOrder'){
     }
 
     $Point = 0;
-    if($grandTotal > 0 && $grandTotal <= 500000) $Point = 2; 
-    if($grandTotal > 500001 && $grandTotal <= 750000) $Point = 3; 
-    if($grandTotal > 750001 && $grandTotal <= 1000000) $Point = 4; 
-    if($grandTotal > 1000001 && $grandTotal <= 1250000) $Point = 5; 
-    if($grandTotal > 1250001 && $grandTotal <= 1500000) $Point = 6; 
-    if($grandTotal > 1500001 && $grandTotal <= 1750000) $Point = 7; 
-    if($grandTotal > 1750001 && $grandTotal <= 2000000) $Point = 10; 
-    if($grandTotal > 2000001 && $grandTotal <= 2250000) $Point = 11; 
-    if($grandTotal > 2250001 && $grandTotal <= 2500000) $Point = 12; 
-    if($grandTotal > 2500001 && $grandTotal <= 2750000) $Point = 13; 
-    if($grandTotal > 2750001 && $grandTotal <= 3000000) $Point = 20; 
-    if($grandTotal > 3000001 && $grandTotal <= 3250000) $Point = 21; 
-    if($grandTotal > 3250001 && $grandTotal <= 3500000) $Point = 22; 
-    if($grandTotal > 3500001 && $grandTotal <= 3750000) $Point = 23; 
-    if($grandTotal > 3750001 && $grandTotal <= 4000000) $Point = 26; 
-    if($grandTotal > 4000001 && $grandTotal <= 4250000) $Point = 27; 
-    if($grandTotal > 4250001 && $grandTotal <= 4500000) $Point = 28; 
-    if($grandTotal > 4500001 && $grandTotal <= 4750000) $Point = 29; 
-    if($grandTotal > 4750001 && $grandTotal <= 5000000) $Point = 30; 
+    if($grandTotal > 0 && $grandTotal <= 500000){ $Point = 2; }  
+    if($grandTotal > 500001 && $grandTotal <= 750000) { $Point = 3; }
+    if($grandTotal > 750001 && $grandTotal <= 1000000) { $Point = 4; }
+    if($grandTotal > 1000001 && $grandTotal <= 1250000) { $Point = 5; }
+    if($grandTotal > 1250001 && $grandTotal <= 1500000) { $Point = 6; }
+    if($grandTotal > 1500001 && $grandTotal <= 1750000) { $Point = 7; }
+    if($grandTotal > 1750001 && $grandTotal <= 2000000) { $Point = 10;} 
+    if($grandTotal > 2000001 && $grandTotal <= 2250000) { $Point = 11;} 
+    if($grandTotal > 2250001 && $grandTotal <= 2500000) { $Point = 12;} 
+    if($grandTotal > 2500001 && $grandTotal <= 2750000) { $Point = 13;} 
+    if($grandTotal > 2750001 && $grandTotal <= 3000000) { $Point = 20;} 
+    if($grandTotal > 3000001 && $grandTotal <= 3250000) { $Point = 21;} 
+    if($grandTotal > 3250001 && $grandTotal <= 3500000) { $Point = 22;} 
+    if($grandTotal > 3500001 && $grandTotal <= 3750000) { $Point = 23;} 
+    if($grandTotal > 3750001 && $grandTotal <= 4000000) { $Point = 26;} 
+    if($grandTotal > 4000001 && $grandTotal <= 4250000) { $Point = 27;} 
+    if($grandTotal > 4250001 && $grandTotal <= 4500000) { $Point = 28;} 
+    if($grandTotal > 4500001 && $grandTotal <= 4750000) { $Point = 29;} 
+    if($grandTotal > 4750001 && $grandTotal <= 5000000) { $Point = 30;} 
     $customerID = $delivery['CustomerID'];
     if($type == 'BD_CP') {
         $oldpoint = $config->getData('Point', 'corporate_pics', "id = '".$delivery['PIC']."' AND corporate_id = '". $customerID ."' ");

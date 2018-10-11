@@ -98,12 +98,12 @@ if($_GET['type'] == 'savePIC'){
     $tmpemail = explode('@', $j);
     $password = $config->newPassword($tmpemail[0]);
 
-    $stmt = $config->runQuery("INSERT INTO corporate_pics (corporate_id, type, name, ReferensiInvoice, email, password, nomor, province_id, city, kecamatan, kelurahan, alamat) VALUES (:a, :i, :b, :ReferensiInvoice, :j, :password, :c, :d, :e, :f, :g, :h)");
+    $stmt = $config->runQuery("INSERT INTO corporate_pics (corporate_id, type, name, InvoiceReferensi, email, password, nomor, province_id, city, kecamatan, kelurahan, alamat) VALUES (:a, :i, :b, :InvoiceReferensi, :j, :password, :c, :d, :e, :f, :g, :h)");
     $stmt->execute(array(
         ':a'    => $a,
         ':i'    => $i,
         ':b'    => $b,
-        ':ReferensiInvoice'    => $ReferensiInvoice,
+        ':InvoiceReferensi'    => $ReferensiInvoice,
         ':j'    => $j,
         ':password'    => $password,
         ':c'    => $c,

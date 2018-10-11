@@ -51,7 +51,6 @@ $content = '
    border: 0px solid #ccc;
    border-radius: 4px;
    font-family: Arial, "sans-serif";
-   text-transform: capitalize;
 }
 .fromcard {
    display: block;

@@ -145,8 +145,8 @@ if($_GET['type'] == 'revenue')
             $subdata[]  = $statuspaid;
             $subdata[]  = $paydate;
             $subdata[]  = $config->formatPrice($row['TotalCostPrice']);
-            $subdata[]  = $config->formatPrice($row['TotalSellingPrice']);
-            $subdata[]  = ceil($row['MP']).'%';
+            $subdata[]  = $config->formatPrice($row['grandTotal']);
+            $subdata[]  = ceil($row['MP'] * 100).'%';
             array_push($data, $subdata);
             //$data = $subdata;
         }
@@ -161,7 +161,7 @@ if($_GET['type'] == 'revenue')
         'data'              => $data,
         'totalData'         => $config->formatPrice($costprice),
         'totalKurir'        => $config->formatPrice($sellingprice),
-        'subtotal'          => ceil($selisihPembayaran).'%'
+        'subtotal'          => ceil($selisihPembayaran * 100).'%'
     );
     echo json_encode($json_data);
 }
@@ -290,7 +290,7 @@ if($_GET['type'] == 'piutang')
             $subdata[]  = $statuspaid;
             $subdata[]  = $datepaid;
             $subdata[]  = $config->formatPrice($row['TotalCostPrice']);
-            $subdata[]  = $config->formatPrice($row['TotalSellingPrice']);
+            $subdata[]  = $config->formatPrice($row['grandTotal']);
             $subdata[]  = '<input type="checkbox" class="checkitem" name="piutangpaid[]" value="'.$row['transactionID'].'" id="exampleCheck1">';
             array_push($data, $subdata);
             //$data = $subdata;
@@ -303,7 +303,7 @@ if($_GET['type'] == 'piutang')
         'recordsTotal'      => intval($totalData),
         'recordsFiltered'   => intval($totalFilter),
         'data'              => $data,
-        'subtotal'          => $config->formatPrice( $GrandTotalPayment)
+        'subtotal'          => $config->formatPrice($GrandTotalPayment)
     );
     echo json_encode($json_data);
 }

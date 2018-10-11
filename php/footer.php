@@ -49,7 +49,22 @@ Many operating systems, software frameworks, and programs include a logging syst
         <script type="text/javascript" src="<?=URL?>assets/vendors/dll/jquery.number.min.js"></script>
     <?php } ?>
     <?php if($menu == 'order' && $footer == 'neworder'){ ?>
+        
+        <script src="<?=URL?>assets/vendors/krajeee/js/fileinput.js" type="text/javascript"></script>
+        <script src="<?=URL?>assets/vendors/krajeee/js/locales/fr.js" type="text/javascript"></script>
+        <script src="<?=URL?>assets/vendors/krajeee/js/locales/es.js" type="text/javascript"></script>
+        <script src="<?=URL?>assets/vendors/krajeee/themes/explorer-fa/theme.js" type="text/javascript"></script>
+        <script src="<?=URL?>assets/vendors/krajeee/themes/fa/theme.js" type="text/javascript"></script>
+        <script src="<?=URL?>assets/vendors/lightbox/ekko-lightbox.js" type="text/javascript"></script>
+        
+        <script type="text/javascript">
+            $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+        </script>
         <script src="<?=URL?>assets/js/modul/createorder.js"></script>
+        <script src="<?=URL?>assets/js/modul/customproduct.js"></script>
     <?php } ?>
     <?php if($menu == 'bd'){ ?>
 
