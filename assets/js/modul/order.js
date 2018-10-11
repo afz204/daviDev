@@ -99,16 +99,27 @@ function selectKurir(trx) {
 }
 
 function changeOrderStatus(status, trx, type) {
-    $.ajax({
-        url: '../php/ajax/order.php?type=changeOrderStatus',
-        type: 'post',
-        data: 'status=' + status + '&transctionID=' + trx + '&types=' + type,
+    if (status == 4 || status == 5 || status == 6) {
 
-        success: function(msg) {
-            alert(msg);
-            location.reload();
-        }
-    });
+        $('[name="TypeOfReason"]').val(status);
+        $('[name="TransactionNumberKurir"]').val(trx);
+
+        $('#chagestatusorder').modal('hide');
+        $('#reasonbox').modal({ show: true, backdrop: 'static', keyboard: false });
+    } else {
+        $.ajax({
+            url: '../php/ajax/order.php?type=changeOrderStatus',
+            type: 'post',
+            data: 'status=' + status + '&transctionID=' + trx + '&types=' + type,
+
+            success: function(msg) {
+                alert(msg);
+                location.reload();
+            }
+        });
+    }
+
+    // alert(status);
 }
 
 function proccessOrder(trx) {
@@ -499,7 +510,7 @@ function getOnDelivery(is_date_search, date_range) {
             }
         },
         'rowCallback': function(row, data, index) {
-            if (data[12].toUpperCase() != '') {
+            if (data[13].toUpperCase() != '') {
                 $(row).css({ 'background-color': '#9A0909', 'color': '#fff' });
             }
             console.log(data);
@@ -523,7 +534,8 @@ function getOnDelivery(is_date_search, date_range) {
             { "data": "8", "orderable": true },
             { "data": "9", "orderable": true },
             { "data": "10", "orderable": true },
-            { "data": "11", "orderable": true }
+            { "data": "11", "orderable": true },
+            { "data": "12", "orderable": true }
         ],
 
     });
@@ -764,6 +776,28 @@ $(document).ready(function() {
     $('#ListSelectedFlorist').select2({ width: '100%', theme: "bootstrap4" });
     $('#ListSelectedKurir').select2({ width: '100%', theme: "bootstrap4" });
 
+    $('#formresonbox').on('submit', function(e) {
+        e.preventDefault();
+
+        var reason = $('#Reason').val();
+        var TransactionNumberKurir = $('[name="TransactionNumberKurir"]').val();
+        var TypeOfReason = $('[name="TypeOfReason"]').val();
+
+        if (reason == '') {
+            alert('Please input reason!');
+        } else {
+            $.ajax({
+                url: '../php/ajax/order.php?type=formresonbox',
+                type: 'post',
+                data: { 'transactionID': TransactionNumberKurir, 'notes': reason, 'Types': TypeOfReason },
+
+                success: function(msg) {
+                    alert(msg);
+                    location.reload();
+                }
+            });
+        }
+    });
     $('#CancelOrder').on('submit', function(e) {
         e.preventDefault();
 

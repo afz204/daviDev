@@ -163,7 +163,7 @@ function getpembukuan(is_date_search, date_range, statuspaid) {
         "processing": true,
         "serverSide": true,
         "searching": true,
-        "pagging": true,
+        "pagging": false,
         "ajax": {
             url: "../php/ajax/pembukuan.php?type=revenue", // json datasource
             type: "post", // method  , by default get
@@ -208,7 +208,7 @@ function getpiutang(is_date_search, date_range, statuspaid) {
         "processing": true,
         "serverSide": true,
         "searching": true,
-        "pagging": true,
+        "pagging": false,
         "ajax": {
             url: "../php/ajax/pembukuan.php?type=piutang", // json datasource
             type: "post", // method  , by default get
@@ -251,7 +251,7 @@ function getbonus(is_date_search, date_range, admin) {
         "processing": true,
         "serverSide": true,
         "searching": true,
-        "pagging": true,
+        "pagging": false,
         "ajax": {
             url: "../php/ajax/pembukuan.php?type=bonus", // json datasource
             type: "post", // method  , by default get

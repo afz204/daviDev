@@ -8,6 +8,14 @@ $transactionID = $_GET['transactionID'];
 
 $data = $config->getData('*', 'transaction', "transactionID = '". $transactionID ."' ");
 
+$cardto = '';
+if($data['card_to'] != '') {
+    $cardto = 'To: '.$data['card_to'];
+}
+$cardfrom = '';
+if($data['card_from'] != '') {
+    $cardfrom = 'From: '.$data['card_from'];
+}
 $content = '
 <html>
 <head>
@@ -71,9 +79,10 @@ $content = '
 </style>
 <body>
    <div class="content">
-       <!-- <div class="fromcard">
-       To : Arfan Azhari
-       </div> -->
+       <div class="fromcard">
+       '.$cardfrom.' <br>
+       '.$cardto.'
+       </div>
        <div class="isi">
        '.$data['card_isi'] .'
        </div>

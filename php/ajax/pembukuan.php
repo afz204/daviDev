@@ -105,7 +105,7 @@ if($_GET['type'] == 'revenue')
         $GrandTotal = $price['GrandTotal'];
 
         $DataQuery.=" MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
-        AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE()) GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
+        AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE()) GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC ";
         $stmt = $config->runQuery($DataQuery);
         $stmt->execute();
 
@@ -124,6 +124,11 @@ if($_GET['type'] == 'revenue')
     if($totalData > 0 ) {
         while ($row = $stmt->fetch(PDO::FETCH_LAZY)){
 
+            $users = $config->getData('*', 'users', "id = '".$row['PaidBy']."' ");
+            $adminuser = '';
+            if($users['name'] != '') {
+                $adminuser = ' By: '.$users['name'];
+            }
             $statuspaid = '<span class="badge badge-secondary">UNPAID</span>';
             if($row['statusPaid'] == 1) $statuspaid = '<span class="badge badge-success">PAID</span>';
     
@@ -142,7 +147,7 @@ if($_GET['type'] == 'revenue')
             $subdata[]  = $row['AdminName'];
             $subdata[]  = $config->_formatdate($row['created_date']);
             $subdata[]  = $config->_formatdate($row['delivery_date']);
-            $subdata[]  = $statuspaid;
+            $subdata[]  = $statuspaid.$adminuser;
             $subdata[]  = $paydate;
             $subdata[]  = $config->formatPrice($row['TotalCostPrice']);
             $subdata[]  = $config->formatPrice($row['grandTotal']);
@@ -219,7 +224,7 @@ if($_GET['type'] == 'piutang')
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
         $status_paid = 'AND transaction.statusPaid = '.$statuspaid;
-        $DataQuery .="  transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
+        $DataQuery .="  transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC ";
         
 
         $price .="  AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $status_paid;
@@ -251,7 +256,7 @@ if($_GET['type'] == 'piutang')
         $GrandTotalPayment = $price['TotalSelling'];
 
         $DataQuery.=" MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
-        AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE()) GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
+        AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE()) GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC ";
         $stmt = $config->runQuery($DataQuery);
         $stmt->execute();
 
@@ -264,12 +269,17 @@ if($_GET['type'] == 'piutang')
     }
     
     
-   // var_dump($price);
+//    var_dump($DataQuery);
     $data = [];
     // 9 1 11 4 10 12 7frecordsTotal
     if($totalData > 0 ) {
         while ($row = $stmt->fetch(PDO::FETCH_LAZY)){
 
+            $users = $config->getData('*', 'users', "id = '".$row['PaidBy']."' ");
+            $adminuser = '';
+            if($users['name'] != '') {
+                $adminuser = ' By: '.$users['name'];
+            }
             $statuspaid = '<a href="javascript:;" onclick="changestatuspaid(\''.$row['transactionID'].'\')"><span class="badge badge-warning">UNPAID</span></a>';
             if($row['statusPaid'] == 1) $statuspaid = '<span class="badge badge-success">PAID</span>';
     
@@ -287,7 +297,7 @@ if($_GET['type'] == 'piutang')
             $subdata[]  = $row['AdminName'];
             $subdata[]  = $config->_formatdate($row['created_date']);
             $subdata[]  = $config->_formatdate($row['delivery_date']);
-            $subdata[]  = $statuspaid;
+            $subdata[]  = $statuspaid .$adminuser;
             $subdata[]  = $datepaid;
             $subdata[]  = $config->formatPrice($row['TotalCostPrice']);
             $subdata[]  = $config->formatPrice($row['grandTotal']);
@@ -365,7 +375,7 @@ if($_GET['type'] == 'bonus')
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
 
-        $DataQuery .=" transaction.statusPaid = 1 AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
+        $DataQuery .=" transaction.statusPaid = 1 AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC ";
         
 
         $price .=" AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $status_paid;
@@ -421,6 +431,11 @@ if($_GET['type'] == 'bonus')
     if($totalData > 0 ) {
         while ($row = $stmt->fetch(PDO::FETCH_LAZY)){
 
+            $users = $config->getData('*', 'users', "id = '".$row['PaidBy']."' ");
+            $adminuser = '';
+            if($users['name'] != '') {
+                $adminuser = ' By: '.$users['name'];
+            }
             $statuspaid = '<a href="javascript:;" onclick="changestatuspaid(\''.$row['transactionID'].'\')"><span class="badge badge-warning">UNPAID</span></a>';
             if($row['statusPaid'] == 1) $statuspaid = '<span class="badge badge-success">PAID</span>';
     
@@ -438,11 +453,11 @@ if($_GET['type'] == 'bonus')
             $subdata[]  = $row['AdminName'];
             $subdata[]  = $config->_formatdate($row['created_date']);
             $subdata[]  = $config->_formatdate($row['delivery_date']);
-            $subdata[]  = $statuspaid;
+            $subdata[]  = $statuspaid.$adminuser;
             $subdata[]  = $datepaid;
             $subdata[]  = $config->formatPrice($row['TotalCostPrice']);
             $subdata[]  = $config->formatPrice($row['TotalSellingPrice']);
-            $subdata[]  = ceil($row['MP']).'%';
+            $subdata[]  = ceil($row['MP']*100).'%';
             array_push($data, $subdata);
             //$data = $subdata;
         }
@@ -457,7 +472,7 @@ if($_GET['type'] == 'bonus')
         'data'              => $data,
         'totalData'         => $config->formatPrice($costprice),
         'totalKurir'        => $config->formatPrice($sellingprice),
-        'subtotal'          => $selisihPembayaran
+        'subtotal'          => ceil($selisihPembayaran) * 100
     );
     echo json_encode($json_data);
 }

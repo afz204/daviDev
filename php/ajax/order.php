@@ -12,6 +12,22 @@ $config = new Admin();
 
 $admin = $config->adminID();
 
+if($_GET['type'] == 'formresonbox'){
+    $transactionID = $_POST['transactionID'];
+    $notes = $_POST['notes'];
+    $Types = $_POST['Types'];
+    
+    $update = $config->runQuery("UPDATE transaction SET statusOrder = '".$Types."', notes = '".$notes."' WHERE transactionID = '".$transactionID."' ");
+    $update->execute();
+
+    if($update) {
+        echo 'Success!';
+
+        $logs = $config->saveLogs($transactionID, $admin, 'u', 'Update Status Order');
+    } else {
+        echo 'Failed!';
+    }
+}
 if($_GET['type'] == 'getcodecustomproduct'){
     $data = $_POST['data'];
     
@@ -491,6 +507,7 @@ if($_GET['type'] == 'tableOnDelivery'){
         9   => 'CreatedBy',
         10   => 'FloristName',
         10   => 'KurirName',
+        10   => 'KurirName',
         11   => 'Color',
     );
 
@@ -595,6 +612,7 @@ if($_GET['type'] == 'tableOnDelivery'){
             $subdata[]  = $row['admin'];
             $subdata[]  = $florist;
             $subdata[]  = $kurir;
+            $subdata[]  = $btnchangestatus;
             $subdata[]  = $color;
             array_push($tampung, $subdata);
          }
@@ -743,7 +761,7 @@ if($_GET['type'] == 'tableHistory'){
                 $type = $config->getData('*', 'corporates', "CorporateUniqueID = '". $row['CustomerID'] ."'");
             }
             if(empty($row['id_florist'])){
-                $florist = '<button class="btn btn-sm btn-primary" onclick="selectFlorist(\''. $row['transactionID'] .'\')" style="font-size: 12px;">select florist</button>';
+                $florist = '<span class="badge badge-secondary">unset</span>';
             }else{
                 $data = $config->getData('ID, FloristName', 'florist', "ID = '". $row['id_florist'] ."'");
                 $florist = '<a href="javascript:;" onclick="selectFlorist(\''. $row['transactionID'] .'\')"><span class="badge badge-sm badge-success">'. $data['FloristName'] .'</span></a>';
