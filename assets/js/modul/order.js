@@ -1,46 +1,3 @@
-// $('#customproductform').on('submit', function(e) {
-//     e.preventDefault();
-
-//     var product_id = $('#codeProduct').val();
-//     var name_product = $('#nameProduct').val();
-//     var cost_price = $('#costProduct').val();
-//     var selling_price = $('#sellProduct').val();
-//     var full_desc = $('#shortDesc').val();
-//     var remkarsfloris = $('#remkarsfloris').val();
-//     // alert(product_id + name_product);
-//     $.ajax({
-//         url: '../php/ajax/customproduct.php?type=customproduct',
-//         type: 'post',
-//         data: {
-//             product_id: product_id,
-//             name_product: name_product,
-//             cost_price: cost_price,
-//             selling_price: selling_price,
-//             full_desc: full_desc,
-//             remkarsfloris: remkarsfloris,
-//             transactionID: transactionID
-//         },
-//         success: function(msg) {
-//             if (msg == '0') {
-//                 dataCheckout(trx);
-//                 $('#codeSearch').select2("val", "");
-//                 $('#modalAddProducts').modal('hide');
-//                 var data = JSON.parse(msg);
-//                 console.log(data);
-//                 var count = parseInt(data.qty);
-//                 $('#listProductsData').hide().append(data.data).fadeIn('fast');
-//                 $('#countProduct').hide().html(count).fadeIn(800);
-//             } else {
-//                 alert('error');
-//             }
-
-//             // $('#ImagesProductID').val(title);
-//             // $('#imagesProduct').removeClass('hidden');
-//             // $('#detailProduct').addClass('hidden');
-//         }
-//     });
-// });
-
 function cancelOrder(trx) {
     if (!confirm('Are you sure want Cancel?')) {
         return false;
@@ -717,7 +674,12 @@ function submitformcustomproduct() {
 }
 $(document).ready(function() {
 
-    $('#customproductform').on('submit', function(e) {
+    var arr = [];
+    for (var i = 0; i < 1000000; i++) {
+        arr.push(Math.random());
+    }
+
+    $('#caracustomfrom').on('submit', function(e) {
         e.preventDefault();
 
         var product_id = $('#codeProduct').val();
@@ -730,34 +692,27 @@ $(document).ready(function() {
         $.ajax({
             url: '../php/ajax/customproduct.php?type=cekimagesid',
             type: 'post',
-            data: { 'product_id': product_id },
+            data: { 'product_id': product_id, 'name_product': name_product, 'cost_price': cost_price, 'selling_price': selling_price, 'full_desc': full_desc, 'remkarsfloris': remkarsfloris, 'transactionID': transactionID },
 
             success: function(msg) {
-                if (msg == 'OK') {
-                    $.ajax({
-                        url: '../php/ajax/customproduct.php?type=customproduct',
-                        type: 'post',
-                        data: { 'product_id': product_id, 'name_product': name_product, 'cost_price': cost_price, 'selling_price': selling_price, 'full_desc': full_desc, 'remkarsfloris': remkarsfloris, 'transactionID': transactionID },
-
-                        success: function(msg) {
-                            $('#customproductform')[0].reset();
-                            $('.fileinput-remove-button').click();
-                            var data = JSON.parse(msg);
-                            console.log(data);
-                            dataCheckout(transactionID);
-                            $('#modalCustomProduct').modal('hide');
-                            var data = JSON.parse(msg);
-                            console.log(data);
-                            var count = parseInt(data.qty);
-                            location.reload();
-                            $('#listProductsData').html('');
-                            $('#textproductkosong').remove();
-                            $('#listProductsData').hide().append(data.data).fadeIn('fast');
-                            $('#countProduct').hide().html(count).fadeIn(800);
-                        }
-                    });
-                } else {
+                if (msg == 'NO') {
                     alert('Upload Images!');
+                } else {
+                    $('#caracustomfrom')[0].reset();
+                    $('.fileinput-remove-button').click();
+                    var data = JSON.parse(msg);
+                    console.log(data);
+                    dataCheckout(transactionID);
+                    $('#modalCustomProduct').modal('hide');
+                    var data = JSON.parse(msg);
+                    console.log(data);
+                    var count = parseInt(data.qty);
+                    location.reload();
+                    $('#listProductsData').html('');
+                    $('#textproductkosong').remove();
+                    $('#listProductsData').hide().append(data.data).fadeIn('fast');
+                    $('#countProduct').hide().html(count).fadeIn(800);
+
                 }
             }
         });

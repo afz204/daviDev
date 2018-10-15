@@ -80,12 +80,13 @@ $content = '
 <body>
    <div class="content">
        <div class="fromcard">
-       '.$cardfrom.' <br>
+       
        '.$cardto.'
        </div>
        <div class="isi">
        '.$data['card_isi'] .'
        </div>
+       <div class="fromcard">'.$cardfrom.'</div>
    </div>
 </body>
 </html>

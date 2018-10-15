@@ -80,6 +80,27 @@ $(document).ready(function() {
     });
 });
 
+function exportrevenue(type) {
+    var range = '';
+    var statuspaid = '';
+    if (type == 'exportrevenue') {
+        range = $('#daterangerevenue').val();
+        statuspaid = $('#StatusPaid option:selected').val();
+    } else if (type == 'exportpiutang') {
+        range = $('#daterangepiutang').val();
+        statuspaid = $('#StatusPaid option:selected').val();
+    } else {
+        range = $('#daterangebonus').val();
+        statuspaid = $('#adminbonus option:selected').val();
+    }
+    if (statuspaid == '') {
+        alert('Select Status Paid!');
+    } else {
+
+        window.open('../php/ajax/exportrevenue.php?type=' + type + '&date_range=' + range + '&status_paid=' + statuspaid, "_blank");
+    }
+}
+
 function allpaid() {
     var data = [];
     var value = $('[name="piutangpaid[]"]:checked').each(function() {

@@ -38,14 +38,14 @@ if($_GET['type'] == 'revenue')
     $databox = '';
     if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
         // echo $_POST['search']['value'];
-        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") AND ';
+        $databox = ' AND(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") ';
     }
 
     $DataQuery = " SELECT transaction.* , (transaction.grandTotal - transaction.TotalCostPrice) / transaction.grandTotal as MP, users.name as AdminName FROM transaction
     LEFT JOIN transaction_details on transaction_details.id_trx = transaction.transactionID
-    LEFT JOIN users on users.id = transaction.created_by WHERE transaction.statusOrder != 6 AND ";
+    LEFT JOIN users on users.id = transaction.created_by WHERE transaction.statusOrder NOT IN (6, 99) AND ";
 
-    $price = 'SELECT SUM(TotalCostPrice) as costprice, SUM(TotalSellingPrice) as sellingprice, SUM(grandTotal) as GrandTotal from transaction WHERE transaction.statusOrder != 6 AND';
+    $price = 'SELECT SUM(TotalCostPrice) as costprice, SUM(TotalSellingPrice) as sellingprice, SUM(grandTotal) as GrandTotal from transaction WHERE transaction.statusOrder NOT IN (6, 99) AND';
 
     //print_r($request);
     $colom = array(
@@ -69,7 +69,7 @@ if($_GET['type'] == 'revenue')
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
 
-        $DataQuery .=" transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
+        $DataQuery .=" AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC LIMIT ".$request['start']." ,".$request['length']." ";
         
 
         $price .=" WHERE transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $status_paid;
@@ -192,12 +192,12 @@ if($_GET['type'] == 'piutang')
     $databox = '';
     if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
         // echo $_POST['search']['value'];
-        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") AND ';
+        $databox = 'AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") ';
     }
 
     $DataQuery = " SELECT transaction.* , (transaction.grandTotal - (transaction_details.product_cost * transaction_details.product_qty)) / transaction.grandTotal as MP, users.name as AdminName FROM transaction
     LEFT JOIN transaction_details on transaction_details.id_trx = transaction.transactionID
-    LEFT JOIN users on users.id = transaction.created_by WHERE ";
+    LEFT JOIN users on users.id = transaction.created_by WHERE transaction.statusPaid = 0 AND transaction.statusOrder NOT IN (6, 99) ";
 
     $price = 'SELECT SUM(transaction.grandTotal) as TotalSelling from transaction WHERE transaction.statusPaid = 0 ';
 
@@ -224,7 +224,7 @@ if($_GET['type'] == 'piutang')
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
         $status_paid = 'AND transaction.statusPaid = '.$statuspaid;
-        $DataQuery .="  transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC ";
+        $DataQuery .=" AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC ";
         
 
         $price .="  AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $status_paid;
@@ -234,7 +234,7 @@ if($_GET['type'] == 'piutang')
         $price = $submitprice->fetch(PDO::FETCH_LAZY);
 
         $GrandTotalPayment = $price['TotalSelling'];
-
+// var_dump($DataQuery);
         $stmt = $config->runQuery($DataQuery);
         $stmt->execute();
 
@@ -255,7 +255,7 @@ if($_GET['type'] == 'piutang')
         
         $GrandTotalPayment = $price['TotalSelling'];
 
-        $DataQuery.=" MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
+        $DataQuery.=" AND MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
         AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE()) GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC ";
         $stmt = $config->runQuery($DataQuery);
         $stmt->execute();
@@ -324,7 +324,7 @@ if($_GET['type'] == 'bonus')
     
     if(isset($_POST['date_range'])){
         $daterange = $_POST['date_range'];
-        $status_paid = 'AND transaction.creted_by = '.$_POST['admin_id'].'';
+        $status_paid = 'AND transaction.created_by = '.$_POST['admin_id'].'';
         if($_POST['admin_id'] == 0) {
             $status_paid = '';
         }
@@ -342,15 +342,15 @@ if($_GET['type'] == 'bonus')
     $databox = '';
     if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
         // echo $_POST['search']['value'];
-        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") AND ';
+        $databox = 'AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") ';
     }
     
 
     $DataQuery = " SELECT transaction.* , (transaction.grandTotal - transaction.TotalCostPrice) / transaction.grandTotal as MP, users.name as AdminName FROM transaction 
         LEFT JOIN transaction_details on transaction_details.id_trx = transaction.transactionID 
-        LEFT JOIN users on users.id = transaction.created_by WHERE transaction.statusOrder != 6 AND ";
+        LEFT JOIN users on users.id = transaction.created_by WHERE transaction.statusOrder NOT IN (6, 99) AND ";
 
-    $price = 'SELECT TotalCostPrice as costprice, TotalSellingPrice as sellingprice, grandTotal as GrandTotal from transaction WHERE transaction.statusOrder != 6 AND transaction.statusPaid = 1 ';
+    $price = 'SELECT TotalCostPrice as costprice, TotalSellingPrice as sellingprice, grandTotal as GrandTotal from transaction WHERE transaction.statusOrder NOT IN (6, 99) AND transaction.statusPaid = 1 ';
 
     //print_r($request);
     $colom = array(
@@ -375,7 +375,7 @@ if($_GET['type'] == 'bonus')
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
 
-        $DataQuery .=" transaction.statusPaid = 1 AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC ";
+        $DataQuery .=" AND transaction.statusPaid = 1 AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC ";
         
 
         $price .=" AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $status_paid;

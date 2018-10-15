@@ -52,6 +52,7 @@
             'CustomerName' => $trx['CustomerName'],
             'CorporateNames' => $trx['nama'],
             'OrganicNames' => $trx['FullName'],
+            'invoice_name' => $trx['invoice_name'],
             'delivery_charge' => $trx['delivery_charge'],
             'delivery_time_charge' => $trx['delivery_time_charge'],
             'grandTotal' => $trx['grandTotal'],
@@ -202,6 +203,13 @@
                      <div class="col-md-6 mb-3">
                         <label for="firstName">corporate pic</label>
                         <input type="corporate_name" class="form-control" id="corporate_name"  value="<?=$data['CustomerName']?>" autocomplete="text" placeholder="" value="" readonly>
+                        <div class="invalid-feedback">
+                           Valid first name is required.
+                        </div>
+                     </div>
+                     <div class="col-md-6 mb-3">
+                        <label for="firstName">Referensi Invoice</label>
+                        <input type="corporate_name" class="form-control" id="corporate_name"  value="<?=$data['invoice_name']?>" autocomplete="text" placeholder="" value="" readonly>
                         <div class="invalid-feedback">
                            Valid first name is required.
                         </div>

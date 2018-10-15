@@ -85,6 +85,8 @@
   // /var_dump($card);
 
   $paymentList = $config->Products('ID, PaymentName, AccountName, AccountNumber, PaymentImages', 'payment WHERE Status = 1 ');
+
+  
   ?>
   <style>
   .listPayment span {
@@ -456,6 +458,7 @@
           <div class="card-header bg-white">
              Detail Produk 
              <button class="btn btn-sm btn-primary float-right" onclick="modalListProduct()"><span class="fa fa-plus"></span> product</button>
+             <button class="btn btn-sm btn-primary float-right" onclick="showcustomproduct()"><span class="fa fa-plus"></span> custom product</button>
           </div>
        <div class="card-body">
 
@@ -606,11 +609,11 @@
               <div id="kv-success-2" class="alert alert-success" style="margin-top:10px;display:none"></div>
             </div>
             <div id="detailProduct" class="col-12 col-md-6 col-lg-6">
-              <form  method="post" id="customproductform" data-parsley-validate="" autocomplete="off">
+              <form  method="post" action="" name="caracustomfrom" data-parsley-validate="">
 
                 <div class="form-group">
                     <label for="codeProduct">Code Product</label>
-                    <input type="text" name="codeProduct" id="codeProduct" placeholder="BDxxxxxx" class="form-control" data-parsley-minLength="3" required="" readonly="readonly">
+                    <input type="text" name="codeProduct" id="codeProduct" name="codeProduct" placeholder="BDxxxxxx" class="form-control" data-parsley-minLength="3" required="" readonly="readonly">
                     <input type="hidden" name="transactionID" id="transactionID" value="<?=$_GET['trx']?>" placeholder="BDxxxxxx" class="form-control" data-parsley-minLength="3" required="" readonly="readonly">
                 </div>
 
@@ -631,15 +634,15 @@
 
                 <div class="form-group">
                     <label for="shortDesc">Description Product</label>
-                    <textarea style="text-transform: capitalize;" data-parsley-minLength="5" data-parsley-maxLength="255" name="sort" id="shortDesc" class="form-control" rows="2" required=""></textarea>
+                    <textarea style="text-transform: capitalize;" data-parsley-minLength="5" data-parsley-maxLength="255" name="shortDesc" id="shortDesc" class="form-control" rows="2" required=""></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="shortDesc">Remarks Florist</label>
-                    <textarea style="text-transform: capitalize;" data-parsley-minLength="5" data-parsley-maxLength="255" name="sort" id="remkarsfloris" class="form-control" rows="2" required=""></textarea>
+                    <textarea  style="text-transform: capitalize;" data-parsley-minLength="5" data-parsley-maxLength="255" name="remkarsfloris" id="remkarsfloris" class="form-control" rows="2" required=""></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-block btn-outline-primary">submit</button>
+                <button type="submit" name="makan" class="btn btn-block btn-outline-primary">submit</button>
 
               </form>
             </div>
@@ -648,5 +651,46 @@
     </div>
   </div>
 </div>
+<?php 
+
+if(isset($_POST['makan']))
+   { 
+     
+    $product_id = $_POST['codeProduct'];
+    $transactionID = $_POST['transactionID'];
+    $name_product = $_POST['nameProduct'];
+    $cost_price = $_POST['costProduct'];
+    $selling_price = $_POST['sellProduct'];
+    $full_desc = $_POST['shortDesc'];
+    $remkarsfloris = $_POST['remkarsfloris'];
+    $images = strtolower(str_replace(" ", "_", $name_product)).'.jpg';
+    $permalink = str_replace(' ', '_', strtolower($name_product));
+    $created_at = $config->getDate('Y-m-d H:m:s');
+
+    $sql = "INSERT INTO products (product_id, name_product, cost_price, selling_price, full_desc, images, permalink, created_at, admin_id) 
+    VALUES ('".$product_id."', '".$name_product."', '".$cost_price."', '".$selling_price."', '".$full_desc."', '".$images."', '".$permalink."', '".$created_at."', '".$admin."')";
+    $stmt = $config->runQuery($sql);
+    $stmt->execute();
+    // $reff = $config->lastInsertId();
+    // $logs = $config->saveLogs($reff, $admin, 'c', 'new custom products');
+
+      $cek = $config->runQuery("INSERT INTO transaction_details (id_trx, id_product, product_name, product_price, product_cost, product_qty, florist_remarks) VALUES (:a, :b, :c, :d, :e, :f, :g) ");
+      $cek->execute(array(
+          ':a' => $transactionID,
+          ':b' => $product_id,
+          ':c' => $name_product,
+          ':d' => $selling_price,
+          ':e' => $cost_price,
+          ':f' => '1',
+          ':g' => $remkarsfloris
+      ));
+
+      echo "<meta http-equiv='refresh' content='0'>";
+      // $reff = $config->lastInsertId();
+      // $logs = $config->saveLogs($reff, $admin, 'c', 'add product checkout');
+  }
+
+
+?>
 
 

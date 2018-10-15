@@ -21,6 +21,7 @@
                 <div class="col-12 col-sm-3 col-lg-3">
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="submit"><span class="fa fa-search"></span> filter</button>
+                        <button class="btn btn-outline-success" onClick="exportrevenue('exportrevenue')" type="button"><span class="fa fa-download"></span> export</button>
                     </div>
                 </div>
             </div>

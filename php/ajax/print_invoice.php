@@ -132,6 +132,7 @@ $content = '
             padding-left: 2%;
             width: 83%;
             height: 20px;
+            text-transform: none;
          }
          .summary {
             border-collapse: collapse;
@@ -272,7 +273,7 @@ $content = '
         <tr>
             <td id="1">Delivery Address</td>
             <td id="2" >:</td>
-            <td id="3" style="text-transform: capitalize;">'. $data['alamat_penerima'].', '. $data['Kelurahan']. ', '. $data['Kecamatan']. ', '. $data['KotaName']. ', '. $data['ProvinsiName'] .'</td>
+            <td id="3">'. $data['alamat_penerima'].', '. $data['Kelurahan']. ', '. $data['Kecamatan']. ', '. $data['KotaName']. ', '. $data['ProvinsiName'] .'</td>
         </tr>
       </table>
       <div class="clearfix"></div>

@@ -28,7 +28,7 @@ $arrstatusorder = array(
             <form id="OnDelivery" class="form-inline" methods="post" data-parsley-validate="" style="    padding-left: 1.2222222%;">
                 <div class="row">
                     <div class="form-group mx-sm-3">
-                    <label for="dateneworder">Created Date</label>
+                    <label for="dateneworder">Delivery Date</label>
                         <div id="dateneworder" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%;">
                             <i class="fa fa-calendar"></i>&nbsp;
                             <span></span> <i class="fa fa-caret-down"></i>

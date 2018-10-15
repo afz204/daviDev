@@ -116,7 +116,7 @@ $content = '
                   <tr>
                      <td class="c1"  style="height: 20px;">Recipient Name</td>
                      <td class="c2" style="vertical-align: middle; text-transform: capitalize;">:</td>
-                     <td style="vertical-align: middle;">'. $config->capitalize($data['nama_penerima']) .'</td>
+                     <td style="vertical-align: middle;">'. $config->capitalize($data['nama_penerima']) .' ('. $data['hp_penerima'] .')</td>
                   </tr>
                   <tr>
                      <td class="c1" style="height:20px;, vertical-align: middle;">Card Messages</td>
@@ -140,7 +140,7 @@ $content = '
                   <tr>
                      <td style="height: 20px; vartical-align: middle; font-weight: 600;">Alamat</td>
                      <td style="height: 20px; vartical-align: middle;">:</td>
-                     <td style="height: 20px; vartical-align: middle; font-weight: 600; text-transform: capitalize;">&nbsp;'. $config->capitalize($data['alamat_penerima']).', '. $config->capitalize($data['Kelurahan']). ', '. $config->capitalize($data['Kecamatan']). ', '. $config->capitalize($data['KotaName']). ', '. $config->capitalize($data['ProvinsiName']) .'</td>
+                     <td style="height: 20px; vartical-align: middle; font-weight: 600;">&nbsp;'. $data['alamat_penerima'].', '. $data['Kelurahan']. ', '. $data['Kecamatan']. ', '. $data['KotaName']. ', '. $data['ProvinsiName'] .'</td>
                   </tr>
                   <tr>
                      <td style="height: 20px; vartical-align: middle; font-weight: 600;">Remarks</td>
