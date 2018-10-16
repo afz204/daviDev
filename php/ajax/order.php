@@ -512,7 +512,7 @@ if($_GET['type'] == 'formresonbox'){
 if($_GET['type'] == 'getcodecustomproduct'){
     $data = $_POST['data'];
     
-    $tgl = $config->getDate('ymhms');
+    $tgl = $config->getDate('ydmhsm');
     $dd = $config->getDate('hs');
     $new_code = $tgl;
     $tilte = 'CUSTOMIZEPRODUCT'.$dd;

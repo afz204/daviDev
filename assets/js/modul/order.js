@@ -695,7 +695,7 @@ function showcustomproduct() {
             var data = JSON.parse(msg);
             if (data['msg'] == 'OK') {
                 $('#codeProduct').val(data['code']);
-                $('#nameProduct').val(data['title']);
+                $('#nameProduct').val(data['code']);
                 $('#modalAddProducts').modal('hide');
                 $('#modalCustomProduct').modal({ show: true, backdrop: 'static', keyboard: false });
             } else {
@@ -979,10 +979,16 @@ $(document).ready(function() {
         }
     });
 
-    var settanggal = new Date($('[name="delivery_dates"]').val());
+    var dates = $('[name="delivery_dates"]').val();
+    var settanggal = new Date();
+    if (dates != undefined) {
+        var settanggal = new Date();
+    }
+    // console.log(dates);
+    // console.log(settanggal);
     $('#delivery_dates').datetimepicker({
         format: 'YYYY/MM/DD',
-        minDate: new Date(settanggal.getFullYear(), settanggal.getMonth(), settanggal.getDate()),
+        minDate: settanggal,
     }).on('dp.change', function(e) {
         var times = e.date.format("YYYY-MM-DD");
         $.ajax({

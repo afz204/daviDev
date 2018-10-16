@@ -336,7 +336,7 @@
                    <div class="row ">
                       <div class="col-md-6 mb-3 form-group">
                          <label for="delivery_dates">tanggal_pengiriman</label>
-                         <input type="text" class="form-control" id="delivery_dates" value="<?=isset($trx[0]['delivery_date']) && $trx[0]['delivery_date'] !='' ? $trx[0]['delivery_charge'] : '0' ?>" required>
+                         <input type="text" class="form-control" id="delivery_dates" value="<?=isset($trx[0]['delivery_date']) && $trx[0]['delivery_date'] !='' ? $trx[0]['delivery_date'] : $config->getDate("Y-m-d") ?>" required>
                          <input type="hidden" class="form-control" name="delivery_dates" value="<?=isset($trx[0]['delivery_date']) && $trx[0]['delivery_date'] !='' ? $trx[0]['delivery_date'] : $config->getDate("Y-m-d") ?>" required>
                          <div class="help-block with-errors"></div>
                       </div>
@@ -619,17 +619,17 @@
 
                 <div class="form-group">
                     <label for="nameProduct">Nama Product</label>
-                    <input type="text" name="nameProduct" id="nameProduct" class="form-control" data-parsley-minLength="3" required="" readonly="readonly">
+                    <input type="text" name="nameProduct" id="nameProduct" class="form-control" data-parsley-minLength="3" required="" >
                 </div>
 
                 <div class="form-group">
                     <label for="tagsProduct">Cost Price Product</label>
-                    <input type="text" name="costProduct" id="costProduct" data-parsley-type="number" class="form-control" data-parsley-minLength="3" required="">
+                    <input type="text" name="costProduct" id="costProduct" data-parsley-type="number" class="form-control" data-parsley-minLength="1" required="">
                 </div>
 
                 <div class="form-group">
                     <label for="tagsProduct">Selling Price Product</label>
-                    <input type="text" name="sellProduct" id="sellProduct" data-parsley-type="number" class="form-control" data-parsley-minLength="3" required="">
+                    <input type="text" name="sellProduct" id="sellProduct" data-parsley-type="number" class="form-control" data-parsley-minLength="1" required="">
                 </div>
 
                 <div class="form-group">
