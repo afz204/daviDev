@@ -622,8 +622,13 @@ class Admin
     }
     public function formatPrice($val)
     {
-        $price = number_format($val, 2, ',', '.');
-        $price = 'Rp. ' . $price;
+        if($val >= 3) {
+            $price = number_format($val, 2, ',', '.');
+            $price = 'Rp. ' . $price;
+        } else {
+           
+            $price = '$ ' . $val;
+        }
 
         return $price;
     }

@@ -184,7 +184,7 @@ function getpembukuan(is_date_search, date_range, statuspaid) {
         "processing": true,
         "serverSide": true,
         "searching": true,
-        "pagging": false,
+        "pagging": true,
         "ajax": {
             url: "../php/ajax/pembukuan.php?type=revenue", // json datasource
             type: "post", // method  , by default get
@@ -208,16 +208,16 @@ function getpembukuan(is_date_search, date_range, statuspaid) {
             console.log(data);
         },
         "columns": [
-            { "data": "0", "orderable": false },
-            { "data": "1", "orderable": false },
-            { "data": "2", "orderable": false },
-            { "data": "3", "orderable": false },
-            { "data": "4", "orderable": false },
-            { "data": "5", "orderable": false },
-            { "data": "6", "orderable": false },
-            { "data": "7", "orderable": false },
-            { "data": "8", "orderable": false },
-            { "data": "9", "orderable": false }
+            { "data": "0", "orderable": true },
+            { "data": "1", "orderable": true },
+            { "data": "2", "orderable": true },
+            { "data": "3", "orderable": true },
+            { "data": "4", "orderable": true },
+            { "data": "5", "orderable": true },
+            { "data": "6", "orderable": true },
+            { "data": "7", "orderable": true },
+            { "data": "8", "orderable": true },
+            { "data": "9", "orderable": true }
         ],
 
     });
@@ -251,16 +251,16 @@ function getpiutang(is_date_search, date_range, statuspaid) {
             console.log(data);
         },
         "columns": [
-            { "data": "0", "orderable": false },
-            { "data": "1", "orderable": false },
-            { "data": "2", "orderable": false },
-            { "data": "3", "orderable": false },
-            { "data": "4", "orderable": false },
-            { "data": "5", "orderable": false },
-            { "data": "6", "orderable": false },
-            { "data": "7", "orderable": false },
-            { "data": "8", "orderable": false },
-            { "data": "9", "orderable": false }
+            { "data": "0", "orderable": true },
+            { "data": "1", "orderable": true },
+            { "data": "2", "orderable": true },
+            { "data": "3", "orderable": true },
+            { "data": "4", "orderable": true },
+            { "data": "5", "orderable": true },
+            { "data": "6", "orderable": true },
+            { "data": "7", "orderable": true },
+            { "data": "8", "orderable": true },
+            { "data": "9", "orderable": true }
         ],
 
     });
@@ -272,7 +272,7 @@ function getbonus(is_date_search, date_range, admin) {
         "processing": true,
         "serverSide": true,
         "searching": true,
-        "pagging": false,
+        "pagging": true,
         "ajax": {
             url: "../php/ajax/pembukuan.php?type=bonus", // json datasource
             type: "post", // method  , by default get
@@ -296,16 +296,16 @@ function getbonus(is_date_search, date_range, admin) {
             console.log(data);
         },
         "columns": [
-            { "data": "0", "orderable": false },
-            { "data": "1", "orderable": false },
-            { "data": "2", "orderable": false },
-            { "data": "3", "orderable": false },
-            { "data": "4", "orderable": false },
-            { "data": "5", "orderable": false },
-            { "data": "6", "orderable": false },
-            { "data": "7", "orderable": false },
-            { "data": "8", "orderable": false },
-            { "data": "9", "orderable": false }
+            { "data": "0", "orderable": true },
+            { "data": "1", "orderable": true },
+            { "data": "2", "orderable": true },
+            { "data": "3", "orderable": true },
+            { "data": "4", "orderable": true },
+            { "data": "5", "orderable": true },
+            { "data": "6", "orderable": true },
+            { "data": "7", "orderable": true },
+            { "data": "8", "orderable": true },
+            { "data": "9", "orderable": true }
         ],
 
     });
@@ -313,8 +313,8 @@ function getbonus(is_date_search, date_range, admin) {
 
 $(function() {
 
-    var start = moment().subtract(29, 'days');
-    var end = moment();
+    var start = moment().startOf('month');
+    var end = moment().endOf('month');
 
     function cb(start, end) {
         $('#daterevenue span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));

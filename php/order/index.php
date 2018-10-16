@@ -1,3 +1,22 @@
+<?php 
+
+$arrstatusorder = array(
+    0 => 'New order',
+    1 => 'On Production',
+    2 => 'On Delivery',
+    3 => 'Success',
+    4 => 'Return',
+    5 => 'Complain',
+    6 => 'Cancel',
+    99 => 'not ready'
+);
+
+$formR = '';
+if(isset($_GET['type'])) $formR = 'hidden';
+
+
+?>
+
 <style>
     .widget{
         display : block;
@@ -84,4 +103,56 @@
         </div>
     </div>
     
+</div>
+
+<div class="card">
+    <div class="card-header" <?=$access['read']?>>
+        List Order
+    </div>
+    <div class="card-body">
+        <form id="caridata" class="form-inline" methods="post" data-parsley-validate="" style="    padding-left: 1.2222222%;">
+            <div class="form-group mx-sm-3 mb-2">
+                    <input type="text" class="form-control" id="invoicenomor" name="invoicenomor" placeholder="Nomor Invoice">
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <input type="text" class="form-control" id="sendername" name="sendername" placeholder="Sender Name">
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <input type="text" class="form-control" id="address" name="address" placeholder="Address">
+            </div>
+            <div class="form-group mb-2">
+                <select name="typeReport" id="typeReport" class="form-control">
+                    <option value="">status</option>
+                    <?php foreach($arrstatusorder as $key => $val) { ?>
+                        <option value="<?=$key?>"><?=$val?></option>
+                    <?php } ?>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary mb-2">cari</button>
+        </form>
+        <div id="listOrder">
+            <table id="tableSearch" class="table table-hover<?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover">
+                <thead class="thead-light">
+                <tr style="text-transform: lowercase;">
+                    <th scope="col">Invoice</th>
+                    <th scope="col">Product Name</th>
+                    <th scope="col">Sender Name</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Qty</th>
+                    <th scope="col">Total Payment</th>
+                    <th scope="col">delivery_date</th>
+                    <th scope="col">status_paid</th>
+                    <th scope="col">created order</th>
+                    <th scope="col">created by</th>
+                    <th scope="col">florist</th>
+                    <th scope="col">action</th>
+                </tr>
+                </thead>
+                <tbody>
+               
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

@@ -310,13 +310,80 @@ $(window).load(function() {
     $('#SmartWizard').hide().fadeIn(1000);
 });
 
-function getNewOrder(is_date_search, date_range) {
+function tableSearch(is_date_search, invoicenomor, sendername, address, typeReport) {
 
-    var tablePaymentKurir = $('#tableNewOrder').DataTable({
-        "scrollY": "300px",
+    var tableSearch = $('#tableSearch').DataTable({
+        // "scrollY": "300px",
         "scrollX": true,
         "scrollCollapse": true,
-        "paging": false,
+        "paging": true,
+        "columnDefs": [{ "width": 200, "targets": 0 }],
+        "fixedColumns": true,
+        "processing": true,
+        "serverSide": true,
+        "searching": false,
+        "pagging": true,
+        'language': {
+            "loadingRecords": "&nbsp;",
+            "processing": "contoh"
+        },
+        "ajax": {
+            url: "php/ajax/order.php?type=tableSearch", // json datasource
+            type: "post", // method  , by default get
+            data: {
+                'is_date_search': is_date_search,
+                'invoicenomor': invoicenomor,
+                'sendername': sendername,
+                'address': address,
+                'typeReport': typeReport
+
+            },
+            error: function() { // error handling
+                $(".employee-grid-error").html("");
+                $("#tableSearch").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                $("#employee-grid_processing").css("display", "none");
+
+            }
+        },
+        'rowCallback': function(row, data, index) {
+            if (data[12].toUpperCase() != '') {
+                $(row).css({ 'background-color': '#9A0909', 'color': '#fff' });
+            }
+            console.log(data);
+
+        },
+        drawCallback: function(settings) {
+            var data = this.api().ajax.json();
+            // $('#totalPayment').html(data['totalData']);
+            // $('#totalPerKurir').html(data['totalKurir']);
+            // $('#selisih').html(data['subtotal']);
+            // console.log(data);
+        },
+        "columns": [
+            { "data": "0", "orderable": true },
+            { "data": "1", "orderable": true },
+            { "data": "2", "orderable": true },
+            { "data": "3", "orderable": true },
+            { "data": "4", "orderable": true },
+            { "data": "5", "orderable": true },
+            { "data": "6", "orderable": true },
+            { "data": "7", "orderable": true },
+            { "data": "8", "orderable": true },
+            { "data": "9", "orderable": true },
+            { "data": "10", "orderable": true },
+            { "data": "11", "orderable": true }
+        ],
+
+    });
+}
+
+function getNewOrder(is_date_search, date_range) {
+
+    var tableNewOrder = $('#tableNewOrder').DataTable({
+        // "scrollY": "300px",
+        "scrollX": true,
+        "scrollCollapse": true,
+        "paging": true,
         "columnDefs": [{ "width": 200, "targets": 0 }],
         "fixedColumns": true,
         "processing": true,
@@ -325,7 +392,7 @@ function getNewOrder(is_date_search, date_range) {
         "pagging": true,
         'language': {
             "loadingRecords": "&nbsp;",
-            "processing": ""
+            "processing": "contoh"
         },
         "ajax": {
             url: "../php/ajax/order.php?type=tableNewOrder", // json datasource
@@ -375,11 +442,11 @@ function getNewOrder(is_date_search, date_range) {
 
 function getOnProccess(is_date_search, date_range) {
 
-    var tablePaymentKurir = $('#tableOnProccess').DataTable({
-        "scrollY": "300px",
+    var tableOnProccess = $('#tableOnProccess').DataTable({
+        // "scrollY": "300px",
         "scrollX": true,
         "scrollCollapse": true,
-        "paging": false,
+        "paging": true,
         "columnDefs": [{ "width": 200, "targets": 0 }],
         "fixedColumns": true,
         "processing": true,
@@ -388,7 +455,7 @@ function getOnProccess(is_date_search, date_range) {
         "pagging": true,
         'language': {
             "loadingRecords": "&nbsp;",
-            "processing": ""
+            "processing": "contoh"
         },
         "ajax": {
             url: "../php/ajax/order.php?type=tableOnProccess", // json datasource
@@ -438,10 +505,10 @@ function getOnProccess(is_date_search, date_range) {
 function getOnDelivery(is_date_search, date_range) {
 
     var tablePaymentKurir = $('#tableOnDelivery').DataTable({
-        "scrollY": "300px",
+        // "scrollY": "300px",
         "scrollX": true,
         "scrollCollapse": true,
-        "paging": false,
+        "paging": true,
         "columnDefs": [{ "width": 200, "targets": 0 }],
         "fixedColumns": true,
         "processing": true,
@@ -450,7 +517,7 @@ function getOnDelivery(is_date_search, date_range) {
         "pagging": true,
         'language': {
             "loadingRecords": "&nbsp;",
-            "processing": ""
+            "processing": "contoh"
         },
         "ajax": {
             url: "../php/ajax/order.php?type=tableOnDelivery", // json datasource
@@ -501,10 +568,10 @@ function getOnDelivery(is_date_search, date_range) {
 function getHistory(is_date_search, date_range) {
 
     var tablePaymentKurir = $('#tableHistory').DataTable({
-        "scrollY": "300px",
+        // "scrollY": "300px",
         "scrollX": true,
         "scrollCollapse": true,
-        "paging": false,
+        "paging": true,
         "columnDefs": [{ "width": 200, "targets": 0 }],
         "fixedColumns": true,
         "processing": true,
@@ -513,7 +580,7 @@ function getHistory(is_date_search, date_range) {
         "pagging": true,
         'language': {
             "loadingRecords": "&nbsp;",
-            "processing": ""
+            "processing": "contoh"
         },
         "ajax": {
             url: "../php/ajax/order.php?type=tableHistory", // json datasource
@@ -561,10 +628,10 @@ function getHistory(is_date_search, date_range) {
 function getCancel(is_date_search, date_range) {
 
     var tablePaymentKurir = $('#tableCancelOrder').DataTable({
-        "scrollY": "300px",
+        // "scrollY": "300px",
         "scrollX": true,
         "scrollCollapse": true,
-        "paging": false,
+        "paging": true,
         "columnDefs": [{ "width": 200, "targets": 0 }],
         "fixedColumns": true,
         "processing": true,
@@ -573,7 +640,7 @@ function getCancel(is_date_search, date_range) {
         "pagging": true,
         'language': {
             "loadingRecords": "&nbsp;",
-            "processing": ""
+            "processing": "contoh"
         },
         "ajax": {
             url: "../php/ajax/order.php?type=tableCancelOrder", // json datasource
@@ -679,6 +746,55 @@ $(document).ready(function() {
         arr.push(Math.random());
     }
 
+    $('#caridata').on('submit', function(e) {
+        e.preventDefault();
+
+        var invoicenomor = $('#invoicenomor').val();
+        var sendername = $('#sendername').val();
+        var address = $('#address').val();
+        var typeReport = $('#typeReport').val();
+
+        tableSearch('yes', invoicenomor, sendername, address, typeReport);
+
+    });
+    $('#caridata').on('submit', function(e) {
+        e.preventDefault();
+
+        var product_id = $('#codeProduct').val();
+        var name_product = $('#nameProduct').val();
+        var cost_price = $('#costProduct').val();
+        var selling_price = $('#sellProduct').val();
+        var full_desc = $('#shortDesc').val();
+        var remkarsfloris = $('#remkarsfloris').val();
+
+        $.ajax({
+            url: '../php/ajax/customproduct.php?type=cekimagesid',
+            type: 'post',
+            data: { 'product_id': product_id, 'name_product': name_product, 'cost_price': cost_price, 'selling_price': selling_price, 'full_desc': full_desc, 'remkarsfloris': remkarsfloris, 'transactionID': transactionID },
+
+            success: function(msg) {
+                if (msg == 'NO') {
+                    alert('Upload Images!');
+                } else {
+                    $('#caracustomfrom')[0].reset();
+                    $('.fileinput-remove-button').click();
+                    var data = JSON.parse(msg);
+                    console.log(data);
+                    dataCheckout(transactionID);
+                    $('#modalCustomProduct').modal('hide');
+                    var data = JSON.parse(msg);
+                    console.log(data);
+                    var count = parseInt(data.qty);
+                    location.reload();
+                    $('#listProductsData').html('');
+                    $('#textproductkosong').remove();
+                    $('#listProductsData').hide().append(data.data).fadeIn('fast');
+                    $('#countProduct').hide().html(count).fadeIn(800);
+
+                }
+            }
+        });
+    });
     $('#caracustomfrom').on('submit', function(e) {
         e.preventDefault();
 
@@ -723,6 +839,7 @@ $(document).ready(function() {
     getOnDelivery("no");
     getHistory("no");
     getCancel("no");
+    tableSearch("no");
 
     $('#ListAdminNewOrder').select2({ width: '100%', theme: "bootstrap4" });
     $('#ListCorporate').select2({ width: '100%', theme: "bootstrap4" });
@@ -1333,8 +1450,8 @@ $(document).ready(function() {
 
 $(function() {
 
-    var start = moment().subtract(29, 'days');
-    var end = moment();
+    var start = moment().startOf('month');
+    var end = moment().endOf('month');
 
     function cb(start, end) {
         $('#dateneworder span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
