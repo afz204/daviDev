@@ -87,12 +87,13 @@ if($_GET['type'] == 'revenue')
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
 
-        $DataQuery .=" AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ". $orderby. ' '. $limit;
+        $DataQuery .=" transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ". $orderby. ' '. $limit;
 
-        $QueryTotal .=" AND transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ". $orderby;
+        $QueryTotal .=" transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ". $orderby;
         
 
-        $price .=" WHERE transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $status_paid;
+        $price .=" transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $status_paid;
+        // var_dump($price);
         $submitprice = $config->runQuery($price);
         $submitprice->execute();
 
