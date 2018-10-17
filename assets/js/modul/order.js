@@ -695,7 +695,6 @@ function showcustomproduct() {
             var data = JSON.parse(msg);
             if (data['msg'] == 'OK') {
                 $('#codeProduct').val(data['code']);
-                $('#nameProduct').val(data['code']);
                 $('#modalAddProducts').modal('hide');
                 $('#modalCustomProduct').modal({ show: true, backdrop: 'static', keyboard: false });
             } else {

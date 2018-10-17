@@ -37,7 +37,12 @@ $(document).ready(function() {
         uploadExtraData: function() {
             return {
                 imagesid: $('#codeProduct').val(),
-                imagesname: $('#nameProduct').val()
+                imagesname: $('#nameProduct').val(),
+                costProduct: $('#costProduct').val(),
+                sellProduct: $('#sellProduct').val(),
+                shortDesc: $('#shortDesc').val(),
+                remkarsfloris: $('#remkarsfloris').val(),
+                transactionID: $('#transactionID').val()
             };
         }
     }).on('fileloaded', function(event, file, previewId, index, reader) {
@@ -50,6 +55,8 @@ $(document).ready(function() {
         // // });
         // $('#kv-success-2').append(buttonSuccessProduct);
         // $('#kv-success-2').fadeIn('slow');
+        alert('Success!');
+        location.reload();
     });
 
 
