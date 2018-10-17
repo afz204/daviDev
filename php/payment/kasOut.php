@@ -32,6 +32,7 @@ $kurir = $config->Products('*', 'users where status = 1');
                                 <div class="form-group">
                                     <select class="form-control" name="adminkasout" id="adminkasout" required>
                                         <option value="">:: admin ::</option>
+                                        <option value="99">All Admin</option>
                                         <?php while($col = $kurir->fetch(PDO::FETCH_LAZY)) { ?>
                                         <option value="<?=$col['id']?>"><?=$col['name']?></option>
                                         <?php } ?>
@@ -39,7 +40,7 @@ $kurir = $config->Products('*', 'users where status = 1');
                                 </div>
                                 <div class="col-12 col-sm-3 col-lg-3">
                                     <div class="input-group-append">
-                                        <button class="btn btn-outline-success" onClick="exportrevenue('exportpiutang')" type="button"><span class="fa fa-download"></span> export</button>
+                                        <button class="btn btn-outline-success" onClick="exportkas('kasout')" type="button"><span class="fa fa-download"></span> export</button>
                                     </div>
                                 </div>
                             </div>

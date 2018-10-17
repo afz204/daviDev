@@ -479,10 +479,11 @@ if($_GET['type'] == 'bonus')
         $sellingprice = $price['sellingprice'];
         $GrandTotal = $price['GrandTotal'];
 
-        $QueryTotal.=" transaction.statusPaid = 1 AND MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
+        $QueryTotal.=" AND transaction.statusPaid = 1 AND MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
         AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE()) GROUP BY transaction.transactionID  ". $orderby;
-        $DataQuery.=" transaction.statusPaid = 1 AND MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
+        $DataQuery.=" AND transaction.statusPaid = 1 AND MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
         AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE()) GROUP BY transaction.transactionID  ". $orderby. ' '. $limit;
+        // var_dump($DataQuery);
        $stmt = $config->runQuery($DataQuery);
         $stmt->execute();
 
@@ -495,7 +496,6 @@ if($_GET['type'] == 'bonus')
     }
     
     
-//    var_dump($status_paid);
    // var_dump($stmt);
     $data = [];
     // 9 1 11 4 10 12 7frecordsTotal

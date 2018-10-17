@@ -33,7 +33,7 @@ if($_GET['type'] == 'exportrevenue') {
     LEFT JOIN transaction_details on transaction_details.id_trx = transaction.transactionID
     LEFT JOIN users on users.id = transaction.created_by 
     LEFT JOIN florist on florist.ID = transaction.id_florist
-    WHERE transaction.statusOrder != 6 AND ";
+    WHERE transaction.statusOrder NOT IN (6, 99) AND ";
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 
@@ -113,7 +113,7 @@ if($_GET['type'] == 'exportrevenue') {
         $statuspaid = 'UNPAID';
             if($row['statusPaid'] == 1) $statuspaid = 'PAID';
 
-        $paydate = $config->_formatdate($row['PaidDate']);
+        $paydate = $row['PaidDate'];
         if(strtotime($row['PaidDate']) == false) {
             $paydate = 'unset';
         }
@@ -122,7 +122,7 @@ if($_GET['type'] == 'exportrevenue') {
         ->setCellValue('B'.$loop, $row['transactionID'])
         ->setCellValue('C'.$loop, $row['CustomerName'])
         ->setCellValue('D'.$loop, $row['AdminName'])
-        ->setCellValue('E'.$loop, $config->_formatdate($row['created_date']))
+        ->setCellValue('E'.$loop, $row['created_date'])
         ->setCellValue('F'.$loop, $row['delivery_date'])
         ->setCellValue('G'.$loop, $statuspaid)
         ->setCellValue('H'.$loop, $paydate)
@@ -132,24 +132,16 @@ if($_GET['type'] == 'exportrevenue') {
 
         $loop++;
     }
-
+   
     $filename = str_replace(' ', '_', 'Laporan Revenue '.$daterange);
-    header('Content-Type: application/vnd.ms-excel');
-    header('Content-Disposition: attachment;filename="'.$filename.'.xls"');
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="'.$filename.'.xlsx"');
     header('Cache-Control: max-age=0');
 
-    $writer = \PHPExcel_IOFactory::createWriter($Excel, 'Excel5');
+    $writer = \PHPExcel_IOFactory::createWriter($Excel, 'Excel2007');
     $writer->save('php://output');
 }
 if($_GET['type'] == 'exportpiutang') {
-
-    error_reporting(E_ALL);
-    ini_set('display_errors', TRUE);
-    ini_set('display_startup_errors', TRUE);
-    date_default_timezone_set('Europe/London');
-
-    define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
-
     /** Include PHPExcel */
     require_once '../../assets/vendors/PHPExcel/Classes/PHPExcel.php';
 
@@ -168,11 +160,11 @@ if($_GET['type'] == 'exportpiutang') {
     LEFT JOIN transaction on transaction.transactionID = transaction_details.id_trx
     LEFT JOIN users on users.id = transaction.created_by 
     LEFT JOIN florist on florist.ID = transaction.id_florist
-    WHERE transaction.statusOrder != 6 AND ";
+    WHERE transaction.statusOrder NOT IN (6, 99) AND ";
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 
-    $DataQuery .=" transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." ORDER BY transaction.created_date DESC ";
+    $DataQuery .=" (transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid.") GROUP BY transaction.transactionID";
     // var_dump($DataQuery);
     $data = $config->runQuery($DataQuery);
     $data->execute();
@@ -261,7 +253,7 @@ if($_GET['type'] == 'exportpiutang') {
         ->setCellValue('C'.$loop, $row['CustomerName'])
         ->setCellValue('D'.$loop, $row['AdminName'])
         ->setCellValue('E'.$loop, $row['card_from'])
-        ->setCellValue('F'.$loop, $row['product_name'])
+        ->setCellValue('F'.$loop, "'".$row['product_name']."'")
         ->setCellValue('G'.$loop, $row['invoice_name'])
         ->setCellValue('H'.$loop, Date('Y-m-d', strtotime($row['created_date'])))
         ->setCellValue('I'.$loop, $row['delivery_date'])
@@ -273,11 +265,11 @@ if($_GET['type'] == 'exportpiutang') {
     }
 
     $filename = str_replace(' ', '_', 'Laporant Piutang '.$daterange);
-    header('Content-Type: application/vnd.ms-excel');
-    header('Content-Disposition: attachment;filename="'.$filename.'.xls"');
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="'.$filename.'.xlsx"');
     header('Cache-Control: max-age=0');
 
-    $writer = \PHPExcel_IOFactory::createWriter($Excel, 'Excel5');
+    $writer = \PHPExcel_IOFactory::createWriter($Excel, 'Excel2007');
     $writer->save('php://output');
 }
 if($_GET['type'] == 'exportbonus') {
@@ -307,7 +299,7 @@ if($_GET['type'] == 'exportbonus') {
     LEFT JOIN transaction_details on transaction_details.id_trx = transaction.transactionID
     LEFT JOIN users on users.id = transaction.created_by 
     LEFT JOIN florist on florist.ID = transaction.id_florist
-    WHERE transaction.statusOrder != 6 AND ";
+    WHERE transaction.statusOrder NOT IN (6, 99) AND ";
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 
@@ -316,10 +308,10 @@ if($_GET['type'] == 'exportbonus') {
     $data->execute();
     // var_dump($DataQuery);
     
-    $total = $config->getData('COUNT(transaction.id) as Total', 'transaction', "transaction.statusOrder != 6 AND transaction.created_date BETWEEN'". $startDate ."' AND '". $endsDate ."' ".$status_paid.' AND transaction.statusPaid = 1');
-    $MP = $config->getData('SUM(TotalCostPrice) as costprice, SUM(grandTotal) as grandprice', 'transaction', "transaction.statusOrder != 6 AND transaction.created_date BETWEEN'". $startDate ."' AND '". $endsDate ."' ".$status_paid.' AND transaction.statusPaid = 1');
+    $total = $config->getData('COUNT(transaction.id) as Total', 'transaction', "transaction.statusOrder NOT IN (6, 99) AND transaction.created_date BETWEEN'". $startDate ."' AND '". $endsDate ."' ".$status_paid.' AND transaction.statusPaid = 1');
+    $MP = $config->getData('SUM(TotalCostPrice) as costprice, SUM(grandTotal) as grandprice', 'transaction', "transaction.statusOrder NOT IN (6, 99) AND transaction.created_date BETWEEN'". $startDate ."' AND '". $endsDate ."' ".$status_paid.' AND transaction.statusPaid = 1');
     // echo $total['Total'];
-    var_dump($MP);
+    // var_dump($MP);
     $stylecenter = array(
         'alignment' => array(
             'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
@@ -424,11 +416,11 @@ if($_GET['type'] == 'exportbonus') {
     ->setCellValue('J'.($page + 1), $sellingprice)
     ->setCellValue('J'.($page + 2), ($GrandMP * 100) );
 
-    // $filename = str_replace(' ', '_', 'Laporan Komisi '.$daterange);
-    // header('Content-Type: application/vnd.ms-excel');
-    // header('Content-Disposition: attachment;filename="'.$filename.'.xls"');
-    // header('Cache-Control: max-age=0');
+    $filename = str_replace(' ', '_', 'Laporan Komisi '.$daterange);
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="'.$filename.'.xlsx"');
+    header('Cache-Control: max-age=0');
 
-    // $writer = \PHPExcel_IOFactory::createWriter($Excel, 'Excel5');
-    // $writer->save('php://output');
+    $writer = \PHPExcel_IOFactory::createWriter($Excel, 'Excel2007');
+    $writer->save('php://output');
 }

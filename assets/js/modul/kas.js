@@ -1,3 +1,24 @@
+function exportkas(type) {
+    var range = '';
+    var statuspaid = '';
+    if (type == 'kasout') {
+        range = $('#daterangekasout').val();
+        statuspaid = $('#adminkasout option:selected').val();
+    } else if (type == 'exportpiutang') {
+        range = $('#daterangepiutang').val();
+        statuspaid = $('#StatusPaid option:selected').val();
+    } else {
+        range = $('#daterangebonus').val();
+        statuspaid = $('#adminbonus option:selected').val();
+    }
+    if (statuspaid == '') {
+        alert('Select Admin!');
+    } else {
+
+        window.open('../php/ajax/exportkas.php?type=' + type + '&date_range=' + range + '&status_paid=' + statuspaid, "_blank");
+    }
+}
+
 function delPayCharge(id) {
     if (!confirm("Are you sure want to delete this ?")) {
         return false;
