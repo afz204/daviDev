@@ -2,95 +2,48 @@
       $KasOut = $config->ProductsJoin('kas.id, kas.nama, kas.qty, kas.harga, kas.satuan, kas.ket, kas.created_at, kas.status, users.name, cat.content as category, subcat.category as subCategory', 'kas_outs AS kas',
       'INNER JOIN users ON users.id = kas.admin_id
       LEFT OUTER JOIN satuans AS cat ON cat.id = kas.type
-      LEFT OUTER JOIN satuans AS subcat ON subcat.id = kas.sub_type', "WHERE kas.status ='' ORDER BY kas.created_at ASC ");
+      LEFT OUTER JOIN satuans AS subcat ON subcat.id = kas.sub_type', "WHERE MONTH(kas.created_at) = MONTH(CURRENT_DATE()) AND YEAR(kas.created_at) = YEAR(CURRENT_DATE()) AND kas.status ='' ORDER BY kas.created_at DESC ");
   $data = $config->Products('id, content', 'satuans WHERE content_id = 0');
+//   $admin = $config->Products('id, name', 'users where status = 1');
+$kurir = $config->Products('*', 'users where status = 1');
 ?>
 <div id="listKas">
     <div class="row">
-<!--        <div class="col-12 col-sm-4 col-lg-4" id="listPemasukanKas">-->
-<!--            <div class="card">-->
-<!--                <div class="card-header">-->
-<!--                    List Pemasukan-->
-<!--                </div>-->
-<!--                <div class="card-body">-->
-<!---->
-<!--                    <div class="jumbotron">-->
-<!--                        ASAP-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
+    
         <div class="col-12 col-sm-12 col-lg-12" id="listPengeluaranKas">
             <div class="card">
                 <div class="card-header">
                     List Pengeluaran
                 </div>
                 <div class="card-body">
-                    <div id="form-kasKeluar" class="hidden">
-                        <div class="card border-dark mb-3">
-                            <div class="card-header bg-transparent border-dark">Form Tambah Pengeluaran Kas</div>
-                            <div class="card-body">
-                            <form id="belanja-form" method="post" data-parsley-validate="" autocomplete="off">
-                                    <div class="form-group">
-                                        <select class="form-control" name="specSatuan" id="specSatuan" required>
-                                            <option value="">:: category ::</option>
-                                            <?php while ($row = $data->fetch(PDO::FETCH_LAZY)){ ?>
-                                                <option value="<?=$row['id']?>"><?=$row['content']?></option>
-                                            <?php } ?>
-                                        </select>
-                                    </div>
-                                    <div class="form-group hidden" id="satuanCat">
-                                        <select class="form-control" name="catSatuan" id="catSatuan" >
-                                            <option value="">:: category ::</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group hidden" id="satuanSubCat">
-                                        <select class="form-control" name="subCatSatuan" id="subCatSatuan" >
-                                            <option value="">:: category ::</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="hidden" value="<?=$admin[0]['user_id']?>" id="adminBelanja">
-                                        <input type="text"
-                                               data-parsley-minLength="3" data-parsley-maxLength="36" data-parsley-message-maxLength="lebih"
-                                               class="form-control" placeholder="nama pengeluaran" id="nameBelanja" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="text"
-                                               data-parsley-type="number"
-                                               class="form-control" placeholder="quantity belanja" id="qtyBelanja" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <select id="satuanBelanja" class="form-control" required>
-                                            <option value="">:: satuan harga ::</option>
-                                            <option value="tangkai">tangkai</option>
-                                            <option value="helai">helai</option>
-                                            <option value="buah">buah</option>
-                                            <option value="ikat">ikat</option>
-                                            <option value="bungkus">bungkus</option>
-                                            <option value="dus">dus</option>
-                                            <option value="menter">menter</option>
-                                            <option value="lusin">lusin</option>
-                                            <option value="kodi">kodi</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="text"
-                                               data-parsley-type="number"
-                                               class="form-control" placeholder="harga satuan" id="hargaBelanja" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <textarea class="form-control" rows="5" id="ketBelanja" required placeholder="keterangan pengeluaran"></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-sm btn-block btn-primary">submit belanjaan</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
                     <div id="listKasKeluar">
                         <p>
                             <button class="btn btn-sm btn-primary hidden" onclick='addKasOut(<?=$admin[0]['user_id']?>)' <?=$access['create']?> type="button"><span class="fa fa-fw fa-plus"></span> pengeluaran</button>
                         </p>
+                        <form id="kasOut" methods="post" data-parsley-validate="">
+                            <div class="row">
+                                <div class="form-group mx-sm-3 mb-2">
+                                    <div id="datekasout" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
+                                    </div>
+                                    <input type="hidden" id='daterangekasout'>
+                                </div>
+                                <div class="form-group">
+                                    <select class="form-control" name="adminkasout" id="adminkasout" required>
+                                        <option value="">:: admin ::</option>
+                                        <?php while($col = $kurir->fetch(PDO::FETCH_LAZY)) { ?>
+                                        <option value="<?=$col['id']?>"><?=$col['name']?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-sm-3 col-lg-3">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-success" onClick="exportrevenue('exportpiutang')" type="button"><span class="fa fa-download"></span> export</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                         <table id="table_kas_out" class="table table-bordered  <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
                             <thead class="thead-light">
                                 <tr style="text-transform: lowercase;">

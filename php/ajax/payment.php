@@ -251,36 +251,43 @@ if($_GET['type'] == 'delKasIns')
     $e = $_POST['admin'];
     $tgl = $config->getDate('Y-m-d H:m:s');
 
-    $stmt = $config->delRecord('kas_ins', 'id', $a);
-    $logs = $config->saveLogs($a, $e, 'd', 'hapus belanja');
-    if($stmt){
-        echo $config->actionMsg('d', 'kas_ins');
-        $cek = $config->runQuery("SELECT total FROM kas_ins WHERE id ='". $c ."' ");
-        $cek->execute();
-        $cek =  $cek->fetch(PDO::FETCH_LAZY);
-        $dana = $cek['total'] + $d;
-        $update = $config->runQuery("UPDATE kas_ins SET total = '". $dana ."' WHERE id = '". $c ."' ");
-        $update->execute();
+    $data = $config->getData('*', 'kas_ins', "id = ". $a);
 
-        if($update){
-                $sql = "INSERT INTO kas_ins (types, title, total, ket, admin_id, status, created_at) VALUES (:a, :c, :b, :d, :e, :f, :tgl)";
-            $stmt = $config->runQuery($sql);
-            $stmt->execute(array(
-                ':a'    => 'debit',
-                ':c'    => 'return belanja',
-                ':b'    => $d,
-                ':d'    => 'return belanja',
-                ':e'    => $e,
-                ':f'    => $c,
-                ':tgl'  => $tgl
-            ));
-            $reff = $config->lastInsertId();
-            $logs = $config->saveLogs($reff, $admin, 'c', 'refund dana belanja ');
+    if($data) {
+        $delkasout = $config->delRecord('kas_outs', 'id', $data['kas_out_id']);
+        $stmt = $config->delRecord('kas_ins', 'id', $a);
+        $logs = $config->saveLogs($a, $e, 'd', 'hapus belanja');
+        if($stmt){
+            echo $config->actionMsg('d', 'kas_ins');
+            $cek = $config->runQuery("SELECT total FROM kas_ins WHERE id ='". $c ."' ");
+            $cek->execute();
+            $cek =  $cek->fetch(PDO::FETCH_LAZY);
+            $dana = $cek['total'] + $d;
+            $update = $config->runQuery("UPDATE kas_ins SET total = '". $dana ."' WHERE id = '". $c ."' ");
+            $update->execute();
+
+            if($update){
+                    $sql = "INSERT INTO kas_ins (types, title, total, ket, admin_id, status, created_at) VALUES (:a, :c, :b, :d, :e, :f, :tgl)";
+                $stmt = $config->runQuery($sql);
+                $stmt->execute(array(
+                    ':a'    => 'debit',
+                    ':c'    => 'return belanja',
+                    ':b'    => $d,
+                    ':d'    => 'return belanja',
+                    ':e'    => $e,
+                    ':f'    => $c,
+                    ':tgl'  => $tgl
+                ));
+                $reff = $config->lastInsertId();
+                $logs = $config->saveLogs($reff, $admin, 'c', 'refund dana belanja ');
+            }
+            
+            
+
+        }else{
+            echo 'Failed!';
         }
-        
-        
-
-    }else{
+    } else {
         echo 'Failed!';
     }
 }
@@ -587,7 +594,7 @@ if($_GET['type'] == 'payDelivery'){
     
     $a = $_POST['id_record'];
 
-    $cek = $config->getData('remarks, weight, total', 'pay_kurirs', "id = '". $a ."' "); //get keterangan
+    $cek = $config->getData('no_trx,kurir_id, remarks, weight, total', 'pay_kurirs', "id = '". $a ."' "); //get keterangan
 
     $sql = $config->runQuery("UPDATE pay_kurirs SET status = '1' WHERE id = '". $a."' ");
     $sql->execute();
@@ -609,7 +616,7 @@ if($_GET['type'] == 'payDelivery'){
             ':a' => 'kredit',
             ':b' => $total,
             ':c' => 'pay_kurirs',
-            ':d' => $cek['remarks'],
+            ':d' => $cek['remarks'].' _ '.$cek['no_trx'],
             ':e' => '2',
             ':f' =>  $admin
         ));

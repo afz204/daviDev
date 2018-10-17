@@ -173,8 +173,9 @@ if($_GET['type'] == 'addBelanja')
             ':h'    => $h,
             ':i'    => $i
         ));
-        $reff = $config->lastInsertId();
-            $logs = $config->saveLogs($reff, $admin, 'c', 'tambah belanja');
+        $refkasouts = $config->lastInsertId();
+        echo $refkasouts;
+            $logs = $config->saveLogs($refkasouts, $admin, 'c', 'tambah belanja');
         if($stmt)
         {
             echo $config->actionMsg('c', 'kas_outs');
@@ -193,14 +194,15 @@ if($_GET['type'] == 'addBelanja')
                     ':h'    => $i
                 ));
                 $reff = $config->lastInsertId();
-            $logs = $config->saveLogs($reff, $admin, 'c', 'tambah stock barang');
+                $logs = $config->saveLogs($reff, $admin, 'c', 'tambah stock barang');
                 if($stmt2){
                     echo $config->actionMsg('c', 'stocks');
-
-                    $sql3 = "INSERT INTO kas_ins (parent_id, types, title, total, ket, admin_id, status) VALUES (:parent, :tipe, :title, :total, :ket, :admin, :status)";
+                    echo $refkasouts.' : hhahaha';
+                    $sql3 = "INSERT INTO kas_ins (parent_id, kas_out_id, types, title, total, ket, admin_id, status) VALUES (:parent, :kas_out_id, :tipe, :title, :total, :ket, :admin, :status)";
                     $stmt3 = $config->runQuery($sql3);
                     $stmt3->execute(array(
                         ':parent'   => $idKas,
+                        ':kas_out_id'   => $refkasouts,
                         ':tipe'     => 'kredit',
                         ':title'    => $c,
                         ':total'    => $totalBelanja,
@@ -227,10 +229,11 @@ if($_GET['type'] == 'addBelanja')
                 }
 
             }else{
-                $sql3 = "INSERT INTO kas_ins (parent_id, types, title, total, ket, admin_id, status) VALUES (:parent, :tipe, :title, :total, :ket, :admin, :status)";
+                $sql3 = "INSERT INTO kas_ins (parent_id, kas_out_id, types, title, total, ket, admin_id, status) VALUES (:parent, :kas_out_id, :tipe, :title, :total, :ket, :admin, :status)";
                     $stmt3 = $config->runQuery($sql3);
                     $stmt3->execute(array(
                         ':parent'   => $idKas,
+                        ':kas_out_id'   => $refkasouts,
                         ':tipe'     => 'kredit',
                         ':title'    => $c,
                         ':total'    => $totalBelanja,

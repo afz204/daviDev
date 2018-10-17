@@ -57,7 +57,7 @@ if($total > 0 ){
                                                class="form-control" placeholder="total biaya" id="biayaKasB" required>
                                     </div>
                                     <div class="form-group">
-                                        <textarea class="form-control" rows="5" id="ketKasB" required placeholder="keterangan kas masuk"></textarea>
+                                        <textarea class="form-control" rows="5" id="ketKasB" required placeholder="keterangan kas"></textarea>
                                     </div>
                                     <button type="submit" id="btnKas_besar" class="btn btn-sm btn-block btn-primary">submit pemasukan</button>
                                 </form>

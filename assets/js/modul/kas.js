@@ -1,20 +1,20 @@
-function delPayCharge(id)
-{
-    if(!confirm("Are you sure want to delete this ?")){
+function delPayCharge(id) {
+    if (!confirm("Are you sure want to delete this ?")) {
         return false;
-    }else{
+    } else {
         $.ajax({
-                url: '../php/ajax/payment.php?type=delPayCharge',
-                method: 'post',
-                data: { id: id },
+            url: '../php/ajax/payment.php?type=delPayCharge',
+            method: 'post',
+            data: { id: id },
 
-                success: function(msg) {
-                    alert(msg);
-                    location.reload();
-                }
-            });
+            success: function(msg) {
+                alert(msg);
+                location.reload();
+            }
+        });
     }
 }
+
 function payDelivery(id) {
     if (!confirm('Are you sure want to add remarks ?')) {
         return false;
@@ -583,9 +583,24 @@ $(function() {
     function cb(start, end) {
         $('#filterPayKurir span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
         $('#dataPayKurirFilter').val(start.format('YYYY-MM-DD') + '_' + end.format('YYYY-MM-DD'));
+
+        $('#datekasout span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        $('#daterangekasout').val(start.format('YYYY-MM-DD') + '_' + end.format('YYYY-MM-DD'));
     }
 
     $('#filterPayKurir').daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+    $('#datekasout').daterangepicker({
         startDate: start,
         endDate: end,
         ranges: {
