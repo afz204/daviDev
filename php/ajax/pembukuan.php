@@ -38,7 +38,7 @@ if($_GET['type'] == 'revenue')
     $databox = '';
     if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
         // echo $_POST['search']['value'];
-        $databox = ' AND(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") ';
+        $databox = ' (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") AND';
     }
 
     $DataQuery = " SELECT transaction.* , (transaction.grandTotal - transaction.TotalCostPrice) / transaction.grandTotal as MP, users.name as AdminName FROM transaction

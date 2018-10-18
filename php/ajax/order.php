@@ -17,7 +17,7 @@ if($_GET['type'] == 'formresonbox'){
     $notes = $_POST['notes'];
     $Types = $_POST['Types'];
 
-    if(in_array($Types, [4, 5, 6])) {
+    if(in_array($Types, [4, 5])) {
         $a  = $_POST['transactionID'];
         $b  = $_POST['notes'];
         
@@ -498,7 +498,7 @@ if($_GET['type'] == 'formresonbox'){
         }
     }
 
-    $update = $config->runQuery("UPDATE transaction SET statusOrder = '".$Types."', notes = '".$notes."' WHERE transactionID = '".$transactionID."' ");
+    $update = $config->runQuery("UPDATE transaction SET statusOrder = '".$Types."', notes = '".$notes."', updated_by = '".$admin."' WHERE transactionID = '".$transactionID."' ");
     $update->execute();
 
     if($update) {
