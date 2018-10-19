@@ -321,7 +321,7 @@ function tableSearch(is_date_search, invoicenomor, sendername, address, typeRepo
         "fixedColumns": true,
         "processing": true,
         "serverSide": true,
-        "searching": false,
+        "searching": true,
         "pagging": true,
         'language': {
             "loadingRecords": "&nbsp;",

@@ -110,7 +110,7 @@ if(isset($_GET['type'])) $formR = 'hidden';
         List Order
     </div>
     <div class="card-body">
-        <form id="caridata" class="form-inline" methods="post" data-parsley-validate="" style="    padding-left: 1.2222222%;">
+        <!-- <form id="caridata" class="form-inline" methods="post" data-parsley-validate="" style="    padding-left: 1.2222222%;">
             <div class="form-group mx-sm-3 mb-2">
                     <input type="text" class="form-control" id="invoicenomor" name="invoicenomor" placeholder="Nomor Invoice">
             </div>
@@ -122,15 +122,15 @@ if(isset($_GET['type'])) $formR = 'hidden';
             </div>
             <div class="form-group mb-2">
                 <select name="typeReport" id="typeReport" class="form-control">
-                    <option value="">status</option>
-                    <?php foreach($arrstatusorder as $key => $val) { ?>
+                    <option value="">status</option> -->
+                    <!-- <?php foreach($arrstatusorder as $key => $val) { ?>
                         <option value="<?=$key?>"><?=$val?></option>
-                    <?php } ?>
-                </select>
+                    <?php } ?> -->
+                <!-- </select>
             </div>
 
             <button type="submit" class="btn btn-primary mb-2">cari</button>
-        </form>
+        </form> -->
         <div id="listOrder">
             <table id="tableSearch" class="table table-hover<?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover">
                 <thead class="thead-light">

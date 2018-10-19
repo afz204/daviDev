@@ -154,6 +154,11 @@
                     <td width="5%">:</td>
                     <td width="55%"><?=$prod['product_qty']?></td>
                 </tr>
+                <tr>
+                    <td width="40%">Description</td>
+                    <td width="5%">:</td>
+                    <td width="55%"><?=$prod['full_desc']?></td>
+                </tr>
             </table>
             <div class="title" style="text-align: center; font-size: 18px;">
                
