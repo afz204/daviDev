@@ -57,25 +57,34 @@ if(isset($session_id)){
     
     $datamenu = [];
     $datasubmenu = [];
-    $subcat = "SELECT staffs.id, menus.id, menus.menu, menus.links, sub_menus.submenu, sub_menus.link, previllages.weight FROM staffs
-    INNER JOIN menus ON menus.id = staffs.id_menu
-    INNER JOIN sub_menus ON sub_menus.id_menu = menus.id
-    INNER JOIN previllages ON previllages.id_submenu = sub_menus.id
-    WHERE previllages.id_admin = :adminID GROUP BY sub_menus.submenu DESC ORDER BY menus.id";
-
+    // $subcat = "SELECT staffs.id, menus.id, menus.menu, menus.links, sub_menus.id as groupid, sub_menus.submenu, sub_menus.link, previllages.weight FROM staffs
+    // INNER JOIN menus ON menus.id = staffs.id_menu
+    // INNER JOIN sub_menus ON sub_menus.id_menu = menus.id
+    // INNER JOIN previllages ON previllages.id_submenu = sub_menus.id
+    // WHERE previllages.id_admin = :adminID GROUP BY sub_menus.submenu ORDER BY sub_menus.id ASC";
+    $subcat = "select previllages.id as previllagesid, previllages.weight, menus.menu as cat, menus.links as catlink, sub_menus.submenu as subcat, sub_menus.link as subcatlink 
+    from previllages
+    left join sub_menus on sub_menus.id = previllages.id_submenu
+    left join menus on menus.id = sub_menus.id_menu
+    WHERE previllages.id_admin = :adminID and menus.menu IS NOT NULL order by menus.id asc";
     $subcat = $config->runQuery($subcat);
     $subcat->execute(array(':adminID' => $session_id));
     while($col = $subcat->fetch(PDO::FETCH_LAZY)) {
-        $datamenu[$col['link']] = $col['weight'];
+        $datamenu[$col['subcatlink']] = $col['weight'];
     }
     
     
     $adminName = $admin[0]['user_name'];
-    $sql2 = "SELECT staffs.id, menus.id, menus.menu, menus.links, sub_menus.submenu, sub_menus.link, previllages.weight FROM staffs
-    INNER JOIN menus ON menus.id = staffs.id_menu
-    INNER JOIN sub_menus ON sub_menus.id_menu = menus.id
-    INNER JOIN previllages ON previllages.id_submenu = sub_menus.id
-    WHERE previllages.id_admin = :adminID GROUP BY sub_menus.submenu DESC ORDER BY menus.id";
+    // $sql2 = "SELECT staffs.id, menus.id, menus.menu, menus.links, sub_menus.submenu, sub_menus.link, previllages.weight FROM staffs
+    // INNER JOIN menus ON menus.id = staffs.id_menu
+    // INNER JOIN sub_menus ON sub_menus.id_menu = menus.id
+    // INNER JOIN previllages ON previllages.id_submenu = sub_menus.id
+    // WHERE previllages.id_admin = :adminID GROUP BY sub_menus.submenu DESC ORDER BY menus.id";
+    $sql2 = "select previllages.id as previllagesid, previllages.weight, menus.menu as cat, menus.links as catlink, sub_menus.submenu as subcat, sub_menus.link as subcatlink 
+    from previllages
+    left join sub_menus on sub_menus.id = previllages.id_submenu
+    left join menus on menus.id = sub_menus.id_menu
+    WHERE previllages.id_admin = :adminID and menus.menu IS NOT NULL order by menus.id asc";
 
     $stmt2 = $config->runQuery($sql2);
     $stmt2->execute(array(':adminID' => $session_id));
@@ -84,10 +93,10 @@ if(isset($session_id)){
     while ($row = $stmt2->fetch(PDO::FETCH_LAZY))
     {
         $category[] = array(
-            'cat' => $row['menu'],    
-            'cat_link'   => $row['links'],
-            'subcat'    => $row['submenu'],
-            'subcat_link' => $row['link'],
+            'cat' => $row['cat'],    
+            'cat_link'   => $row['catlink'],
+            'subcat'    => $row['subcat'],
+            'subcat_link' => $row['subcatlink'],
             'weight_page'    => $row['weight']
         );
     }

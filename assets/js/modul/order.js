@@ -867,6 +867,7 @@ $(document).ready(function() {
                     location.reload();
                 }
             });
+            // alert(TypeOfReason);
         }
     });
     $('#CancelOrder').on('submit', function(e) {

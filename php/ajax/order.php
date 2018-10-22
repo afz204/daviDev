@@ -938,6 +938,12 @@ if($_GET['type'] == 'tableNewOrder'){
             // echo $delivarydatess .' '. $datenow . '    -' .$row['delivery_date'];
             $btnchangestatus = '<button class="btn btn-sm btn-primary" onclick="chagestatusordermodal(\''. $row['transactionID'] .'\')" style="font-size: 12px;">'. $arrstatusorder[$row['statusOrder']] .'</button>';
 
+            $statuspaidflag = '<span class="badge badge-sm badge-warning">UNPAID</span>';
+            if($row['statusPaid'] == 1) {
+                $paidby = $config->getData('*','users', "id = ".$row['PaidBy']);
+                $statuspaidflag = '<span class="badge badge-sm badge-success">PAID</span> By: '. $paidby['name'];
+            }
+
             $subdata = array();
             
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
@@ -949,7 +955,8 @@ if($_GET['type'] == 'tableNewOrder'){
             $subdata[]  = $Kirim . '<span class="small" style="color: red;"> '.$deliverytime.'</span>';
             // $subdata[]  = $row['kelurahan'];
             // $subdata[]  = '<span class="badge badge-sm badge-info">'.$arrstatusorder[$row['statusOrder']].'</span>';
-            $subdata[]  = '<span class="badge badge-sm badge-'.$statuspaid.'">'.$arrstatuspaid[$row['statusPaid']].'</span>';
+            // $subdata[]  = '<span class="badge badge-sm badge-'.$statuspaid.'">'.$arrstatuspaid[$row['statusPaid']].'</span> arfan azhari';
+            $subdata[]  = $statuspaidflag;
             $subdata[]  = $createorder;
             $subdata[]  = $row['admin'];
             $subdata[]  = $florist;
@@ -1181,6 +1188,12 @@ if($_GET['type'] == 'tableOnProccess'){
             if($row['delivery_time']) $deliverytime = $arrtime[$row['delivery_time']];
             // var_dump(strtotime(Date('Y-m-d', strtotime($row['delivery_date']))));
             // var_dump(strtotime($config->getdate('Y-m-d')));
+            $statuspaidflag = '<span class="badge badge-sm badge-warning">UNPAID</span>';
+            if($row['statusPaid'] == 1) {
+                $paidby = $config->getData('*','users', "id = ".$row['PaidBy']);
+                $statuspaidflag = '<span class="badge badge-sm badge-success">PAID</span> By: '. $paidby['name'];
+            }
+
             $subdata = array();
 
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
@@ -1192,7 +1205,8 @@ if($_GET['type'] == 'tableOnProccess'){
             $subdata[]  = $Kirim . '<span class="small" style="color: red;"> '.$deliverytime.'</span>';
             // $subdata[]  = $row['kelurahan'];
             // $subdata[]  = '<span class="badge badge-sm badge-info">'.$arrstatusorder[$row['statusOrder']].'</span>';
-            $subdata[]  = '<span class="badge badge-sm badge-'.$statuspaid.'">'.$arrstatuspaid[$row['statusPaid']].'</span>';
+            // $subdata[]  = '<span class="badge badge-sm badge-'.$statuspaid.'">'.$arrstatuspaid[$row['statusPaid']].'</span>';
+            $subdata[]  = $statuspaidflag;
             $subdata[]  = $createorder;
             $subdata[]  = $row['admin'];
             $subdata[]  = $florist;
@@ -1426,6 +1440,12 @@ if($_GET['type'] == 'tableOnDelivery'){
                 $color =   '';
             }
 
+            $statuspaidflag = '<span class="badge badge-sm badge-warning">UNPAID</span>';
+            if($row['statusPaid'] == 1) {
+                $paidby = $config->getData('*','users', "id = ".$row['PaidBy']);
+                $statuspaidflag = '<span class="badge badge-sm badge-success">PAID</span> By: '. $paidby['name'];
+            }
+
             $subdata = array();
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
             $subdata[]  = $dataproduct;
@@ -1436,7 +1456,8 @@ if($_GET['type'] == 'tableOnDelivery'){
             $subdata[]  = $Kirim . '<span class="small" style="color: red;"> '.$deliverytime.'</span>';
             // $subdata[]  = $row['kelurahan'];
             // $subdata[]  = '<span class="badge badge-sm badge-info">'.$arrstatusorder[$row['statusOrder']].'</span>';
-            $subdata[]  = '<span class="badge badge-sm badge-'.$statuspaid.'">'.$arrstatuspaid[$row['statusPaid']].'</span>';
+            // $subdata[]  = '<span class="badge badge-sm badge-'.$statuspaid.'">'.$arrstatuspaid[$row['statusPaid']].'</span>';
+            $subdata[]  = $statuspaidflag;
             $subdata[]  = $createorder;
             $subdata[]  = $row['admin'];
             $subdata[]  = $florist;
@@ -1666,6 +1687,12 @@ if($_GET['type'] == 'tableHistory'){
                 $color = '';
             } else {
                 $color =   '';
+            }
+
+            $statuspaidflag = '<span class="badge badge-sm badge-warning">UNPAID</span>';
+            if($row['statusPaid'] == 1) {
+                $paidby = $config->getData('*','users', "id = ".$row['PaidBy']);
+                $statuspaidflag = '<span class="badge badge-sm badge-success">PAID</span> By: '. $paidby['name'];
             }
 
             $subdata = array();

@@ -81,7 +81,7 @@ $kurir = $config->Products('*', 'users where status = 1');
                             <?php } ?>
                             </tbody>
                         </table>
-                        <form <?=$access['update']?> action="" id="reportKasOutAdmin" data-parsley-validate="" autocomplete="off">
+                        <!-- <form <?=$access['update']?> action="" id="reportKasOutAdmin" data-parsley-validate="" autocomplete="off">
                             <div class="form-row align-items-center">
                                 <div class="col-auto my-1">
                                     <input type="hidden" value="<?=$admin[0]['user_id']?>" id="reportOutAdminID">
@@ -97,7 +97,7 @@ $kurir = $config->Products('*', 'users where status = 1');
                                     <button type="submit" class="btn btn-sm btn-success">report</button>
                                 </div>
                             </div>
-                        </form>
+                        </form> -->
                     </div>
                 </div>
             </div>

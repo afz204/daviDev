@@ -11,7 +11,7 @@ $kasMasuk = $totalKas['totalDana'];
 $kasKeluar = $totalKeluar['totalDana'];
 $total = $kasMasuk - $kasKeluar;
 $totalDanaKas = $config->formatPrice($total);
-
+// var_dump($kas);
 if($total > 0 ){
         $style = 'success';
     }else{
@@ -79,7 +79,22 @@ if($total > 0 ){
                         </div>
                     </div>
                     <div id="listKasBesar" class="hidden">
-
+                        <form id="FilterPayKurir" methods="post" data-parsley-validate="">
+                            <div class="row">
+                                <div class="form-group mx-sm-3 mb-2">
+                                    <div id="daterangekasbesar" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
+                                    </div>
+                                    <input type="hidden" id='datarangekasbesar'>
+                                </div>
+                                <div class="col-12 col-sm-3 col-lg-3">
+                                    <div class="btn-group mr-2" role="group" aria-label="First group" style="padding-top: 1%">
+                                        <button type="button" onClick="exportkasbesar('kasbesar')" class="btn btn-sm btn-outline-info"><span class="fa fa-download"></span> export</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                         <table id="kasMasuk" class="table table-bordered  <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
                             <thead class="thead-light">
                             <tr style="text-transform: lowercase;">

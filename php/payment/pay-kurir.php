@@ -90,11 +90,11 @@
                                     </select>
                                 </div>
                                 <div class="col-12 col-sm-3 col-lg-3">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-outline-secondary" type="submit"><span class="fa fa-search"></span> filter</button>
-                                        </div>
-                                        </div>
+                                    <div class="btn-group mr-2" role="group" aria-label="First group" style="padding-top: 1%">
+                                        <button type="submit" class="btn btn-sm btn-outline-success"><span class="fa fa-search"></span> filter</button>
+                                        <button type="button" onClick="exportpaykurir('kurir')" class="btn btn-sm btn-outline-info"><span class="fa fa-download"></span> export</button>
                                     </div>
+                                </div>
                             </div>
                         </form>
                         <table id="tablePayKurir" class="table table-bordered  <?=$device['device']=='MOBILE' ? 'table-responsive' : ''?> table-condensed table-hover" style="text-transform: capitalize;">
@@ -130,8 +130,8 @@
                                 </tr>
                             </tfoot> -->
                         </table>
-                        <div class="col-6 col-sm-3 col-lg-3 text-right">
-                            <ul class="list-group mb-3">
+                        <div class="col-6 col-sm-4 col-lg-4 text-right">
+                            <ul class="list-group mb-4">
                                
                                 <li class="list-group-item d-flex justify-content-between" style="padding: .25rem .75rem !important;">
                                     <span>Total Transaksi </span>
@@ -148,7 +148,7 @@
                             </ul>
                         </div>
                                         </br>
-                        <form <?=$access['update']?> action="" id="reportPayCharge" data-parsley-validate="" autocomplete="off">
+                        <!-- <form <?=$access['update']?> action="" id="reportPayCharge" data-parsley-validate="" autocomplete="off">
                             <div class="form-row align-items-center">
                                 <div class="col-auto my-1">
                                     <input type="hidden" value="<?=$admin[0]['user_id']?>" id="reportPayChargeAdminID">
@@ -164,7 +164,7 @@
                                     <button type="submit" class="btn btn-sm btn-success">report</button>
                                 </div>
                             </div>
-                        </form>
+                        </form> -->
                     </div>
                 </div>
             </div>

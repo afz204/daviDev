@@ -19,6 +19,33 @@ function exportkas(type) {
     }
 }
 
+function exportpaykurir(type) {
+    var range = '';
+    var statuspaid = '';
+    if (type == 'kasout') {
+        range = $('#dataPayKurirFilter').val();
+        statuspaid = $('#selectKurirPay option:selected').val();
+    } else if (type == 'exportpiutang') {
+        range = $('#dataPayKurirFilter').val();
+        statuspaid = $('#selectKurirPay option:selected').val();
+    } else {
+        range = $('#dataPayKurirFilter').val();
+        statuspaid = $('#selectKurirPay option:selected').val();
+    }
+    if (statuspaid == '') {
+        alert('Select Admin!');
+    } else {
+
+        window.open('../php/ajax/exportpaykurir.php?type=' + type + '&date_range=' + range + '&status_paid=' + statuspaid, "_blank");
+    }
+}
+
+function exportkasbesar(type) {
+    var range = $('#datarangekasbesar').val();
+    var statuspaid = '';
+    window.open('../php/ajax/exportkasbesar.php?type=kasbesar&date_range=' + range, "_blank");
+}
+
 function delPayCharge(id) {
     if (!confirm("Are you sure want to delete this ?")) {
         return false;
@@ -199,7 +226,7 @@ function fetch_payKurir(is_date_search, date_range, kurir) {
     var tablePaymentKurir = $('#tablePayKurir').DataTable({
         "processing": true,
         "serverSide": true,
-        "searching": false,
+        "searching": true,
         "pagging": true,
         "ajax": {
             url: "../php/ajax/listPayment.php?type=pay-kurir", // json datasource
@@ -235,6 +262,47 @@ function fetch_payKurir(is_date_search, date_range, kurir) {
 
     });
 }
+
+function kasMasuk(is_date_search, date_range) {
+
+    var tablePaymentKurir = $('#skasMasuk').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "searching": true,
+        "pagging": true,
+        "ajax": {
+            url: "../php/ajax/listPayment.php?type=kasMasuk", // json datasource
+            type: "post", // method  , by default get
+            data: {
+                is_date_search: is_date_search,
+                date_range: date_range
+            },
+            error: function() { // error handling
+                $(".employee-grid-error").html("");
+                $("#tablePayKurir").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                $("#employee-grid_processing").css("display", "none");
+
+            }
+        },
+        drawCallback: function(settings) {
+            var data = this.api().ajax.json();
+            // $('#totalPayment').html(data['totalData']);
+            // $('#totalPerKurir').html(data['totalKurir']);
+            // $('#selisih').html(data['subtotal']);
+        },
+        "columns": [
+            { "data": "0", "orderable": false },
+            { "data": "1", "orderable": false },
+            { "data": "2", "orderable": false },
+            { "data": "3", "orderable": false },
+            { "data": "4", "orderable": false },
+            { "data": "5", "orderable": false },
+            { "data": "6", "orderable": false },
+            { "data": "7", "orderable": false }
+        ],
+
+    });
+}
 $(document).ready(function() {
     $('#starDateReport').datetimepicker();
     $('#endDateReport').datetimepicker();
@@ -246,6 +314,7 @@ $(document).ready(function() {
     $('#selectKurirPay').select2({ width: '100%', theme: "bootstrap4" });
 
     fetch_payKurir('no');
+    kasMasuk('no');
 
     $('#table_kas_out').DataTable();
     var listOutKas = $('#listKasKeluar').show();
@@ -261,6 +330,15 @@ $(document).ready(function() {
 
         $('#tablePayKurir').DataTable().destroy();
         fetch_payKurir('yes', range, kurir);
+    });
+    $('#FilterkasMasuk').on('submit', function(e) {
+        e.preventDefault();
+
+        var range = $('#dataPayKurirFilter').val();
+        var kurir = $('#selectKurirPay option:selected').val();
+
+        $('#kasMasuk').DataTable().destroy();
+        kasMasuk('yes', range, kurir);
     });
 
     $('#listPengeluaranKas').on('click', '.addOutKas', function() {
@@ -607,8 +685,23 @@ $(function() {
 
         $('#datekasout span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
         $('#daterangekasout').val(start.format('YYYY-MM-DD') + '_' + end.format('YYYY-MM-DD'));
+
+        $('#daterangekasbesar span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        $('#datarangekasbesar').val(start.format('YYYY-MM-DD') + '_' + end.format('YYYY-MM-DD'));
     }
 
+    $('#daterangekasbesar').daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
     $('#filterPayKurir').daterangepicker({
         startDate: start,
         endDate: end,

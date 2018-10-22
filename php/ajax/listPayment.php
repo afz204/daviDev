@@ -28,12 +28,18 @@ if($_GET['type'] == 'pay-kurir')
         // $month = 'AND DATE(pay_kurirs.created_at) = DATE(NOW())';
     }
 
+    if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
+        // echo $_POST['search']['value'];
+        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%")  OR (transaction_details.product_name LIKE "%'.$_POST['search']['value'].'%") AND ';
+    }
+
     $payCharge = " SELECT pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.name, users.name as admin FROM pay_kurirs INNER JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
     INNER JOIN delivery_charges ON delivery_charges.id = pay_kurirs.charge_id
     INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan
-    INNER JOIN users ON users.id = delivery_charges.admin_id WHERE pay_kurirs.status != '2' " . $month ." ";
+    INNER JOIN users ON users.id = delivery_charges.admin_id WHERE pay_kurirs.status != '2' ";
 
-    $totalPembayaran = $config->getData('SUM(total) as TOTAL', 'pay_kurirs', "pay_kurirs.status != '2' ". $month);
+    // $totalPembayaran = $config->runQuery()
+    $totalPembayaran = $config->getData('SUM(total) as TOTAL', 'pay_kurirs', "pay_kurirs.status != '2' ");
     $totalPembayaran = $totalPembayaran['TOTAL'];
     //print_r($request);
     $colom = array(
@@ -64,19 +70,20 @@ if($_GET['type'] == 'pay-kurir')
         if($kurir == 0) {
             $kurir = '';
         } else {
-            $kurir = 'AND pay_kurirs.kurir_id = '. $kurir;
+            $kurir = "AND pay_kurirs.kurir_id = ". $kurir;
         }
         
         $rangeArray = explode("_",$daterange); 
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
-        $payCharge.= $kurir."AND ( pay_kurirs.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ) ";
+        $payCharge.= $kurir." AND ( pay_kurirs.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ) ";
         $stmt = $config->runQuery($payCharge);
         $stmt->execute(); 
         $totalFilter = $stmt->rowCount();
-
-        $totalPerKurir = $config->getData('SUM(total) as TOTAL', 'pay_kurirs', "pay_kurirs.status != '2' ". $month . " AND pay_kurirs.kurir_id = '". $kurir ."' AND ( pay_kurirs.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ) ");
-
+        
+        $totalPerKurir = $config->getData('SUM(total) as TOTAL', 'pay_kurirs', "pay_kurirs.status != '2' ". $month . $kurir ." AND ( pay_kurirs.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ) ");
+        
+        // var_dump($totalPerKurir);
         $totalPerKurir = $totalPerKurir['TOTAL'];
 
     }
@@ -84,7 +91,7 @@ if($_GET['type'] == 'pay-kurir')
         $stmt = $config->runQuery($payCharge);
         $stmt->execute(); 
    
-   //var_dump($stmt);
+//    var_dump($stmt);
     $data = array();
     // 9 1 11 4 10 12 7
     while ($row = $stmt->fetch(PDO::FETCH_LAZY)){

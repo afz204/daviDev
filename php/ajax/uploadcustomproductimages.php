@@ -111,8 +111,8 @@ if ($success === true) {
             ':a' => $transactionID,
             ':b' => $imagesid,
             ':c' => $nameproduct,
-            ':d' => $costProduct,
-            ':e' => $sellProduct,
+            ':d' => $sellProduct,
+            ':e' => $costProduct,
             ':f' => '1',
             ':g' => $remkarsfloris
         ));
