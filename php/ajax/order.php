@@ -758,7 +758,7 @@ if($_GET['type'] == 'tableNewOrder'){
     $databox = '';
     if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
         // echo $_POST['search']['value'];
-        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") OR (transaction_details.product_name LIKE "%'.$_POST['search']['value'].'%") AND ';
+        $databox = 'transaction.statusOrder = 0 AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") OR (transaction_details.product_name LIKE "%'.$_POST['search']['value'].'%") AND ';
     }
 
     $colom = array(
