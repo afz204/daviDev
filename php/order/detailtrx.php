@@ -1,4 +1,5 @@
-<?php 
+<?php
+    $kelurahan = $config->Products('delivery_charges.id as idcarge, delivery_charges.id_kelurahan, villages.name as villagename, delivery_charges.price as harga', 'delivery_charges LEFT JOIN villages ON villages.id = delivery_charges.id_kelurahan');
     $arrtime = [
         0 => '9am - 1pm',
         1 => '2pm - 5pm',
@@ -37,7 +38,7 @@
             'name' => $vi['name'],
         );
     }
-    $transaction = $config->ProductsJoin('transaction.*, transaction_details.*, customer.*, corporates.*, payment.PaymentName', 'transaction', 
+    $transaction = $config->ProductsJoin('transaction.*, transaction_details.*, transaction_details.id as productID, customer.*, corporates.*, payment.PaymentName', 'transaction', 
     'LEFT JOIN transaction_details ON transaction_details.id_trx = transaction.transactionID 
     LEFT JOIN customer ON customer.ID = transaction.CustomerID 
     LEFT JOIN corporates ON corporates.CorporateUniqueID = transaction.CustomerID 
@@ -67,7 +68,7 @@
             'provinsi_id' => $prov[$trx['provinsi_id']]['name'],
             'kota_id' => $reg[$trx['kota_id']]['name'],
             'kecamata_id' => $dis[$trx['kecamata_id']]['name'],
-            'kelurahan_id' => $vil[$trx['kelurahan_id']]['name'],
+            'kelurahan' => $trx['kelurahan_id'],
             'alamat_penerima' => $trx['alamat_penerima'],
             'delivery_date' => $trx['delivery_date'],
             'delivery_time' => $trx['delivery_time'],
@@ -77,6 +78,7 @@
             'card_template1' => $trx['card_template1'],
             'card_template2' => $trx['card_template2'],
             'card_isi' => $trx['card_isi'],
+            'hp_penerima' => $trx['hp_penerima'],
         );
         
         $prod = $config->Products('product_id, category_id, subcategory_id, name_product, cost_price, selling_price, available_on, sort_desc, full_desc, note, images', "products WHERE product_id = '". $trx['id_product'] ."' ");
@@ -98,7 +100,8 @@
                 'product_price'    => $trx['product_price'],
                 'product_cost'    => $trx['product_cost'] != '' ? $trx['product_cost'] : $p['cost_price'],
                 'delivery_charge'    => $trx['delivery_charge'],
-                'delivery_charge_time'    => $trx['delivery_charge_time']
+                'delivery_charge_time'    => $trx['delivery_charge_time'],
+                'productTransactionID'    => $trx['productID']
             );
         }
     }
@@ -114,7 +117,8 @@
    <div class="row justify-content-center card-body">
       <div id="imagesProduct" class="col-12 col-md-4 col-lg-4">
          <div class="card-header">
-            <h5 class="card-title">Product</h5>
+            <h5 class="card-title">Product</h5> 
+            <!-- <button class="btn btn-sm btn-warning" onclick="editproduct()">Edit</button> -->
          </div>
          <div class="card-body">
             <?php foreach($product as $prod) { ?>
@@ -124,6 +128,11 @@
                </a>
             </picture>
             <table class="table table-bordered table-responsive">
+                <tr id="btn-product" class="">
+                    <td colspan="3">
+                    <button class="btn btn-sm btn-block btn-danger " onclick="hapusproduct(<?=$prod['productTransactionID']?>)">Hapus</button>
+                    </td>
+                </tr>
                 <tr>
                     <td width="40%">Nama Product</td>
                     <td width="5%">:</td>
@@ -192,8 +201,10 @@
                   <button class="btn btn-primary btn-block text-left" data-toggle="collapse" data-target="#collapseDetails" aria-expanded="true" aria-controls="collapseDetails">
                   Details Customer 
                   </button>
+                  <button class="btn btn-sm btn-warning" onclick="editcustomer()">Edit</button>
                </h5>
             </div>
+            <input type="hidden" class="form-control" id="TransactionNumber"  value="<?=$data['transactionID']?>">
             <div id="collapseDetails" class="collapse show" aria-labelledby="customer_details" data-parent="#accordion">
                <div class="card-body">
                   <div class="row">
@@ -214,7 +225,7 @@
                      </div>
                      <div class="col-md-6 mb-3">
                         <label for="firstName">Referensi Invoice</label>
-                        <input type="corporate_name" class="form-control" id="corporate_name"  value="<?=$data['invoice_name']?>" autocomplete="text" placeholder="" value="" readonly>
+                        <input type="corporate_name" class="form-control" id="invoice_name"  value="<?=$data['invoice_name']?>" autocomplete="text" placeholder="" value="" readonly>
                         <div class="invalid-feedback">
                            Valid first name is required.
                         </div>
@@ -229,6 +240,11 @@
                      </div>
                      <?php } ?>
                   </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                        <button class="btn-block btn btn-success btn-customer hidden" onclick="customer()">UPDATE</button>
+                    </div>
+                    </div>
                </div>
             </div>
          </div>
@@ -237,6 +253,7 @@
                <button class="btn btn-primary btn-block text-left" data-toggle="collapse" data-target="#collapseAddress" aria-expanded="true" aria-controls="collapseAddress">
                Detail Penerima
                </button>
+               <button class="btn btn-sm btn-warning" onclick="editpenerima()">Edit</button>
             </h5>
          </div>
          <div id="collapseAddress" class="collapse show" aria-labelledby="customer_address" data-parent="#accordion">
@@ -244,56 +261,30 @@
                <div class="row">
                   <div class="col-md-6 mb-3">
                      <label for="firstName">nama penerima</label>
-                     <input type="text" class="form-control" id="provinsi" value="<?=$data['nama_penerima']?>" autocomplete="text" placeholder=""  readonly>
+                     <input type="text" class="form-control" id="nama_penerima" value="<?=$data['nama_penerima']?>" autocomplete="text" placeholder=""  readonly>
                      <div class="invalid-feedback">
                         Valid first name is required.
                      </div>
                   </div>
                   <div class="col-md-6 mb-3">
                      <label for="lastName">email penerima</label>
-                     <input type="text" class="form-control" id="status" value="<?=$data['email']?>" autocomplete="text" placeholder="" readonly>
+                     <input type="text" class="form-control" id="email" value="<?=$data['email']?>" autocomplete="text" placeholder="" readonly>
+                     <div class="invalid-feedback">
+                        Valid last name is required.
+                     </div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                     <label for="lastName">nomor_handphone</label>
+                     <input type="text" class="form-control" id="hp_penerima" value="<?=$data['hp_penerima']?>" autocomplete="text" placeholder="" readonly>
                      <div class="invalid-feedback">
                         Valid last name is required.
                      </div>
                   </div>
                </div>
                <div class="row">
-                  <div class="col-md-6 mb-3">
-                     <label for="firstName">provinsi</label>
-                     <input type="text" class="form-control" id="link" value="<?=$data['provinsi_id']?>" autocomplete="text" placeholder=""  readonly>
-                     <div class="invalid-feedback">
-                        Valid first name is required.
-                     </div>
-                  </div>
-                  <div class="col-md-6 mb-3">
-                     <label for="lastName">kota</label>
-                     <input type="text" class="form-control" id="kecamatan" value="<?=$data['kota_id']?>" autocomplete="text" placeholder="" readonly>
-                     <div class="invalid-feedback">
-                        Valid last name is required.
-                     </div>
-                  </div>
-               </div>
-               <div class="row">
-                  <div class="col-md-6 mb-3">
-                     <label for="firstName">kecamatan</label>
-                     <input type="text" class="form-control" id="link" value="<?=$data['kecamata_id']?>" autocomplete="text" placeholder=""  readonly>
-                     <div class="invalid-feedback">
-                        Valid first name is required.
-                     </div>
-                  </div>
-                  <div class="col-md-6 mb-3">
-                     <label for="lastName">kelurahan</label>
-                     <input type="text" class="form-control" id="kecamatan" value="<?=$data['kelurahan_id']?>" autocomplete="text" placeholder="" readonly>
-                     <div class="invalid-feedback">
-                        Valid last name is required.
-                     </div>
-                  </div>
-               </div>
-               <div class="row">
-                  <div class="col-md-12 mb-3">
-                     <label for="firstName">alamat</label>
-                     <textarea type="text" class="form-control" id="alamat" autocomplete="text" placeholder="" value="" readonly><?=$data['alamat_penerima']?></textarea>
-                  </div>
+                    <div class="col-md-12">
+                        <button class="btn-block btn btn-success btn-penerima hidden" onclick="penerima()">UPDATE</button>
+                    </div>
                </div>
             </div>
          </div>
@@ -302,21 +293,30 @@
                <button class="btn btn-primary btn-block text-left" data-toggle="collapse" data-target="#collapseHistory" aria-expanded="true" aria-controls="collapseHistory">
                Alamat dan Tempat   
                </button>
+               <button class="btn btn-sm btn-warning" onclick="editalamatempat()">Edit</button>
             </h5>
          </div>
          <div id="collapseHistory" class="collapse show" aria-labelledby="customer_history" data-parent="#accordion">
             <div class="card-body">
+                <div class="row">
+                  <div class="col-md-12 mb-3">
+                     <label for="firstName">alamat lengkap</label>
+                     <textarea type="text" class="form-control" id="alamat_penerima" autocomplete="text" placeholder="" value="" readonly><?=$data['alamat_penerima']?></textarea>
+                  </div>
+               </div>
                <div class="row">
                   <div class="col-md-6 mb-3">
-                     <label for="firstName">alamat</label>
-                     <input type="text" class="form-control" id="provinsi" value="<?=$data['kelurahan_id']?>" autocomplete="text" placeholder=""  readonly>
-                     <div class="invalid-feedback">
-                        Valid first name is required.
-                     </div>
+                     <label for="firstName">kelurahan</label>
+                     <select class="form-control" name="kelurahan_id" id="kelurahan_id">
+                        <option value="">:: kelurahan ::</option>
+                        <?php while($kel = $kelurahan->fetch(PDO::FETCH_LAZY)) { ?>
+                            <option value="<?=$kel['idcarge']?>" data-price="<?=$kel['harga']?>" <?=$kel['id_kelurahan'] == $data['kelurahan'] ? 'selected' : ''?> ><?=$kel['villagename']?> || <?=$config->formatPrice($kel['harga'])?></option>
+                        <?php } ?>
+                    </select>
                   </div>
                   <div class="col-md-6 mb-3">
                      <label for="lastName">tanggal kirim</label>
-                     <input type="text" class="form-control" id="status" value="<?=Date('d F Y', strtotime($data['delivery_date']))?>" autocomplete="text" placeholder="" readonly>
+                     <input type="text" class="form-control" id="delivery_date" value="<?=$data['delivery_date']?>" autocomplete="text" placeholder="" readonly>
                      <div class="invalid-feedback">
                         Valid last name is required.
                      </div>
@@ -325,11 +325,17 @@
                <div class="row">
                   <div class="col-md-6 mb-3">
                      <label for="firstName">time slot</label>
-                     <input type="text" class="form-control" id="provinsi" value="<?=$arrtime[$data['delivery_time']]?>" autocomplete="text" placeholder=""  readonly>
-                     <div class="invalid-feedback">
-                        Valid first name is required.
-                     </div>
+                        <select class="form-control" id="time_slot" name="time_slot" readonly>
+                        <?php foreach($arrtime as $key => $val) { ?>
+                            <option value="<?=$key?>" <?=$key == $data['delivery_time'] ? 'selected' : '' ?> ><?=$val?></option>
+                        <?php } ?>
+                        </select>
                   </div>
+               </div>
+               <div class="row">
+                    <div class="col-md-12">
+                        <button class="btn-block btn btn-success btn-alamatempat hidden" onclick="alamatempat()">UPDATE</button>
+                    </div>
                </div>
             </div>
          </div>
@@ -338,6 +344,7 @@
                <button class="btn btn-primary btn-block text-left" data-toggle="collapse" data-target="#collapseFavorite" aria-expanded="true" aria-controls="collapseFavorite">
                Kartu Ucapan
                </button>
+                <button class="btn btn-sm btn-warning" onclick="editcardmsg()">Edit</button>
             </h5>
          </div>
          <div id="collapseFavorite" class="collapse show" aria-labelledby="customer_favorite" data-parent="#accordion">
@@ -345,30 +352,14 @@
                <div class="row">
                   <div class="col-md-6 mb-3">
                      <label for="firstName">from</label>
-                     <input type="text" class="form-control" id="provinsi" value="<?=$data['card_from']?>" autocomplete="text" placeholder=""  readonly>
+                     <input type="text" class="form-control" id="card_from" value="<?=$data['card_from']?>" autocomplete="text" placeholder=""  readonly>
                      <div class="invalid-feedback">
                         Valid first name is required.
                      </div>
                   </div>
                   <div class="col-md-6 mb-3">
                      <label for="lastName">to</label>
-                     <input type="text" class="form-control" id="status" value="<?=$data['card_to']?>" autocomplete="text" placeholder="" readonly>
-                     <div class="invalid-feedback">
-                        Valid last name is required.
-                     </div>
-                  </div>
-               </div>
-               <div class="row">
-                  <div class="col-md-6 mb-3">
-                     <label for="firstName">template</label>
-                     <input type="text" class="form-control" id="provinsi" value="<?=$data['card_template1']?>" autocomplete="text" placeholder=""  readonly>
-                     <div class="invalid-feedback">
-                        Valid first name is required.
-                     </div>
-                  </div>
-                  <div class="col-md-6 mb-3">
-                     <label for="lastName">template</label>
-                     <input type="text" class="form-control" id="status" value="<?=$data['card_template2']?>" autocomplete="text" placeholder="" readonly>
+                     <input type="text" class="form-control" id="card_to" value="<?=$data['card_to']?>" autocomplete="text" placeholder="" readonly>
                      <div class="invalid-feedback">
                         Valid last name is required.
                      </div>
@@ -377,8 +368,13 @@
                <div class="row">
                   <div class="col-md-12 mb-3">
                      <label for="firstName">isi card</label>
-                     <textarea type="text" class="form-control" id="alamat" autocomplete="text" placeholder="" value="" readonly><?=$data['card_isi']?></textarea>
+                     <textarea type="text" class="form-control" id="card_isi" autocomplete="text" placeholder="" value="" readonly><?=$data['card_isi']?></textarea>
                   </div>
+               </div>
+               <div class="row">
+                    <div class="col-md-12">
+                        <button class="btn-block btn btn-success btn-msg hidden" onclick="submitmsg()">UPDATE</button>
+                    </div>
                </div>
             </div>
          </div>

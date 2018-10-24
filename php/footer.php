@@ -66,6 +66,9 @@ Many operating systems, software frameworks, and programs include a logging syst
         <script src="<?=URL?>assets/js/modul/createorder.js"></script>
         <script src="<?=URL?>assets/js/modul/customproduct.js"></script>
     <?php } ?>
+    <?php if($menu == 'order' && $footer = 'detailtrx') { ?>
+        <script src="<?=URL?>assets/js/modul/editorder.js"></script>
+    <?php } ?>
     <?php if($menu == 'bd'){ ?>
 
         <script src="<?=URL?>assets/vendors/krajeee/js/fileinput.js" type="text/javascript"></script>

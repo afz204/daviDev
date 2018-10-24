@@ -28,9 +28,10 @@ if($_GET['type'] == 'pay-kurir')
         // $month = 'AND DATE(pay_kurirs.created_at) = DATE(NOW())';
     }
 
+    $databox = '';
     if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
         // echo $_POST['search']['value'];
-        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%")  OR (transaction_details.product_name LIKE "%'.$_POST['search']['value'].'%") AND ';
+        $databox = 'AND (pay_kurirs.no_trx LIKE "%'. $_POST['search']['value'] . '%" OR kurirs.nama_kurir LIKE "%'. $_POST['search']['value'] . '%" OR delivery_charges.price LIKE "%'. $_POST['search']['value'] . '%")  OR (villages.name LIKE "%'.$_POST['search']['value'].'%") ';
     }
 
     $payCharge = " SELECT pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.name, users.name as admin FROM pay_kurirs INNER JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
@@ -42,6 +43,7 @@ if($_GET['type'] == 'pay-kurir')
     $totalPembayaran = $config->getData('SUM(total) as TOTAL', 'pay_kurirs', "pay_kurirs.status != '2' ");
     $totalPembayaran = $totalPembayaran['TOTAL'];
     //print_r($request);
+    $payCharge .=$databox;
     $colom = array(
         0   => 'payChargeID',
         1   => 'no_trx',
@@ -57,7 +59,7 @@ if($_GET['type'] == 'pay-kurir')
         11   => 'name',
         12   => 'admin'
     );
-
+    // var_dump($payCharge);
     $stmt = $config->runQuery($payCharge);
     $stmt->execute();
     $totalData = $stmt->rowCount();

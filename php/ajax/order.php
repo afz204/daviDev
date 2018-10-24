@@ -1534,7 +1534,7 @@ if($_GET['type'] == 'tableHistory'){
     LEFT JOIN villages ON villages.id = transaction.kelurahan_id 
     LEFT JOIN users ON users.id = transaction.created_by 
     LEFT JOIN kurirs ON kurirs.id = transaction.id_kurir
-    WHERE ';
+     ';
     
     $QueryTotal = '
     SELECT 
@@ -1548,7 +1548,7 @@ if($_GET['type'] == 'tableHistory'){
     LEFT JOIN villages ON villages.id = transaction.kelurahan_id 
     LEFT JOIN users ON users.id = transaction.created_by 
     LEFT JOIN kurirs ON kurirs.id = transaction.id_kurir
-    WHERE ';
+     ';
 
     $Query .= $databox;
     $QueryTotal .= $databox;
@@ -1562,8 +1562,8 @@ if($_GET['type'] == 'tableHistory'){
         $corporatequery = " AND transaction.CustomerID = '".$corporate."'";
         $adminquery = " AND transaction.created_by = '".$admin."'";
 
-        $Query .= $daterangequery." AND transaction.statusOrder IN (3, 4, 5) GROUP BY transaction.transactionID ". $orderby. ' '. $limit;
-        $QueryTotal .= $daterangequery." AND transaction.statusOrder IN (3, 4, 5) GROUP BY transaction.transactionID ". $orderby;
+        $Query .= $daterangequery." GROUP BY transaction.transactionID ". $orderby. ' '. $limit;
+        $QueryTotal .= $daterangequery." GROUP BY transaction.transactionID ". $orderby;
 
         $stmt2 = $config->runQuery($QueryTotal);
         $stmt2->execute();
@@ -1573,9 +1573,10 @@ if($_GET['type'] == 'tableHistory'){
         $Data = $config->runQuery($Query);
         $Data->execute();
     } else {
-        $Query .=" transaction.statusOrder IN (3, 4, 5) GROUP BY transaction.transactionID ". $orderby. ' '. $limit;
-        $QueryTotal .=" transaction.statusOrder IN (3, 4, 5) GROUP BY transaction.transactionID ". $orderby;
+        $Query .=" GROUP BY transaction.transactionID ". $orderby. ' '. $limit;
+        $QueryTotal .=" GROUP BY transaction.transactionID ". $orderby;
         
+        // var_dump($Query);
         $stmt2 = $config->runQuery($QueryTotal);
         $stmt2->execute();
         $totalData = $stmt2->rowCount();

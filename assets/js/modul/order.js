@@ -988,7 +988,6 @@ $(document).ready(function() {
     // console.log(settanggal);
     $('#delivery_dates').datetimepicker({
         format: 'YYYY/MM/DD',
-        minDate: settanggal,
     }).on('dp.change', function(e) {
         var times = e.date.format("YYYY-MM-DD");
         $.ajax({
