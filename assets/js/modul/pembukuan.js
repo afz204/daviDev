@@ -6,6 +6,23 @@ $.fn.onEnter = function(func) {
 };
 $(document).ready(function() {
 
+    $('#send-email').on('click', function(e) {
+        e.preventDefault();
+        var trx = $(this).data('trx');
+        $("#send-email").attr("disabled", true);
+        $.ajax({
+            url: '../php/ajax/send_email.php?type=savedate',
+            type: 'post',
+            data: { 'transactionID': trx },
+
+            success: function(msg) {
+                var data = JSON.parse(msg);
+                alert(data['msg']);
+                location.reload();
+            }
+        });
+    });
+
     $('#allpaid').change(function(e) {
         $("input:checkbox").prop("checked", $(this).prop("checked"));
     });
@@ -21,12 +38,17 @@ $(document).ready(function() {
     $('[name="paidDate"]').datetimepicker({
         format: 'YYYY-MM-DD HH:mm:ss',
     });
+    $('[name="residate"]').datetimepicker({
+        format: 'YYYY-MM-DD HH:mm:ss',
+    });
     $('[name="paidDatemultiple"]').datetimepicker({
         format: 'YYYY-MM-DD HH:mm:ss',
     });
     getpembukuan('no');
     getpiutang('no');
     getbonus('no');
+    gethardcopy('no');
+    getsoftcopy('no');
 
     // $('[name="passwordpushtoken"]').on('keypress', function(e) {
     //     var password = $('[name="passwordpushtoken"]').val();
@@ -34,6 +56,10 @@ $(document).ready(function() {
     // });
     $('[name="passwordpushtoken"]').onEnter(function() {
         submitgeneratepushtoken();
+    });
+
+    $('[name="nomorresi"]').onEnter(function() {
+        submitresi();
     });
 
     $('[name="passwordpushtokenmultiple"]').onEnter(function() {
@@ -50,15 +76,24 @@ $(document).ready(function() {
         getbonus('yes', range, admin);
     });
 
-    $('#Revenue').on('submit', function(e) {
+    $('#HardCopy').on('submit', function(e) {
         e.preventDefault();
 
         var range = $('#daterangerevenue').val();
-        var statuspaid = $('#StatusPaid option:selected').val();
 
-        $('#TableRevenue').DataTable().destroy();
-        getpembukuan('yes', range, statuspaid);
+        $('#TableHardCopy').DataTable().destroy();
+        gethardcopy('yes', range);
     });
+
+    $('#SoftCopy').on('submit', function(e) {
+        e.preventDefault();
+
+        var range = $('#daterangerevenue').val();
+
+        $('#TableSoftCopy').DataTable().destroy();
+        getsoftcopy('yes', range);
+    });
+
     $('#Revenue').on('submit', function(e) {
         e.preventDefault();
 
@@ -79,6 +114,20 @@ $(document).ready(function() {
         getpiutang('yes', range, statuspaid);
     });
 });
+
+function sendemail(trx) {
+    $.ajax({
+        url: '../php/ajax/send_email.php?type=savedate',
+        type: 'post',
+        data: { 'transactionID': trx },
+
+        success: function(msg) {
+            var data = JSON.parse(msg);
+            alert(data['msg']);
+            location.reload();
+        }
+    });
+}
 
 function exportrevenue(type) {
     var range = '';
@@ -120,18 +169,23 @@ function allpaid() {
     } else {
         alert("Please at least check one of the checkbox");
     }
+}
 
+function submitresi() {
+    var residate = $('[name="residate"]').val();
+    var nomorresi = $('[name="nomorresi"]').val();
+    var trx = $('[name="transactionIDpush"]').val();
 
-    // $.ajax({
-    //     url: '../php/ajax/pembukuan.php?type=changestatuspaidmultiple',
-    //     method: 'post',
-    //     data: { 'transactionID': trx, 'password': password, 'PaidDate': paiddate },
+    $.ajax({
+        url: '../php/ajax/pembukuan.php?type=inputresi',
+        method: 'post',
+        data: { 'transactionID': trx, 'nomorresi': nomorresi, 'residate': residate },
 
-    //     success: function(msg) {
-    //         location.reload();
-    //         alert(msg);
-    //     }
-    // })
+        success: function(msg) {
+            location.reload();
+            alert(msg);
+        }
+    })
 }
 
 function submitgeneratepushtoken() {
@@ -145,8 +199,24 @@ function submitgeneratepushtoken() {
         data: { 'transactionID': trx, 'password': password, 'PaidDate': paiddate },
 
         success: function(msg) {
-            location.reload();
-            alert(msg);
+            var data = JSON.parse(msg);
+            if (data['response'] == 'OK') {
+                $.ajax({
+                    url: '../php/ajax/send_email.php',
+                    method: 'post',
+                    data: { 'transactionID': trx },
+
+                    success: function(msgg) {
+                        var n = JSON.parse(msgg);
+                        alert(n['msg']);
+                        location.reload();
+                    }
+                })
+            } else {
+                location.reload();
+                alert(data['msg']);
+
+            }
         }
     })
 }
@@ -162,8 +232,24 @@ function submitgeneratepushtokenmultiple() {
         data: { 'transactionID': trx, 'password': password, 'PaidDate': paiddate },
 
         success: function(msg) {
-            location.reload();
-            alert(msg);
+            var data = JSON.parse(msg);
+            if (data['response'] == 'OK') {
+                // $.ajax({
+                //     url: '../php/ajax/send_email_multiple.php',
+                //     method: 'post',
+                //     data: { 'transactionID': trx },
+
+                //     success: function(msgg) {
+                //         var n = JSON.parse(msgg);
+                //         alert(n['msg']);
+                //         location.reload();
+                //     }
+                // })
+            } else {
+                location.reload();
+                alert(data['msg']);
+
+            }
         }
     })
 }
@@ -176,6 +262,95 @@ function changestatuspaid(obj) {
     });
 
     $('[name="transactionIDpush"]').val(obj);
+}
+
+function inputresi(obj) {
+    $('#modalinputresi').modal({
+        show: true,
+        backdrop: 'static',
+        keyboard: false
+    });
+
+    $('[name="transactionIDpush"]').val(obj);
+}
+
+function getsoftcopy(is_date_search, date_range) {
+
+    var TableSoftCopy = $('#TableSoftCopy').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "searching": true,
+        "pagging": true,
+        "ajax": {
+            url: "../php/ajax/pembukuan.php?type=softcopy", // json datasource
+            type: "post", // method  , by default get
+            data: {
+                is_date_search: is_date_search,
+                date_range: date_range
+            },
+            error: function() { // error handling
+                $(".employee-grid-error").html("");
+                $("#TableRevenue").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                $("#employee-grid_processing").css("display", "none");
+
+            }
+        },
+        drawCallback: function(settings) {
+            var data = this.api().ajax.json();
+        },
+        "columns": [
+            { "data": "0", "orderable": true },
+            { "data": "1", "orderable": true },
+            { "data": "2", "orderable": true },
+            { "data": "3", "orderable": true },
+            { "data": "4", "orderable": true },
+            { "data": "5", "orderable": true },
+            { "data": "6", "orderable": true },
+            { "data": "7", "orderable": true },
+            { "data": "8", "orderable": true }
+        ],
+
+    });
+}
+
+function gethardcopy(is_date_search, date_range) {
+
+    var TableHardCopy = $('#TableHardCopy').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "searching": true,
+        "pagging": true,
+        "ajax": {
+            url: "../php/ajax/pembukuan.php?type=hardcopy", // json datasource
+            type: "post", // method  , by default get
+            data: {
+                is_date_search: is_date_search,
+                date_range: date_range
+            },
+            error: function() { // error handling
+                $(".employee-grid-error").html("");
+                $("#TableRevenue").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                $("#employee-grid_processing").css("display", "none");
+
+            }
+        },
+        drawCallback: function(settings) {
+            var data = this.api().ajax.json();
+        },
+        "columns": [
+            { "data": "0", "orderable": true },
+            { "data": "1", "orderable": true },
+            { "data": "2", "orderable": true },
+            { "data": "3", "orderable": true },
+            { "data": "4", "orderable": true },
+            { "data": "5", "orderable": true },
+            { "data": "6", "orderable": true },
+            { "data": "7", "orderable": true },
+            { "data": "8", "orderable": true },
+            { "data": "9", "orderable": true }
+        ],
+
+    });
 }
 
 function getpembukuan(is_date_search, date_range, statuspaid) {
@@ -260,7 +435,8 @@ function getpiutang(is_date_search, date_range, statuspaid) {
             { "data": "6", "orderable": true },
             { "data": "7", "orderable": true },
             { "data": "8", "orderable": true },
-            { "data": "9", "orderable": true }
+            { "data": "9", "orderable": true },
+            { "data": "10", "orderable": true }
         ],
 
     });

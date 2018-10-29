@@ -553,6 +553,18 @@ class Admin
 
         return $tanggal;
     }
+    public function _parsingproductname($product) {
+        $tmpname = str_replace('_', ' ', $product);
+
+        $newname = $product;
+        if($tmpname) {
+            $countname = strlen($tmpname);
+            $newname = substr($tmpname, 13, $countname);
+        }
+        
+
+        return $newname;
+    }
     public function timeAgo($time_ago)
     {
         date_default_timezone_set("Asia/Jakarta");

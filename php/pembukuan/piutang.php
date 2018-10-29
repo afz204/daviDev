@@ -32,6 +32,7 @@
             <tr style="text-transform: lowercase;">
                 <th scope="col" width="10%">invoice</th>
                 <th scope="col" width="10%">pengirim</th>
+                <th scope="col" width="10%">nama invoice</th>
                 <th scope="col" width="10%">admin</th>
                 <th scope="col" width="10%">tgl order</th>
                 <th scope="col" width="10%">tgl kirim</th>

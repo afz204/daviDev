@@ -136,7 +136,7 @@
                 <tr>
                     <td width="40%">Nama Product</td>
                     <td width="5%">:</td>
-                    <td width="55%"><?=strtoupper($prod['name_product'])?></td>
+                    <td width="55%"><?=$config->_parsingproductname($prod['name_product'])?></td>
                 </tr>
                 <tr>
                     <td width="40%">Cost Price</td>

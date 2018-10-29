@@ -41,10 +41,7 @@
                         <?php } ?> 
                         <?php if(in_array($subcat['subcat_link'], ['order'])) { ?>
                                 <span class="badge badge-pill bg-success align-text-bottom" style="color: #fff;"><?=$neworder?></span>
-                        <?php } ?> 
-                        <?php if(in_array($subcat['subcat_link'], ['report'])) { ?>
-                                <span class="badge badge-pill bg-success align-text-bottom" style="color: #fff;"><?=$report?></span>
-                        <?php } ?> 
+                        <?php } ?>
                         <?php if(in_array($subcat['subcat_link'], ['cancelorder'])) { ?>
                                 <span class="badge badge-pill bg-success align-text-bottom" style="color: #fff;"><?=$cancelorder?></span>
                         <?php } ?> 

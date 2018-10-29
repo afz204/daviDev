@@ -15,6 +15,7 @@ $arrstatusorder = array(
 $formR = '';
 if(isset($_GET['type'])) $formR = 'hidden';
 
+$listtransaction = $config->FindProducts('*', 'transaction', 'statusOrder NOT IN (99)')
 
 ?>
 
@@ -41,7 +42,17 @@ if(isset($_GET['type'])) $formR = 'hidden';
     }
 </style>
 <div class="row">
-    <div class="col-6 col-md-3 col-lg-3">
+    <div class="col-md-12 text-center">
+        <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-outline-primary" onclick="multiple_print('SPK')" id="multiple-print" data-type="SPK"><span class="fa fa-print"></span> Multiple SPK</button>
+            <button type="button" class="btn btn-outline-danger" onclick="multiple_print('DO')" id="multiple-print" data-type="DO"><span class="fa fa-print"></span> Multiple DO</button>
+            <button type="button" class="btn btn-outline-success" onclick="multiple_print('invoice')" id="multiple-print" data-type="invoice"><span class="fa fa-print"></span> Multiple Invoice</button>
+            <button type="button" class="btn btn-outline-warning" onclick="multiple_print('msg')" id="multiple-print" data-type="msg"><span class="fa fa-print"></span> Multiple Card Messages</button>
+        </div>
+    </div>
+    <br>
+    <br>
+    <!-- <div class="col-6 col-md-3 col-lg-3">
         <div class="card border-info mb-3">
             <div class="card-body">
                 <div class="widget">
@@ -102,7 +113,7 @@ if(isset($_GET['type'])) $formR = 'hidden';
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
     
 </div>
 
@@ -208,4 +219,30 @@ if(isset($_GET['type'])) $formR = 'hidden';
             </div>
         </div>
     </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="modalmultiple" role="dialog" aria-labelledby="modalMultiple" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <form id="generatemultiple" data-parsley-validate="">
+                <div class="form-group">
+                    <select class="js-example-basic-multiple" name="TransactionNumber[]" multiple="multiple">
+                    <?php while($col = $listtransaction->fetch(PDO::FETCH_LAZY)) { ?>
+                        <option value="<?=$col['transactionID']?>"><?=$col['transactionID']?></option>
+                    <?php } ?>
+                    </select>
+                    <input type="hidden" name="typemultiple">
+                    <div class="help-block with-errors"></div>
+                </div>
+                <button type="submit" class="btn btn-block btn-primary ">submit</button>
+            </form>
+      </div>
+    </div>
+  </div>
 </div>

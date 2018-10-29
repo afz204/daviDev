@@ -610,7 +610,8 @@ if($_GET['type'] == 'tableSearch'){
         $Data = $config->runQuery($Query);
         $Data->execute();
         
-    } else {
+    } 
+    else {
         $Query .=" GROUP BY transaction.transactionID ". $orderby. ' '. $limit;
         $QueryTotal .=" GROUP BY transaction.transactionID ". $orderby;
         
@@ -886,7 +887,7 @@ if($_GET['type'] == 'tableNewOrder'){
             // echo $row['product'];
             $dataproduct = [];
             foreach($product as $key => $val) {
-                $dataproduct[] = '<span class="badge badge-info">'.$val.'</span></br>';
+                $dataproduct[] = '<span class="badge badge-info">'.$config->_parsingproductname($val).'</span></br>';
             }
             $dataprice = [];
             foreach($price as $key => $val) {
@@ -944,6 +945,12 @@ if($_GET['type'] == 'tableNewOrder'){
                 $statuspaidflag = '<span class="badge badge-sm badge-success">PAID</span> By: '. $paidby['name'];
             }
 
+             $created_date = '<span class="badge badge-secondary">unset</span>';
+            if(($row['created_date']) != '0000-00-00 00:00:00') $datepaid = $config->_formatdate($row['created_date']);
+            $deliverydate = '<span class="badge badge-secondary">unset</span>';
+            if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
+            
+
             $subdata = array();
             
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
@@ -952,12 +959,12 @@ if($_GET['type'] == 'tableNewOrder'){
             $subdata[]  = $dataprice;
             $subdata[]  = $dataquantity;
             $subdata[]  = $config->formatprice($row['grandTotal']);
-            $subdata[]  = $Kirim . '<span class="small" style="color: red;"> '.$deliverytime.'</span>';
+            $subdata[]  = $deliverydate . '<span class="small" style="color: red;"> '.$deliverytime.'</span>';
             // $subdata[]  = $row['kelurahan'];
             // $subdata[]  = '<span class="badge badge-sm badge-info">'.$arrstatusorder[$row['statusOrder']].'</span>';
             // $subdata[]  = '<span class="badge badge-sm badge-'.$statuspaid.'">'.$arrstatuspaid[$row['statusPaid']].'</span> arfan azhari';
             $subdata[]  = $statuspaidflag;
-            $subdata[]  = $createorder;
+            $subdata[]  = $created_date;
             $subdata[]  = $row['admin'];
             $subdata[]  = $florist;
             $subdata[]  = $btnchangestatus;
@@ -988,7 +995,7 @@ if($_GET['type'] == 'tableOnProccess'){
     $databox = '';
     if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
         // echo $_POST['search']['value'];
-        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") OR (transaction_details.product_name LIKE "%'.$_POST['search']['value'].'%") AND ';
+        $databox = ' transaction.statusOrder = 1 AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") OR (transaction_details.product_name LIKE "%'.$_POST['search']['value'].'%") AND ';
     }
 
     $colom = array(
@@ -1133,7 +1140,7 @@ if($_GET['type'] == 'tableOnProccess'){
             // echo $row['product'];
             $dataproduct = [];
             foreach($product as $key => $val) {
-                $dataproduct[] = '<span class="badge badge-info">'.$val.'</span></br>';
+                $dataproduct[] = '<span class="badge badge-info">'.$config->_parsingproductname($val).'</span></br>';
             }
             $dataprice = [];
             foreach($price as $key => $val) {
@@ -1194,6 +1201,11 @@ if($_GET['type'] == 'tableOnProccess'){
                 $statuspaidflag = '<span class="badge badge-sm badge-success">PAID</span> By: '. $paidby['name'];
             }
 
+            $created_date = '<span class="badge badge-secondary">unset</span>';
+            if(($row['created_date']) != '0000-00-00 00:00:00') $datepaid = $config->_formatdate($row['created_date']);
+            $deliverydate = '<span class="badge badge-secondary">unset</span>';
+            if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
+
             $subdata = array();
 
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
@@ -1202,12 +1214,12 @@ if($_GET['type'] == 'tableOnProccess'){
             $subdata[]  = $dataprice;
             $subdata[]  = $dataquantity;
             $subdata[]  = $config->formatprice($row['grandTotal']);
-            $subdata[]  = $Kirim . '<span class="small" style="color: red;"> '.$deliverytime.'</span>';
+            $subdata[]  = $deliverydate . '<span class="small" style="color: red;"> '.$deliverytime.'</span>';
             // $subdata[]  = $row['kelurahan'];
             // $subdata[]  = '<span class="badge badge-sm badge-info">'.$arrstatusorder[$row['statusOrder']].'</span>';
             // $subdata[]  = '<span class="badge badge-sm badge-'.$statuspaid.'">'.$arrstatuspaid[$row['statusPaid']].'</span>';
             $subdata[]  = $statuspaidflag;
-            $subdata[]  = $createorder;
+            $subdata[]  = $created_date;
             $subdata[]  = $row['admin'];
             $subdata[]  = $florist;
             $subdata[]  = $kurir;
@@ -1239,7 +1251,7 @@ if($_GET['type'] == 'tableOnDelivery'){
     $databox = '';
     if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
         // echo $_POST['search']['value'];
-        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") OR (transaction_details.product_name LIKE "%'.$_POST['search']['value'].'%") AND ';
+        $databox = ' transaction.statusOrder = 2 AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") OR (transaction_details.product_name LIKE "%'.$_POST['search']['value'].'%") AND ';
     }
 
     $colom = array(
@@ -1385,7 +1397,7 @@ if($_GET['type'] == 'tableOnDelivery'){
             // echo $row['product'];
             $dataproduct = [];
             foreach($product as $key => $val) {
-                $dataproduct[] = '<span class="badge badge-info">'.$val.'</span></br>';
+                $dataproduct[] = '<span class="badge badge-info">'.$config->_parsingproductname($val).'</span></br>';
             }
             $dataprice = [];
             foreach($price as $key => $val) {
@@ -1446,6 +1458,11 @@ if($_GET['type'] == 'tableOnDelivery'){
                 $statuspaidflag = '<span class="badge badge-sm badge-success">PAID</span> By: '. $paidby['name'];
             }
 
+            $created_date = '<span class="badge badge-secondary">unset</span>';
+            if(($row['created_date']) != '0000-00-00 00:00:00') $datepaid = $config->_formatdate($row['created_date']);
+            $deliverydate = '<span class="badge badge-secondary">unset</span>';
+            if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
+
             $subdata = array();
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
             $subdata[]  = $dataproduct;
@@ -1453,12 +1470,12 @@ if($_GET['type'] == 'tableOnDelivery'){
             $subdata[]  = $dataprice;
             $subdata[]  = $dataquantity;
             $subdata[]  = $config->formatprice($row['grandTotal']);
-            $subdata[]  = $Kirim . '<span class="small" style="color: red;"> '.$deliverytime.'</span>';
+            $subdata[]  = $deliverydate . '<span class="small" style="color: red;"> '.$deliverytime.'</span>';
             // $subdata[]  = $row['kelurahan'];
             // $subdata[]  = '<span class="badge badge-sm badge-info">'.$arrstatusorder[$row['statusOrder']].'</span>';
             // $subdata[]  = '<span class="badge badge-sm badge-'.$statuspaid.'">'.$arrstatuspaid[$row['statusPaid']].'</span>';
             $subdata[]  = $statuspaidflag;
-            $subdata[]  = $createorder;
+            $subdata[]  = $created_date;
             $subdata[]  = $row['admin'];
             $subdata[]  = $florist;
             $subdata[]  = $kurir;
@@ -1638,7 +1655,7 @@ if($_GET['type'] == 'tableHistory'){
             // echo $row['product'];
             $dataproduct = [];
             foreach($product as $key => $val) {
-                $dataproduct[] = '<span class="badge badge-info">'.$val.'</span></br>';
+                $dataproduct[] = '<span class="badge badge-info">'.$config->_parsingproductname($val).'</span></br>';
             }
             $dataprice = [];
             foreach($price as $key => $val) {
@@ -1696,16 +1713,21 @@ if($_GET['type'] == 'tableHistory'){
                 $statuspaidflag = '<span class="badge badge-sm badge-success">PAID</span> By: '. $paidby['name'];
             }
 
+              $created_date = '<span class="badge badge-secondary">unset</span>';
+            if(($row['created_date']) != '0000-00-00 00:00:00') $datepaid = $config->_formatdate($row['created_date']);
+            $deliverydate = '<span class="badge badge-secondary">unset</span>';
+            if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
+
             $subdata = array();
 
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
             $subdata[]  = $dataproduct;
-            $subdata[]  = Date('d-M-Y', strtotime($row['delivery_date']));
+            $subdata[]  = $deliverydate;
             $subdata[]  = $row['kelurahan'];
             $subdata[]  = $btnchangestatus;
             $subdata[]  = $row['notes'] != '' ? $row['notes'] : '<span class="badge badge-sm badge-info">unset</span>';
             $subdata[]  = $statuspaid;
-            $subdata[]  = Date('d-M-Y', strtotime($row['created_date']));;
+            $subdata[]  = $created_date;
             $subdata[]  = $florist;
             $subdata[]  = $row['NamaKurir'];
             // $subdata[]  = $florist;
@@ -1888,7 +1910,7 @@ if($_GET['type'] == 'tableCancelOrder'){
             // echo $row['product'];
             $dataproduct = [];
             foreach($product as $key => $val) {
-                $dataproduct[] = '<span class="badge badge-info">'.$val.'</span></br>';
+                $dataproduct[] = '<span class="badge badge-info">'.$config->_parsingproductname($val).'</span></br>';
             }
             $dataprice = [];
             foreach($price as $key => $val) {
@@ -1940,16 +1962,21 @@ if($_GET['type'] == 'tableCancelOrder'){
                 $color =   '';
             }
 
+            $created_date = '<span class="badge badge-secondary">unset</span>';
+            if(($row['created_date']) != '0000-00-00 00:00:00') $datepaid = $config->_formatdate($row['created_date']);
+            $deliverydate = '<span class="badge badge-secondary">unset</span>';
+            if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
+
             $subdata = array();
 
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
             $subdata[]  = $dataproduct;
-            $subdata[]  = Date('d-M-Y', strtotime($row['delivery_date']));
+            $subdata[]  = $deliverydate;
             $subdata[]  = $row['kelurahan'];
             $subdata[]  = $arrstatusorder[$row['statusOrder']].' By: '. $row['admin'];
             $subdata[]  = $row['notes'] != '' ? $row['notes'] : '<span class="badge badge-sm badge-info">unset</span>';
             $subdata[]  = $statuspaid;
-            $subdata[]  = Date('d-M-Y', strtotime($row['created_date']));;
+            $subdata[]  = $created_date;
             $subdata[]  = $florist;
             $subdata[]  = $row['NamaKurir'];
             // $subdata[]  = $florist;
@@ -2064,7 +2091,7 @@ if($_GET['type'] == 'addProducts')
             $images = ''; $title = ''; $id = ''; $qty = ''; $cost = ''; $selling = ''; $price =''; $remarks='';
             while ($row = $prod->fetch(PDO::FETCH_LAZY)) {
                 $images = $row['images'];
-                $title = $row['name_product'];
+                $title = $config->_parsingproductname($row['name_product']);
                 $id = $row['id'];
                 $qty = $row['qty'];
                 $cost = $config->formatPrice($row['cost_price']);
@@ -2510,7 +2537,7 @@ if($_GET['type'] == 'step2'){
     $e = $_POST['Kec'];
     $f = $_POST['Kel'];
     $g = $_POST['Alamat'];
-    $hh = $_POST['hp_penerima'];
+    $hh = str_replace(' ', '', $_POST['hp_penerima']);
     $trx = $_POST['TransactionID'];
 
    
@@ -2975,7 +3002,7 @@ if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
             <td style="padding: 5px; border-bottom: 0.5px solid;">
             <img style="border:1px solid #FFFFFF; padding:1px; " src="'.URL.'assets/images/product/'. str_replace(' ', '_', strtolower($row['product_name'])) .'.jpg" width="100" height="95" align=center>
             </td>
-            <td style="padding: 3px;font-size: 14px;font-weight: 600; border-bottom: 0.5px solid; text-transform: capitalize;">'. strtoupper($row['id_product']) .' '. $row['product_name'] .'</td>
+            <td style="padding: 3px;font-size: 14px;font-weight: 600; border-bottom: 0.5px solid; text-transform: capitalize;">'. strtoupper($row['id_product']) .' '. $config->_parsingproductname($row['product_name']) .'</td>
             <td style="padding: 3px;font-size: 14px;font-weight: 600; text-align: center; border-bottom: 0.5px solid; padding-right: 4px;">'. $row['product_qty'] .'</td>
             <td style="padding: 3px;font-size: 14px;font-weight: 600; text-align: right; border-bottom: 0.5px solid; padding-right: 4px;">'. number_format($row['product_price'], 2, '.', ',') .'</td>
             <td style="padding: 3px;font-size: 14px;font-weight: 600; text-align: right; border-bottom: 0.5px solid; padding-right: 4px;">'. number_format(($row['product_qty'] * $row['product_price']), 2, '.', ',') .'</td>

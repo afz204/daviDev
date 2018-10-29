@@ -14,7 +14,7 @@ $arrtime = [
 ];
 
 $transactionID = $_GET['transactionID'];
-
+$data = $config->getData('*', 'transaction', "transactionID = '". $transactionID ."' ");
 $sql = "SELECT transaction.*, transaction_details.id_trx, transaction_details.florist_remarks, transaction_details.product_qty, products.name_product, products.images FROM transaction
         LEFT JOIN transaction_details ON transaction_details.id_trx = transaction.transactionID
         LEFT JOIN products ON products.product_id = transaction_details.id_product
@@ -70,8 +70,6 @@ while($row = $stmt->fetch(PDO::FETCH_LAZY)) {
 ';
 }
 $dataproduct = implode(' ', $dataproduct);
-
-$data = $config->getData('*', 'transaction', "transactionID = '". $transactionID ."' ");
 
 $content = '
 <html>
@@ -151,6 +149,7 @@ $content = '
 </head>
 </html>
 ';
+// echo $content;
 $dompdf->loadHtml($content);
 
 // (Opsional) Mengatur ukuran kertas dan orientasi kertas

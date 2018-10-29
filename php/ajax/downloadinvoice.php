@@ -1,27 +1,10 @@
 <?php 
+require '../../config/config.php';
+require_once '../../assets/vendors/dompdf/autoload.inc.php';
+use Dompdf\Dompdf;
+$dompdf = new Dompdf();
 
-require "../../config/config.php";
-require '../../config/Mail.php';
-
-$transactionID = $_POST['transactionID'];
-
-if( isset($_GET['type']) && $_GET['type'] == 'savedate') {
-    $tgl = $config->getDate("Y-m-d H:m:s");
-    $query = "UPDATE transaction SET ResiDate = '".$tgl."' WHERE transactionID = '".$transactionID."' ";
-    $stmt = $config->runQuery($query);
-    $stmt->execute();
-}
-
-$downloadfile = '<tr style="background-color: #ffffff;">
-                        <td style="border-bottom: 0.5px solid; font-weight: 600; font-size: 14px; padding: 8px 0px; text-align: center;" colspan="5">
-                        <div style="background-color: blue; width: 120px;padding: 3px;border: 1px solid blue;border-radius: 5px; margin-left: 41%; color: #FFF;" >
-                            <a href="'.URL.'php/ajax/downloadinvoice.php?transactionID='.$transactionID.'" style="color: #FFF; text-decoration: none;" target="_blank">Download Invoice</a>
-                        </div>
-                        </td>
-                    </tr>';
-if(isset($_GET['type'])) {
-    $downloadfile = '';
-}
+// $html = file_get_contents("print_do.php");
 
 $arrtime = [
     0 => '9am - 1pm',
@@ -37,6 +20,7 @@ $arrpaid = [
     'PAID'
 ];
 
+$transactionID = $_GET['transactionID'];
 
 $data = $config->getData('transaction.*, corporate_pics.name as CorporateName, corporate_pics.email as CorporateEmail, corporate_pics.nomor as CorporatePhone, customer.FullName as OrganicName, customer.Email as OrganicEmail, customer.Mobile as OrganicPhone, provinces.name as ProvinsiName, regencies.name as KotaName, districts.name as Kecamatan, villages.name as Kelurahan', 'transaction LEFT JOIN corporate_pics ON corporate_pics.corporate_id = transaction.CustomerID LEFT JOIN customer on customer.CustomerUniqueID = transaction.CustomerID LEFT JOIN provinces ON provinces.id = transaction.provinsi_id LEFT JOIN regencies on regencies.id = transaction.kota_id LEFT JOIN districts ON districts.id = transaction.kecamata_id LEFT JOIN villages on villages.id = transaction.kelurahan_id', "transactionID = '". $transactionID ."' ");
 // $config->_debugvar($data);
@@ -338,7 +322,6 @@ $content = '
                                         '.$statusPaid.'
                                         </td>
                                     </tr>
-                                    '.$downloadfile.'
                                 </tbody>
                               </table>
                            </td>
@@ -469,8 +452,18 @@ $content = '
       </table>
    </body>
 </html>';
-// echo $content;
-$cc = '';
-$config = new Mail();
-// $email = $config->Mailler('afz60.30@gmail.com', $receivedName, $cc, $subject, $content);
-$email = $config->Mailler($receivedEmail, $receivedName, $cc, $subject, $content);
+
+echo $content;
+// $dompdf->loadHtml($content);
+
+// // // (Opsional) Mengatur ukuran kertas dan orientasi kertas
+// $dompdf->setPaper(array(0, 0, 670, 450), 'portrait');
+// // // $dompdf->setWarnings(false);
+
+// // // Menjadikan HTML sebagai PDF
+// $dompdf->render();
+
+// // // Output akan menghasilkan PDF (1 = download dan 0 = preview)
+// $dompdf->stream("Invoice-". $data['transactionID'],array("Attachment"=>0));
+
+?>

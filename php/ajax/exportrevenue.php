@@ -37,7 +37,7 @@ if($_GET['type'] == 'exportrevenue') {
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 
-    $DataQuery .=" transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC ";
+    $DataQuery .=" transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.delivery_date ASC ";
     // var_dump($DataQuery);
     $data = $config->runQuery($DataQuery);
     $data->execute();
@@ -164,7 +164,8 @@ if($_GET['type'] == 'exportpiutang') {
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 
-    $DataQuery .=" (transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid.") GROUP BY transaction.transactionID";
+    $DataQuery .=" (transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid.") ORDER BY transaction.delivery_date ASC";
+    // $DataQuery .=" (transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid.") GROUP BY transaction.transactionID";
     // var_dump($DataQuery);
     $data = $config->runQuery($DataQuery);
     $data->execute();
@@ -253,7 +254,7 @@ if($_GET['type'] == 'exportpiutang') {
         ->setCellValue('C'.$loop, $row['CustomerName'])
         ->setCellValue('D'.$loop, $row['AdminName'])
         ->setCellValue('E'.$loop, $row['card_from'])
-        ->setCellValue('F'.$loop, "'".$row['product_name']."'")
+        ->setCellValue('F'.$loop, "'".$config->_parsingproductname($row['product_name'])."'")
         ->setCellValue('G'.$loop, $row['invoice_name'])
         ->setCellValue('H'.$loop, Date('Y-m-d', strtotime($row['created_date'])))
         ->setCellValue('I'.$loop, $row['delivery_date'])
@@ -303,13 +304,13 @@ if($_GET['type'] == 'exportbonus') {
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 
-    $DataQuery .=" transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID AND transaction.statusPaid = 1 ORDER BY transaction.created_date DESC ";
+    $DataQuery .=" transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID AND transaction.statusPaid = 1 ORDER BY transaction.delivery_date ASC ";
     $data = $config->runQuery($DataQuery);
     $data->execute();
     // var_dump($DataQuery);
     
-    $total = $config->getData('COUNT(transaction.id) as Total', 'transaction', "transaction.statusOrder NOT IN (6, 99) AND transaction.created_date BETWEEN'". $startDate ."' AND '". $endsDate ."' ".$status_paid.' AND transaction.statusPaid = 1');
-    $MP = $config->getData('SUM(TotalCostPrice) as costprice, SUM(grandTotal) as grandprice', 'transaction', "transaction.statusOrder NOT IN (6, 99) AND transaction.created_date BETWEEN'". $startDate ."' AND '". $endsDate ."' ".$status_paid.' AND transaction.statusPaid = 1');
+    $total = $config->getData('COUNT(transaction.id) as Total', 'transaction', "transaction.statusOrder NOT IN (6, 99) AND transaction.delivery_date BETWEEN'". $startDate ."' AND '". $endsDate ."' ".$status_paid.' AND transaction.statusPaid = 1');
+    $MP = $config->getData('SUM(TotalCostPrice) as costprice, SUM(grandTotal) as grandprice', 'transaction', "transaction.statusOrder NOT IN (6, 99) AND transaction.delivery_date BETWEEN'". $startDate ."' AND '". $endsDate ."' ".$status_paid.' AND transaction.statusPaid = 1');
     // echo $total['Total'];
     // var_dump($MP);
     $stylecenter = array(

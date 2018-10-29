@@ -54,7 +54,8 @@ $shortDesc = empty($_POST['shortDesc']) ? '' : $_POST['shortDesc'];
 $remkarsfloris = empty($_POST['remkarsfloris']) ? '' : $_POST['remkarsfloris'];
 $transactionID = empty($_POST['transactionID']) ? '' : $_POST['transactionID'];
 
-$title = strtolower(str_replace(" ", "_", $imagesName));
+$title = strtolower(str_replace(" ", "_", $imagesid.'_'.$imagesName));
+// $title = strtolower(str_replace(" ", "_", $imagesName));
 // a flag to see if everything is ok
 $success = null;
 
@@ -94,12 +95,12 @@ if ($success === true) {
     // $output = ['uploaded' => $paths];
     $output = "OK";
     $nameproduct = $imagesid.''.$imagesName;
-    $images = strtolower(str_replace(" ", "_", $imagesName)).'.jpg';
+    $images = $title.'.jpg';
     $permalink = str_replace(' ', '_', strtolower($nameproduct));
     $created_at = $config->getDate('Y-m-d H:m:s');
 
     $sql = "INSERT INTO products (product_id, name_product, cost_price, selling_price, full_desc, images, permalink, created_at, admin_id) 
-    VALUES ('".$imagesid."', '".$nameproduct."', '".$costProduct."', '".$sellProduct."', '".$shortDesc."', '".$images."', '".$permalink."', '".$created_at."', '".$admin."')";
+    VALUES ('".$imagesid."', '".$title."', '".$costProduct."', '".$sellProduct."', '".$shortDesc."', '".$images."', '".$permalink."', '".$created_at."', '".$admin."')";
     $stmt = $config->runQuery($sql);
     $stmt->execute();
     $reff = $config->lastInsertId();
@@ -110,7 +111,7 @@ if ($success === true) {
         $cek->execute(array(
             ':a' => $transactionID,
             ':b' => $imagesid,
-            ':c' => $nameproduct,
+            ':c' => $title,
             ':d' => $sellProduct,
             ':e' => $costProduct,
             ':f' => '1',

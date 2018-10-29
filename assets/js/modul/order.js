@@ -731,15 +731,41 @@ function submitformcustomproduct() {
             } else {
                 alert('error');
             }
-
-            // $('#ImagesProductID').val(title);
-            // $('#imagesProduct').removeClass('hidden');
-            // $('#detailProduct').addClass('hidden');
         }
     });
 }
+
+function multiple_print(type) {
+    $('#modalmultiple').modal({ show: true, backdrop: 'static', keyboard: false });
+    $('.js-example-basic-multiple').select2({ width: '100%', theme: "bootstrap4" });
+
+    $('[name="typemultiple"]').val(type);
+}
 $(document).ready(function() {
 
+    $('#modalmultiple').on('hidden.bs.modal', function() {
+        // do something…
+        $('name="TransactionNumber[]"').val('');
+    });
+    $('#generatemultiple').on('submit', function(e) {
+        e.preventDefault();
+        var bulk = $('[name="TransactionNumber[]"]').val();
+        var type = $('[name="typemultiple"]').val();
+        alert(bulk + type);
+
+        if (type == 'SPK') {
+            window.location.href = 'php/ajax/multiplespk.php?transactionID=' + bulk;
+        }
+        if (type == 'DO') {
+            window.location.href = 'php/ajax/multipledo.php?transactionID=' + bulk;
+        }
+        if (type == 'invoice') {
+            window.location.href = 'php/ajax/multipleinvoice.php?transactionID=' + bulk;
+        }
+        if (type == 'msg') {
+            window.location.href = 'php/ajax/multiplemsg.php?transactionID=' + bulk;
+        }
+    })
     var arr = [];
     for (var i = 0; i < 1000000; i++) {
         arr.push(Math.random());

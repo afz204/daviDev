@@ -6,8 +6,8 @@
  * Time: 01.16
  */
 
-session_start();
-require '../../config/api.php';
+require '../../config/config.php';
+require '../../config/Mail.php';
 $config = new Admin();
 $admin = $config->adminID();
 
@@ -165,13 +165,18 @@ if($_GET['type'] == 'revenue')
             if(strtotime($row['PaidDate']) == false) {
                 $paydate = '<span class="badge badge-secondary">unset</span>';
             }
+            $created_date = '<span class="badge badge-secondary">unset</span>';
+            if(($row['created_date']) != '0000-00-00 00:00:00') $created_date = $config->_formatdate($row['created_date']);
+            $deliverydate = '<span class="badge badge-secondary">unset</span>';
+            if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
+
             $subdata = array();
             // $subdata[]  = $row[0];
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
             $subdata[]  = $row['CustomerName'];
             $subdata[]  = $row['AdminName'];
-            $subdata[]  = $config->_formatdate($row['created_date']);
-            $subdata[]  = $config->_formatdate($row['delivery_date']);
+            $subdata[]  = $created_date;
+            $subdata[]  = $deliverydate;
             $subdata[]  = $statuspaid.$adminuser;
             $subdata[]  = $paydate;
             $subdata[]  = $config->formatPrice($row['TotalCostPrice']);
@@ -217,7 +222,7 @@ if($_GET['type'] == 'piutang')
     $databox = '';
     if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
         // echo $_POST['search']['value'];
-        $databox = 'AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") ';
+        $databox = 'AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%" OR transaction.invoice_name LIKE "%'.$_POST['search']['value'].'%") ';
     }
 
     $DataQuery = " SELECT transaction.* , (transaction.grandTotal - (transaction_details.product_cost * transaction_details.product_qty)) / transaction.grandTotal as MP, users.name as AdminName FROM transaction
@@ -243,6 +248,7 @@ if($_GET['type'] == 'piutang')
         8   => 'sellingprice',
         9   => 'quantity',
         10   => 'MP',
+        11   => 'MP',
     );
 
     $orderby = 'ORDER BY transaction.delivery_date ASC';
@@ -335,6 +341,12 @@ if($_GET['type'] == 'piutang')
                 'UNPAID',
                 'PAID'
             ];
+
+            $created_date = '<span class="badge badge-secondary">unset</span>';
+            if(($row['created_date']) != '0000-00-00 00:00:00') $created_date = $config->_formatdate($row['created_date']);
+            $deliverydate = '<span class="badge badge-secondary">unset</span>';
+            if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
+
             $subdata = array();
 
             $datepaid = 'unset';
@@ -342,9 +354,10 @@ if($_GET['type'] == 'piutang')
             // $subdata[]  = $row[0];
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
             $subdata[]  = $row['CustomerName'];
+            $subdata[]  = $row['invoice_name'];
             $subdata[]  = $row['AdminName'];
-            $subdata[]  = $config->_formatdate($row['created_date']);
-            $subdata[]  = $config->_formatdate($row['delivery_date']);
+            $subdata[]  = $created_date;
+            $subdata[]  = $deliverydate;
             $subdata[]  = $statuspaid .$adminuser;
             $subdata[]  = $datepaid;
             $subdata[]  = $config->formatPrice($row['TotalCostPrice']);
@@ -390,7 +403,7 @@ if($_GET['type'] == 'bonus')
     $databox = '';
     if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
         // echo $_POST['search']['value'];
-        $databox = 'AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") ';
+        $databox = 'AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%" OR transaction.invoice_name LIKE "%'.$_POST['search']['value'].'%") ';
     }
     
 
@@ -417,6 +430,7 @@ if($_GET['type'] == 'bonus')
         8   => 'sellingprice',
         9   => 'quantity',
         10   => 'MP',
+        11   => 'MP',
     );
 
 
@@ -515,16 +529,24 @@ if($_GET['type'] == 'bonus')
                 'UNPAID',
                 'PAID'
             ];
+            $created_date = '<span class="badge badge-secondary">unset</span>';
+            if(($row['created_date']) != '0000-00-00 00:00:00') $created_date = $config->_formatdate($row['created_date']);
+            $deliverydate = '<span class="badge badge-secondary">unset</span>';
+            if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
+            
+            
             $subdata = array();
 
             $datepaid = 'unset';
             if(($row['PaidDate']) != '0000-00-00 00:00:00') $datepaid = $config->_formatdate($row['PaidDate']);
             // $subdata[]  = $row[0];
             $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
+
             $subdata[]  = $row['CustomerName'];
+            $subdata[]  = $row['invoice_name'];
             $subdata[]  = $row['AdminName'];
-            $subdata[]  = $config->_formatdate($row['created_date']);
-            $subdata[]  = $config->_formatdate($row['delivery_date']);
+            $subdata[]  = $created_date;
+            $subdata[]  = $deliverydate;
             $subdata[]  = $statuspaid.$adminuser;
             $subdata[]  = $datepaid;
             $subdata[]  = $config->formatPrice($row['TotalCostPrice']);
@@ -549,6 +571,361 @@ if($_GET['type'] == 'bonus')
     echo json_encode($json_data);
 }
 
+if($_GET['type'] == 'hardcopy')
+{
+    $request = $_REQUEST;
+    $search = $_POST['is_date_search'];
+    
+    if(isset($_POST['date_range'])){
+        $daterange = $_POST['date_range'];
+
+        $month = '';   
+    }else{
+        $daterange = '';
+        $status_paid = '';
+        // $month = 'AND MONTH(pay_kurirs.created_at) = MONTH(CURRENT_DATE())
+        // AND YEAR(pay_kurirs.created_at) = YEAR(CURRENT_DATE())';
+        $month = '';
+        // $month = 'AND DATE(pay_kurirs.created_at) = DATE(NOW())';
+    }
+
+    $databox = '';
+    if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
+        // echo $_POST['search']['value'];
+        $databox = ' AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR corporates.nama LIKE "%'. $_POST['search']['value'] . '%" OR corporate_pics.name LIKE "%'. $_POST['search']['value'] . '%" OR transaction.Resi LIKE "%'.$_POST['search']['value'].'%") ';
+    }
+    
+
+    $DataQuery = " select corporates.nama as CorporateName, corporate_pics.name as PICName, corporate_pics.type as TypeInvoice, transaction.transactionID, transaction.grandTotal, transaction.delivery_date, transaction.created_date, transaction.statusPaid, transaction.PaidDate, transaction.Resi, transaction.ResiDate, users.name as AdminName from transaction
+        left join corporates on corporates.CorporateUniqueID = transaction.CustomerID
+        left join corporate_pics on corporate_pics.id = transaction.PIC
+        left join users on users.id = transaction.PaidBy
+        where corporates.nama IS NOT NULL AND corporate_pics.type = 1 AND transaction.statusOrder = 3  ";
+
+    $QueryTotal = " select corporates.nama as CorporateName, corporate_pics.name as PICName, corporate_pics.type as TypeInvoice, transaction.transactionID, transaction.grandTotal, transaction.delivery_date, transaction.created_date, transaction.PaidDate, transaction.Resi, transaction.ResiDate, users.name as AdminName from transaction
+        left join corporates on corporates.CorporateUniqueID = transaction.CustomerID
+        left join corporate_pics on corporate_pics.id = transaction.PIC
+        left join users on users.id = transaction.PaidBy
+        where corporates.nama IS NOT NULL AND corporate_pics.type = 1 AND transaction.statusOrder = 3 ";
+
+    //print_r($request);
+    $colom = array(
+        0   => 'transactionID',
+        1   => 'CustomerName',
+        2   => 'AdminName',
+        3   => 'created_date',
+        4   => 'delivery_date',
+        5   => 'statusPaid',
+        6   => 'updated_date',
+        7   => 'costprice',
+        8   => 'sellingprice',
+        9   => 'quantity',
+        10   => 'MP'
+    );
+
+
+    $orderby = 'ORDER BY transaction.delivery_date ASC';
+    if(isset($_POST['order'][0]['column'])) {
+        $column     = $_POST['order'][0]['column'];
+        $typesort   = $_POST['order'][0]['dir'];
+
+        $orderby = 'ORDER BY '.$colom[$column].' '. $typesort;
+    }
+
+    $limitstart = $_POST['start'];
+    $limitend = $_POST['length'];
+    $limit = 'LIMIT '.$limitstart.','.$limitend;
+
+
+    $DataQuery .= $databox;
+    $QueryTotal .= $databox;
+
+    if( $search != 'no' ) { //age
+        $rangeArray = explode("_",$daterange);
+        
+
+        $startDate = $rangeArray[0]. ' 00:00:00';
+        $endsDate = $rangeArray[1]. ' 23:59:59';
+
+        $DataQuery .=" AND transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $orderby. ' '. $limit;
+        $QueryTotal .=" AND transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $orderby;
+        
+        // var_dump($DataQuery);
+
+        $stmt = $config->runQuery($DataQuery);
+        $stmt->execute();
+
+        $stmt2 = $config->runQuery($QueryTotal);
+        $stmt2->execute();
+        $totalData = $stmt2->rowCount();
+        $totalFilter = $totalData;
+        
+
+    } else {
+        $status_paid = 'AND transaction.created_by = 0';
+
+        $QueryTotal.=" AND MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
+        AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE()) GROUP BY transaction.transactionID  ". $orderby;
+        $DataQuery.=" AND MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
+        AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE()) GROUP BY transaction.transactionID  ". $orderby. ' '. $limit;
+         $stmt = $config->runQuery($DataQuery);
+        $stmt->execute();
+
+        $stmt2 = $config->runQuery($QueryTotal);
+        // var_dump($QueryTotal);
+
+        $stmt2->execute();
+        $totalData = $stmt2->rowCount();
+        $totalFilter = $totalData;
+        
+        $totalPerKurir = 0;
+    }
+    
+    
+   // var_dump($stmt);
+    $data = [];
+    // 9 1 11 4 10 12 7frecordsTotal
+    if($totalData > 0 ) {
+        while ($row = $stmt->fetch(PDO::FETCH_LAZY)){
+
+            $adminuser = '<span class="badge badge-secondary">unset</span>';
+            if($row['AdminName'] != '') {
+                $adminuser = ' By: '.$row['AdminName'];
+            }
+            $statuspaid = '<a href="javascript:;" onclick="changestatuspaid(\''.$row['transactionID'].'\')"><span class="badge badge-warning">UNPAID</span></a>';
+            if($row['statusPaid'] == 1) $statuspaid = '<span class="badge badge-success">PAID</span>';
+
+            $btnresi = '<a href="javascript:;" onclick="inputresi(\''.$row['transactionID'].'\')"><span class="badge badge-info">Send</span></a>';
+            if($row['Resi'] != '') $btnresi = '<span class="badge badge-success">Has been Send</span>';
+    
+            $arrpaid = [
+                'UNPAID',
+                'PAID'
+            ];
+            $subdata = array();
+
+            $datepaid = '<span class="badge badge-secondary">unset</span>';
+            if(($row['PaidDate']) != '0000-00-00 00:00:00') $datepaid = $config->_formatdate($row['PaidDate']);
+            $residate = '<span class="badge badge-secondary">unset</span>';
+            if(($row['ResiDate']) != '0000-00-00 00:00:00') $residate = $config->_formatdate($row['ResiDate']);
+            $deliverydate = '<span class="badge badge-secondary">unset</span>';
+            if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
+            $resi = '<span class="badge badge-secondary">unset</span>';
+            if(($row['Resi']) != '') $resi = $row['Resi'];
+
+            $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
+            $subdata[]  = $row['CorporateName'];
+            $subdata[]  = $row['PICName'];
+            $subdata[]  = $config->formatPrice($row['grandTotal']);
+            $subdata[]  = $config->_formatdate($row['created_date']);
+            $subdata[]  = $deliverydate;
+            $subdata[]  = $statuspaid.'<br>'.$adminuser.'<br>'.$datepaid;
+            $subdata[]  = $resi;
+            $subdata[]  = $residate;
+            $subdata[]  = $btnresi;
+            array_push($data, $subdata);
+            //$data = $subdata;
+        }
+    }
+    
+
+    $json_data = array(
+        'draw'              => intval($request['draw']),
+        'recordsTotal'      => intval($totalData),
+        'recordsFiltered'   => intval($totalFilter),
+        'data'              => $data
+    );
+    echo json_encode($json_data);
+}
+
+if($_GET['type'] == 'softcopy')
+{
+    $request = $_REQUEST;
+    $search = $_POST['is_date_search'];
+    
+    if(isset($_POST['date_range'])){
+        $daterange = $_POST['date_range'];
+
+        $month = '';   
+    }else{
+        $daterange = '';
+        $status_paid = '';
+        // $month = 'AND MONTH(pay_kurirs.created_at) = MONTH(CURRENT_DATE())
+        // AND YEAR(pay_kurirs.created_at) = YEAR(CURRENT_DATE())';
+        $month = '';
+        // $month = 'AND DATE(pay_kurirs.created_at) = DATE(NOW())';
+    }
+
+    $databox = '';
+    if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
+        // echo $_POST['search']['value'];
+        $databox = ' AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR corporates.nama LIKE "%'. $_POST['search']['value'] . '%" OR corporate_pics.name LIKE "%'. $_POST['search']['value'] . '%" OR transaction.Resi LIKE "%'.$_POST['search']['value'].'%") ';
+    }
+    
+
+    $DataQuery = " select corporates.nama as CorporateName, corporate_pics.name as PICName, corporate_pics.type as TypeInvoice, transaction.transactionID, transaction.grandTotal, transaction.delivery_date, transaction.created_date, transaction.statusPaid, transaction.PaidDate, transaction.Resi, transaction.ResiDate, users.name as AdminName from transaction
+        left join corporates on corporates.CorporateUniqueID = transaction.CustomerID
+        left join corporate_pics on corporate_pics.id = transaction.PIC
+        left join users on users.id = transaction.PaidBy
+        where corporates.nama IS NOT NULL AND corporate_pics.type = 0 AND transaction.statusOrder = 3  ";
+
+    $QueryTotal = " select corporates.nama as CorporateName, corporate_pics.name as PICName, corporate_pics.type as TypeInvoice, transaction.transactionID, transaction.grandTotal, transaction.delivery_date, transaction.created_date, transaction.PaidDate, transaction.Resi, transaction.ResiDate, users.name as AdminName from transaction
+        left join corporates on corporates.CorporateUniqueID = transaction.CustomerID
+        left join corporate_pics on corporate_pics.id = transaction.PIC
+        left join users on users.id = transaction.PaidBy
+        where corporates.nama IS NOT NULL AND corporate_pics.type = 0 AND transaction.statusOrder = 3 ";
+
+    //print_r($request);
+    $colom = array(
+        0   => 'transactionID',
+        1   => 'CustomerName',
+        2   => 'AdminName',
+        3   => 'created_date',
+        4   => 'delivery_date',
+        5   => 'statusPaid',
+        6   => 'updated_date',
+        7   => 'costprice',
+        8   => 'sellingprice',
+        9   => 'quantity',
+        10   => 'MP'
+    );
+
+
+    $orderby = 'ORDER BY transaction.delivery_date ASC';
+    if(isset($_POST['order'][0]['column'])) {
+        $column     = $_POST['order'][0]['column'];
+        $typesort   = $_POST['order'][0]['dir'];
+
+        $orderby = 'ORDER BY '.$colom[$column].' '. $typesort;
+    }
+
+    $limitstart = $_POST['start'];
+    $limitend = $_POST['length'];
+    $limit = 'LIMIT '.$limitstart.','.$limitend;
+
+
+    $DataQuery .= $databox;
+    $QueryTotal .= $databox;
+
+    if( $search != 'no' ) { //age
+        $rangeArray = explode("_",$daterange);
+        
+
+        $startDate = $rangeArray[0]. ' 00:00:00';
+        $endsDate = $rangeArray[1]. ' 23:59:59';
+
+        $DataQuery .=" AND transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $orderby. ' '. $limit;
+        $QueryTotal .=" AND transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $orderby;
+        
+        // var_dump($DataQuery);
+
+        $stmt = $config->runQuery($DataQuery);
+        $stmt->execute();
+
+        $stmt2 = $config->runQuery($QueryTotal);
+        $stmt2->execute();
+        $totalData = $stmt2->rowCount();
+        $totalFilter = $totalData;
+        
+
+    } else {
+        $status_paid = 'AND transaction.created_by = 0';
+
+        $QueryTotal.=" AND MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
+        AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE()) GROUP BY transaction.transactionID  ". $orderby;
+        $DataQuery.=" AND MONTH(transaction.created_date) = MONTH(CURRENT_DATE())
+        AND YEAR(transaction.created_date) = YEAR(CURRENT_DATE()) GROUP BY transaction.transactionID  ". $orderby. ' '. $limit;
+         $stmt = $config->runQuery($DataQuery);
+        $stmt->execute();
+
+        $stmt2 = $config->runQuery($QueryTotal);
+        // var_dump($QueryTotal);
+
+        $stmt2->execute();
+        $totalData = $stmt2->rowCount();
+        $totalFilter = $totalData;
+        
+        $totalPerKurir = 0;
+    }
+    
+    
+   // var_dump($stmt);
+    $data = [];
+    // 9 1 11 4 10 12 7frecordsTotal
+    if($totalData > 0 ) {
+        while ($row = $stmt->fetch(PDO::FETCH_LAZY)){
+
+            $adminuser = '<span class="badge badge-secondary">unset</span>';
+            if($row['AdminName'] != '') {
+                $adminuser = ' By: '.$row['AdminName'];
+            }
+            $statuspaid = '<a href="javascript:;" onclick="changestatuspaid(\''.$row['transactionID'].'\')"><span class="badge badge-warning">UNPAID</span></a>';
+            if($row['statusPaid'] == 1) $statuspaid = '<span class="badge badge-success">PAID</span>';
+
+            $btnresi = '<a href="javascript:;" onclick="inputresi(\''.$row['transactionID'].'\')"><span class="badge badge-info">Send</span></a>';
+            if($row['Resi'] != '') $btnresi = '<span class="badge badge-success">Has been Send</span>';
+
+            $btnsendemail = '<button type="button" class="btn btn-sm btn-primary" onclick="sendemail(\''.$row['transactionID'].'\')">Send Email</button>';
+            if($row['ResiDate'] != '0000-00-00 00:00:00') $btnsendemail = '<span class="badge badge-success">Email Send been Send</span>';
+    
+            $arrpaid = [
+                'UNPAID',
+                'PAID'
+            ];
+            $subdata = array();
+
+            $datepaid = '<span class="badge badge-secondary">unset</span>';
+            if(($row['PaidDate']) != '0000-00-00 00:00:00') $datepaid = $config->_formatdate($row['PaidDate']);
+            $residate = '<span class="badge badge-secondary">unset</span>';
+            if(($row['ResiDate']) != '0000-00-00 00:00:00') $residate = $config->_formatdate($row['ResiDate']);
+            $deliverydate = '<span class="badge badge-secondary">unset</span>';
+            if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
+            $resi = '<span class="badge badge-secondary">unset</span>';
+            if(($row['Resi']) != '') $resi = $row['Resi'];
+
+            $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['transactionID'] .'" target="_blank">'.$row['transactionID'].'</a>';
+            $subdata[]  = $row['CorporateName'];
+            $subdata[]  = $row['PICName'];
+            $subdata[]  = $config->formatPrice($row['grandTotal']);
+            $subdata[]  = $config->_formatdate($row['created_date']);
+            $subdata[]  = $deliverydate;
+            $subdata[]  = $statuspaid.'<br>'.$adminuser.'<br>'.$datepaid;
+            $subdata[]  = $residate;
+            $subdata[]  = $btnsendemail;
+            array_push($data, $subdata);
+            //$data = $subdata;
+        }
+    }
+    
+
+    $json_data = array(
+        'draw'              => intval($request['draw']),
+        'recordsTotal'      => intval($totalData),
+        'recordsFiltered'   => intval($totalFilter),
+        'data'              => $data
+    );
+    echo json_encode($json_data);
+}
+
+if($_GET['type'] == 'inputresi') {
+
+    $TransactionNumber = $_POST['transactionID'];
+    $nomorresi = $_POST['nomorresi'];
+    $residate = $_POST['residate'];
+    $tgl = $config->getDate("Y-m-d H:m:s");
+
+    $query = "UPDATE transaction SET Resi = '".$nomorresi."', ResiDate = '".$residate."', updated_date = '".$tgl."', updated_by = '".$admin."' WHERE transactionID = '".$TransactionNumber."' ";
+    $stmt = $config->runQuery($query);
+    $stmt->execute();
+
+    if($stmt) {
+        echo $config->actionMsg('u', 'transaction');
+        $logs = $config->saveLogs($TransactionNumber, $admin, 'c', 'input nomor resi');
+    } else {
+        echo 'Failed !';
+    }
+}
+
 if($_GET['type'] == 'changestatuspaid') {
     $a = $_POST['transactionID'];
     $b = $_POST['password'];
@@ -566,9 +943,12 @@ if($_GET['type'] == 'changestatuspaid') {
                 $update = $config->runQuery("UPDATE transaction SET statusPaid = 1, PaidDate = '".$c."', PaidBy = '".$admin."' WHERE transactionID = '". $a ."'");
                 $update->execute();
 
-                echo 'Success!';
+                die(json_encode(['response' => 'OK', 'msg' => 'Success!']));
+                $logs = $config->saveLogs($a, $admin, 'u', 'transaction');
             } else {
-                echo 'Error insert1';
+                
+                die(json_encode(['response' => 'ERROR', 'msg' => 'Error!']));
+                $logs = $config->saveLogs($a, $admin, 'u', 'transaction');
             }
             $logs = $config->saveLogs($a, $admin, 'c', 'generatetoken dan update transaction');
         } else {
@@ -583,19 +963,25 @@ if($_GET['type'] == 'changestatuspaid') {
                     $update = $config->runQuery("UPDATE token SET Status = 1 WHERE AdminID = '". $admin ."'");
                     $update->execute();
                     if($update) {
-                        echo 'Sorry, your key has disable. Please contact your Manager!';
+                        // echo 'Sorry, your key has disable. Please contact your Manager!';
+                        die(json_encode(['response' => 'ERROR', 'msg' => 'Sorry, your key has disable. Please contact your Manager!']));
+                        
                     } else {
-                        echo 'Error update!';
+                        // echo 'Error update!';
+                        die(json_encode(['response' => 'ERROR', 'msg' => 'Error Update!']));
                     }
                 } else {
-                    echo 'Password mismatch!';
+                    // echo 'Password mismatch!';
+                    die(json_encode(['response' => 'ERROR', 'msg' => 'Password mismatch!']));
                 }
             } else {
-                echo 'Error Insert!';
+                // echo 'Error Insert!';
+                die(json_encode(['response' => 'ERROR', 'msg' => 'Error Insert!']));
             }
         }
     } else {
-        echo 'You have no Power here, Gandalf The Grey!';
+        // echo 'You have no Power here, Gandalf The Grey!';
+        die(json_encode(['response' => 'ERROR', 'msg' => 'You have no Power here, Gandalf The Grey!']));
     }
 }
 if($_GET['type'] == 'changestatuspaidmultiple') {
@@ -616,10 +1002,11 @@ if($_GET['type'] == 'changestatuspaidmultiple') {
                 if($insert) {
                     $update = $config->runQuery("UPDATE transaction SET statusPaid = 1, PaidDate = '".$c."', PaidBy = '".$admin."' WHERE transactionID = '". $val ."'");
                     $update->execute();
-
-                    echo 'Success!';
+                    // echo 'Success!';
+                    die(json_encode(['response' => 'OK', 'msg' => 'Success!']));
                 } else {
-                    echo 'Error insert1';
+                    // echo 'Error insert1';
+                    die(json_encode(['response' => 'ERROR', 'msg' => 'Error insert1!']));
                 }
                 $logs = $config->saveLogs($val, $admin, 'c', 'generatetoken dan update transaction');
             }
@@ -636,19 +1023,24 @@ if($_GET['type'] == 'changestatuspaidmultiple') {
                         $update = $config->runQuery("UPDATE token SET Status = 1 WHERE AdminID = '". $admin ."'");
                         $update->execute();
                         if($update) {
-                            echo 'Sorry, your key has disable. Please contact your Manager!';
+                            // echo 'Sorry, your key has disable. Please contact your Manager!';
+                            die(json_encode(['response' => 'ERROR', 'msg' => 'Sorry, your key has disable. Please contact your Manager!']));
                         } else {
-                            echo 'Error update!';
+                            // echo 'Error update!';
+                            die(json_encode(['response' => 'ERROR', 'msg' => 'Error Update!']));
                         }
                     } else {
-                        echo 'Password mismatch!';
+                        // echo 'Password mismatch!';
+                        die(json_encode(['response' => 'ERROR', 'msg' => 'Password mismatch!']));
                     }
                 } else {
-                    echo 'Error Insert!';
+                    // echo 'Error Insert!';
+                    die(json_encode(['response' => 'ERROR', 'msg' => 'Error Insert!']));
                 }
             }
         }
     } else {
-        echo 'You have no Power here, Gandalf The Grey!';
+        // echo 'You have no Power here, Gandalf The Grey!';
+        die(json_encode(['response' => 'ERROR', 'msg' => 'You have no Power here, Gandalf The Grey!']));
     }
 }

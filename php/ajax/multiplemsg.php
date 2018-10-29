@@ -1,0 +1,125 @@
+<?php
+require '../../config/config.php';
+require_once '../../assets/vendors/dompdf/autoload.inc.php';
+use Dompdf\Dompdf;
+$dompdf = new Dompdf();
+
+$transactionID = $_GET['transactionID'];
+$transactionID = explode(',', $transactionID);
+
+$total = count($transactionID);
+$spk = [];
+
+
+$contentHeader = '
+    <html>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Card Msg</title>
+';
+$contentFooter = '
+    </head>
+    </html>
+';
+
+foreach($transactionID as $key => $val) {
+//   if($total > 0) $html .= '<div style="page-break-before: always;"></div>';
+    $transactionID = $val;
+
+    $data = $config->getData('*', 'transaction', "transactionID = '". $transactionID ."' ");
+
+    $cardto = '';
+    if($data['card_to'] != '') {
+        $cardto = 'To: '.$data['card_to'];
+    }
+    $cardfrom = '';
+    if($data['card_from'] != '') {
+        $cardfrom = 'From: '.$data['card_from'];
+    }
+
+    $contentdata = '
+    <style type="text/css">
+    *{
+        margin:0;
+    }
+    body{
+        margin:1px auto;
+        width:470px;
+        height: 0 auto;
+        border:0px solid black;
+        clear: both;
+    }
+    p { float: left; clear: left; margin: 1em auto; border: 0px solid #888; }
+
+.wb { word-break: break-all; width:400px; }
+
+.ww { word-wrap: break-word; }
+
+.h { -ms-hyphens: auto; hyphens: auto; }
+
+.mw { max-width: 100%; }
+.content {
+   margin-top: 480px; 
+   vertical-align: bottom;
+   }
+.isi {
+   display: block;
+   padding: 12px;
+   /* margin: 0px 6px; */
+   font-size: 15px;
+   line-height: 1.42857143;
+   color: #333;
+   word-break: break-all;
+   word-wrap: break-word;
+   text-align: center;
+   border: 0px solid #ccc;
+   border-radius: 4px;
+   font-family: Arial, "sans-serif";
+}
+.fromcard {
+   display: block;
+   padding: 12px;
+   /* margin: 0px 10px; */
+   font-size: 16px;
+   line-height: 1.42857143;
+   color: #333;
+   word-break: break-all;
+   word-wrap: break-word;
+   border: 0px solid #ccc;
+   border-radius: 4px;
+   font-weight: 600;
+   font-family: Arial, "sans-serif";
+   text-align: center;
+   text-transform: capitalize;
+}
+</style>
+<body>
+   <div class="content">
+       <div class="fromcard">
+       
+       '.$cardto.'
+       </div>
+       <div class="isi">
+       '.$data['card_isi'] .'
+       </div>
+       <div class="fromcard">'.$cardfrom.'</div>
+   </div>
+</body>
+    ';
+    
+  $invoices[] = $contentdata;
+}
+    $content = $contentHeader . implode( '<div style="page-break-before: always;"></div>' , $invoices ) . $contentFooter;
+    // echo $content;
+
+  $dompdf->loadHtml($content);
+    
+    // (Opsional) Mengatur ukuran kertas dan orientasi kertas
+    $dompdf->setPaper(array(0, 0, 419.53, 595.28), 'portrait');
+    
+    // Menjadikan HTML sebagai PDF
+    $dompdf->render();
+    
+    // Output akan menghasilkan PDF (1 = download dan 0 = preview)
+    $dompdf->stream("Card Msg-". $val,array("Attachment"=>0));
+?>
