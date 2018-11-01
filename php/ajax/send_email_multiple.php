@@ -31,9 +31,9 @@ foreach($nomortrx as $key => $val) {
                             </div>
                             </td>
                         </tr>';
-    if(isset($_GET['type'])) {
-        $downloadfile = '';
-    }
+    // if(isset($_GET['type'])) {
+    //     $downloadfile = '';
+    // }
 
     $arrtime = [
         0 => '9am - 1pm',
@@ -63,9 +63,9 @@ foreach($nomortrx as $key => $val) {
         $dataproduct[] = '
         <tr style="background-color: #ffffff;">
             <td style="padding: 5px; border-bottom: 0.5px solid;">
-            <img style="border:1px solid #FFFFFF; padding:1px; " src="'.URL.'assets/images/product/'. str_replace(' ', '_', $row['product_name']) .'.jpg" width="100" height="95" align=center>
+            <img style="border:1px solid #FFFFFF; padding:1px; " src="'.URL.'assets/images/product/'. str_replace(' ', '_', strtolower($row['product_name'])) .'.jpg" width="100" height="95" align=center>
             </td>
-            <td style="padding: 3px;font-size: 14px;font-weight: 600; border-bottom: 0.5px solid; text-transform: capitalize;">'. strtoupper($row['id_product']) .' '. $config->_parsingproductname($row['product_name']) .'</td>
+            <td style="padding: 3px;font-size: 14px;font-weight: 600; border-bottom: 0.5px solid; text-transform: capitalize;">'. strtoupper($row['id_product']) .' '. $config->_parsingproductname(strtolower($row['product_name'])) .'</td>
             <td style="padding: 3px;font-size: 14px;font-weight: 600; text-align: center; border-bottom: 0.5px solid; padding-right: 4px;">'. $row['product_qty'] .'</td>
             <td style="padding: 3px;font-size: 14px;font-weight: 600; text-align: right; border-bottom: 0.5px solid; padding-right: 4px;">'. number_format($row['product_price'], 2, '.', ',') .'</td>
             <td style="padding: 3px;font-size: 14px;font-weight: 600; text-align: right; border-bottom: 0.5px solid; padding-right: 4px;">'. number_format(($row['product_qty'] * $row['product_price']), 2, '.', ',') .'</td>

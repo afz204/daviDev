@@ -946,7 +946,7 @@ if($_GET['type'] == 'tableNewOrder'){
             }
 
              $created_date = '<span class="badge badge-secondary">unset</span>';
-            if(($row['created_date']) != '0000-00-00 00:00:00') $datepaid = $config->_formatdate($row['created_date']);
+            if(($row['created_date']) != '0000-00-00 00:00:00') $created_date = $config->_formatdate($row['created_date']);
             $deliverydate = '<span class="badge badge-secondary">unset</span>';
             if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
             
@@ -1202,7 +1202,7 @@ if($_GET['type'] == 'tableOnProccess'){
             }
 
             $created_date = '<span class="badge badge-secondary">unset</span>';
-            if(($row['created_date']) != '0000-00-00 00:00:00') $datepaid = $config->_formatdate($row['created_date']);
+            if(($row['created_date']) != '0000-00-00 00:00:00') $created_date = $config->_formatdate($row['created_date']);
             $deliverydate = '<span class="badge badge-secondary">unset</span>';
             if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
 
@@ -1508,7 +1508,7 @@ if($_GET['type'] == 'tableHistory'){
     $databox = '';
     if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
         // echo $_POST['search']['value'];
-        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%")  OR (transaction_details.product_name LIKE "%'.$_POST['search']['value'].'%") AND ';
+        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%")  OR (transaction_details.product_name LIKE "%'.$_POST['search']['value'].'%") ';
     }
 
      $colom = array(
@@ -1575,7 +1575,7 @@ if($_GET['type'] == 'tableHistory'){
         $startDate = $rangeArray[0];
         $endsDate = $rangeArray[1];
 
-        $daterangequery = "transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
+        $daterangequery = " AND transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."'";
         $corporatequery = " AND transaction.CustomerID = '".$corporate."'";
         $adminquery = " AND transaction.created_by = '".$admin."'";
 
@@ -1593,7 +1593,7 @@ if($_GET['type'] == 'tableHistory'){
         $Query .=" GROUP BY transaction.transactionID ". $orderby. ' '. $limit;
         $QueryTotal .=" GROUP BY transaction.transactionID ". $orderby;
         
-        // var_dump($Query);
+        var_dump($QueryTotal);
         $stmt2 = $config->runQuery($QueryTotal);
         $stmt2->execute();
         $totalData = $stmt2->rowCount();
@@ -1963,7 +1963,7 @@ if($_GET['type'] == 'tableCancelOrder'){
             }
 
             $created_date = '<span class="badge badge-secondary">unset</span>';
-            if(($row['created_date']) != '0000-00-00 00:00:00') $datepaid = $config->_formatdate($row['created_date']);
+            if(($row['created_date']) != '0000-00-00 00:00:00') $created_date = $config->_formatdate($row['created_date']);
             $deliverydate = '<span class="badge badge-secondary">unset</span>';
             if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
 
@@ -2673,7 +2673,9 @@ if($_GET['type'] == 'proccessOrder'){
 
     $grandTotal = $totalTransaction + $deliveryCharge + $timeslotcharges;
 
-    $stmt = "UPDATE transaction SET statusOrder = '0', invoice_name = '". $b ."', statusOrder = '0', TotalCostPrice = '". $price['costprice'] ."', TotalSellingPrice = '". $price['sellingprice'] ."', grandTotal = '". $grandTotal ."', created_by = '". $admin ."' WHERE transactionID = :trx";
+    $tanggaltrx = $config->getDate('Y-m-d H:m:s');
+
+    $stmt = "UPDATE transaction SET statusOrder = '0', invoice_name = '". $b ."', statusOrder = '0', TotalCostPrice = '". $price['costprice'] ."', TotalSellingPrice = '". $price['sellingprice'] ."', grandTotal = '". $grandTotal ."', created_date = '".$tanggaltrx."',  created_by = '". $admin ."' WHERE transactionID = :trx";
     $stmt = $config->runQuery($stmt);
     $stmt->execute(array(
         ':trx' => $a

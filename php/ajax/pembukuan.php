@@ -989,12 +989,14 @@ if($_GET['type'] == 'changestatuspaidmultiple') {
     $b = $_POST['password'];
     $c = $_POST['PaidDate'];
     $data = explode(',', $a);
-
+    $totaldata = count($data);
+    // die(json_encode(['response' => 'ERROR', 'msg' => $a]));
     $cekuser = $config->getData('ID, tokenkey', 'token', " AdminID = '". $admin ."' AND Status = 0 ");
     if($cekuser) {
         if(password_verify($b, $cekuser['tokenkey'])) {
-
+            $i = 0;
             foreach($data as $key => $val) {
+                $i++;
                 $tokenid = $cekuser['ID'];
                 $insert = $config->runQuery("INSERT INTO generatetoken (TokenID, TransactionNumber, Status, GenerateBy) VALUES (".$tokenid.",'".$val."', '0', ".$admin.") ");
                 $insert->execute();
@@ -1003,7 +1005,7 @@ if($_GET['type'] == 'changestatuspaidmultiple') {
                     $update = $config->runQuery("UPDATE transaction SET statusPaid = 1, PaidDate = '".$c."', PaidBy = '".$admin."' WHERE transactionID = '". $val ."'");
                     $update->execute();
                     // echo 'Success!';
-                    die(json_encode(['response' => 'OK', 'msg' => 'Success!']));
+                    if($totaldata == $i) { die(json_encode(['response' => 'OK', 'msg' => 'Success!'])); }
                 } else {
                     // echo 'Error insert1';
                     die(json_encode(['response' => 'ERROR', 'msg' => 'Error insert1!']));

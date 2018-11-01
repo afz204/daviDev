@@ -234,17 +234,19 @@ function submitgeneratepushtokenmultiple() {
         success: function(msg) {
             var data = JSON.parse(msg);
             if (data['response'] == 'OK') {
-                // $.ajax({
-                //     url: '../php/ajax/send_email_multiple.php',
-                //     method: 'post',
-                //     data: { 'transactionID': trx },
+                console.log(data);
+                $.ajax({
+                    url: '../php/ajax/send_email_multiple.php',
+                    method: 'post',
+                    data: { 'transactionID': trx },
 
-                //     success: function(msgg) {
-                //         var n = JSON.parse(msgg);
-                //         alert(n['msg']);
-                //         location.reload();
-                //     }
-                // })
+                    success: function(msgg) {
+                        var n = JSON.parse(msgg);
+                        console.log(n);
+                        alert(n['msg']);
+                        location.reload();
+                    }
+                })
             } else {
                 location.reload();
                 alert(data['msg']);

@@ -1,6 +1,6 @@
 <?php
 $kas = $config->ProductsJoin('kas_besar.id, kas_besar.type, kas_besar.total, kas_besar.title, kas_besar.ket, kas_besar.status, kas_besar.admin_id, kas_besar.status, kas_besar.created_at, users.name', 'kas_besar',
-    'INNER JOIN users ON users.id = kas_besar.admin_id', "ORDER BY kas_besar.created_at DESC");
+    'INNER JOIN users ON users.id = kas_besar.admin_id', " WHERE MONTH(kas_besar.created_at) = MONTH(CURRENT_DATE()) AND YEAR(kas_besar.created_at) = YEAR(CURRENT_DATE()) ORDER BY kas_besar.created_at DESC");
 $totalKas   = $config->Products('created_at, SUM(total) as totalDana', "kas_besar WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND type  LIKE 'debit'");
 $totalKas   = $totalKas->fetch(PDO::FETCH_LAZY);
 

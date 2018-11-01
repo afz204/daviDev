@@ -246,3 +246,28 @@ $listtransaction = $config->FindProducts('*', 'transaction', 'statusOrder NOT IN
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="reasonbox" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+<div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+            <div class="modal-body">
+                <form id="formresonbox" method="post" data-parsley-validate="" class="needs-validation" novalidate="" autocomplete="off">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="firstName">Reason</label>
+                            <textarea type="text" class="form-control" id="Reason" autocomplete="text" placeholder="" require></textarea>
+                        </div>
+                    </div>
+                    <input type="hidden" name="TypeOfReason">
+                    <input type="hidden" name="TransactionNumberKurir">
+                    <button class="btn btn-success btn-sm btn-block" type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
