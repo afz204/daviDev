@@ -156,15 +156,14 @@ if($_GET['type'] == 'exportpiutang') {
         $status_paid = '';
     }
     
-    $DataQuery = " SELECT transaction_details.product_name, transaction.*, users.name as AdminName, florist.FloristName FROM transaction_details
-    LEFT JOIN transaction on transaction.transactionID = transaction_details.id_trx
-    LEFT JOIN users on users.id = transaction.created_by 
-    LEFT JOIN florist on florist.ID = transaction.id_florist
+    $DataQuery = " SELECT transaction.*, users.name as AdminName, florist.FloristName, (select GROUP_CONCAT(transaction_details.product_name SEPARATOR ',') from transaction_details where transaction_details.id_trx = transaction.transactionID) as product FROM transaction 
+    LEFT JOIN transaction_details on transaction_details.id_trx = transaction.transactionID
+    LEFT JOIN users on users.id = transaction.created_by LEFT JOIN florist on florist.ID = transaction.id_florist
     WHERE transaction.statusOrder NOT IN (6, 99) AND ";
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 
-    $DataQuery .=" (transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid.") ORDER BY transaction.delivery_date ASC";
+    $DataQuery .=" (transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid.") GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC";
     // $DataQuery .=" (transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid.") GROUP BY transaction.transactionID";
     // var_dump($DataQuery);
     $data = $config->runQuery($DataQuery);
@@ -248,13 +247,15 @@ if($_GET['type'] == 'exportpiutang') {
         if(strtotime($row['PaidDate']) == false) {
             $paydate = 'unset';
         }
+        $product = explode(',', $row['product']);
+        
         $Excel->getActiveSheet()
         ->setCellValue('A'.$loop, $nomor++)
         ->setCellValue('B'.$loop, $row['transactionID'])
         ->setCellValue('C'.$loop, $row['CustomerName'])
         ->setCellValue('D'.$loop, $row['AdminName'])
         ->setCellValue('E'.$loop, $row['card_from'])
-        ->setCellValue('F'.$loop, "'".$config->_parsingproductname($row['product_name'])."'")
+        ->setCellValue('F'.$loop, "'". str_replace(',', '; ', $config->_parsingproductname($row['product'])) . "'")
         ->setCellValue('G'.$loop, $row['invoice_name'])
         ->setCellValue('H'.$loop, Date('Y-m-d', strtotime($row['created_date'])))
         ->setCellValue('I'.$loop, $row['delivery_date'])

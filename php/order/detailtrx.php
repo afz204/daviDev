@@ -65,9 +65,9 @@
             'id_kurir' => $trx['id_kurir'],
             'nama_penerima' => $trx['nama_penerima'],
             'email' => $trx['email'],
-            'provinsi_id' => $prov[$trx['provinsi_id']]['name'],
-            'kota_id' => $reg[$trx['kota_id']]['name'],
-            'kecamata_id' => $dis[$trx['kecamata_id']]['name'],
+            'provinsi_id' => $trx['provinsi_id'] != '' ? $prov[$trx['provinsi_id']]['name'] : '',
+            'kota_id' => $trx['kota_id'] != '' ? $reg[$trx['kota_id']]['name'] : '',
+            'kecamata_id' => $trx['kecamata_id'] != '' ? $dis[$trx['kecamata_id']]['name'] : '',
             'kelurahan' => $trx['kelurahan_id'],
             'alamat_penerima' => $trx['alamat_penerima'],
             'delivery_date' => $trx['delivery_date'],
@@ -326,8 +326,9 @@
                   <div class="col-md-6 mb-3">
                      <label for="firstName">time slot</label>
                         <select class="form-control" id="time_slot" name="time_slot" readonly>
+                        <option value="100">select</option>
                         <?php foreach($arrtime as $key => $val) { ?>
-                            <option value="<?=$key?>" <?=$key == $data['delivery_time'] ? 'selected' : '' ?> ><?=$val?></option>
+                            <option value="<?=$key?>" <?=$data['delivery_time'] != '' && $key == $data['delivery_time'] ? 'selected' : '' ?> ><?=$val?></option>
                         <?php } ?>
                         </select>
                   </div>

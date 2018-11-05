@@ -559,7 +559,10 @@ class Admin
         $newname = $product;
         if($tmpname) {
             $countname = strlen($tmpname);
-            $newname = substr($tmpname, 13, $countname);
+            $tmpnewname = substr($tmpname, 0, 12);
+            if(is_numeric($tmpnewname)) {
+                $newname = substr($tmpname, 12, $countname);
+            }
         }
         
 

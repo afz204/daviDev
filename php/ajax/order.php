@@ -1459,7 +1459,7 @@ if($_GET['type'] == 'tableOnDelivery'){
             }
 
             $created_date = '<span class="badge badge-secondary">unset</span>';
-            if(($row['created_date']) != '0000-00-00 00:00:00') $datepaid = $config->_formatdate($row['created_date']);
+            if(($row['created_date']) != '0000-00-00 00:00:00') $created_date = $config->_formatdate($row['created_date']);
             $deliverydate = '<span class="badge badge-secondary">unset</span>';
             if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
 
@@ -1508,7 +1508,7 @@ if($_GET['type'] == 'tableHistory'){
     $databox = '';
     if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
         // echo $_POST['search']['value'];
-        $databox = '(transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%")  OR (transaction_details.product_name LIKE "%'.$_POST['search']['value'].'%") ';
+        $databox = ' AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" ';
     }
 
      $colom = array(
@@ -1527,7 +1527,7 @@ if($_GET['type'] == 'tableHistory'){
         12   => 'Color',
     );
 
-    $orderby = 'ORDER BY transaction.delivery_date ASC';
+    $orderby = 'ORDER BY transaction.created_date DESC';
     if(isset($_POST['order'][0]['column'])) {
         $column     = $_POST['order'][0]['column'];
         $typesort   = $_POST['order'][0]['dir'];
@@ -1550,7 +1550,7 @@ if($_GET['type'] == 'tableHistory'){
     LEFT JOIN transaction_details ON transaction_details.id_trx = transaction.transactionID 
     LEFT JOIN villages ON villages.id = transaction.kelurahan_id 
     LEFT JOIN users ON users.id = transaction.created_by 
-    LEFT JOIN kurirs ON kurirs.id = transaction.id_kurir
+    LEFT JOIN kurirs ON kurirs.id = transaction.id_kurir WHERE transaction.statusOrder NOT IN (6, 99)
      ';
     
     $QueryTotal = '
@@ -1564,7 +1564,7 @@ if($_GET['type'] == 'tableHistory'){
     LEFT JOIN transaction_details ON transaction_details.id_trx = transaction.transactionID 
     LEFT JOIN villages ON villages.id = transaction.kelurahan_id 
     LEFT JOIN users ON users.id = transaction.created_by 
-    LEFT JOIN kurirs ON kurirs.id = transaction.id_kurir
+    LEFT JOIN kurirs ON kurirs.id = transaction.id_kurir WHERE transaction.statusOrder NOT IN (6, 99)
      ';
 
     $Query .= $databox;
@@ -1593,7 +1593,7 @@ if($_GET['type'] == 'tableHistory'){
         $Query .=" GROUP BY transaction.transactionID ". $orderby. ' '. $limit;
         $QueryTotal .=" GROUP BY transaction.transactionID ". $orderby;
         
-        var_dump($QueryTotal);
+        // var_dump($QueryTotal);
         $stmt2 = $config->runQuery($QueryTotal);
         $stmt2->execute();
         $totalData = $stmt2->rowCount();
@@ -1714,7 +1714,7 @@ if($_GET['type'] == 'tableHistory'){
             }
 
               $created_date = '<span class="badge badge-secondary">unset</span>';
-            if(($row['created_date']) != '0000-00-00 00:00:00') $datepaid = $config->_formatdate($row['created_date']);
+            if(($row['created_date']) != '0000-00-00 00:00:00') $created_date = $config->_formatdate($row['created_date']);
             $deliverydate = '<span class="badge badge-secondary">unset</span>';
             if(($row['delivery_date']) != '0000-00-00') $deliverydate = $config->_formatdate($row['delivery_date']);
 

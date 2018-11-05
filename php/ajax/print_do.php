@@ -33,6 +33,8 @@ $dataproduct = implode(' ', $dataproduct);
 
 $cardmsg = substr($data['card_isi'], 0, 47);
 $cardmsg = $config->capitalize($cardmsg).'...';
+$deliverytime = 'unset';
+    if($data['delivery_time']) { $deliverytime = $arrtime[$data['delivery_time']]; }
 
 $content = '
 <html>
@@ -135,7 +137,7 @@ $content = '
                   <tr>
                      <td style="height: 20px; vartical-align: middle; font-weight: 600;">Time</td>
                      <td style="height: 20px; vartical-align: middle;">:</td>
-                     <td style="height: 20px; vartical-align: middle;">&nbsp;'. $arrtime[$data['delivery_time']] .'</td>
+                     <td style="height: 20px; vartical-align: middle;">&nbsp;'. $deliverytime .'</td>
                   </tr>
                   <tr>
                      <td style="height: 20px; vartical-align: middle; font-weight: 600;">Alamat</td>

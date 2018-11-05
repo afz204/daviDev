@@ -63,9 +63,9 @@ $dataproduct = [];
 $dataproduct = implode(' ', $dataproduct);
 $total = ($subtotal['Subtotal'] + $data['delivery_charge'] + $data['delivery_charge_time']) - 0;
 
-$CustomerName = isset($data['CorporateName']) && $data['CorporateName'] == '' ? $data['OrganicName'] : $data['CorporateName'];
-$CustomerEmail = isset($data['CorporateEmail']) && $data['CorporateEmail'] == '' ? $data['OrganicEmail'] : $data['CorporateEmail'];
-$CustomerPhone = isset($data['CorporatePhone']) && $data['CorporatePhone'] == '' ? $data['OrganicPhone'] : $data['CorporatePhone'];
+$CustomerName   = !$data['CorporateName']   ? $data['OrganicName']  : $data['CorporateName'];
+$CustomerEmail  = !$data['CorporateEmail']  ? $data['OrganicEmail'] : $data['CorporateEmail'];
+$CustomerPhone  = !$data['CorporatePhone']  ? $data['OrganicPhone'] : $data['CorporatePhone'];
 
 $receivedEmail = $CustomerEmail;
 $receivedName = $CustomerName;
@@ -472,5 +472,5 @@ $content = '
 // echo $content;
 $cc = '';
 $config = new Mail();
-// $email = $config->Mailler('afz60.30@gmail.com', $receivedName, $cc, $subject, $content);
-$email = $config->Mailler($receivedEmail, $receivedName, $cc, $subject, $content);
+$email = $config->Mailler('afz60.30@gmail.com', $receivedName, $cc, $subject, $content);
+// $email = $config->Mailler($receivedEmail, $receivedName, $cc, $subject, $content);
