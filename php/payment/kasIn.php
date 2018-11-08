@@ -168,7 +168,7 @@ $dl = $config->formatPrice($dll['totalProduksi']);
                             <?php } ?>
                             </tbody>
                         </table>
-                        <button class="btn btn-sm btn-success reportKasIn" <?=$access['update']?> data-admin="<?=$admin[0]['user_id']?>">report</button>
+                        <!-- <button class="btn btn-sm btn-success reportKasIn" <?=$access['update']?> data-admin="<?=$admin[0]['user_id']?>">report</button> -->
                     </div>
                 </div>
             </div>

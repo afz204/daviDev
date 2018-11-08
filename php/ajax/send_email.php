@@ -82,7 +82,7 @@ if($data['statusPaid'] == 1) {
 }
 
 $timedelivery = 'unset';
-if($data['delivery_time']) $timedelivery = $arrtime[$data['delivery_time']];
+if($data['delivery_time'] != '') $timedelivery = $arrtime[$data['delivery_time']];
 
 $emailrecipient = 'unset';
 if($data['email']) $emailrecipient = $data['email'];
@@ -472,5 +472,5 @@ $content = '
 // echo $content;
 $cc = '';
 $config = new Mail();
-$email = $config->Mailler('afz60.30@gmail.com', $receivedName, $cc, $subject, $content);
-// $email = $config->Mailler($receivedEmail, $receivedName, $cc, $subject, $content);
+// $email = $config->Mailler('afz60.30@gmail.com', $receivedName, $cc, $subject, $content);
+$email = $config->Mailler($receivedEmail, $receivedName, $cc, $subject, $content);

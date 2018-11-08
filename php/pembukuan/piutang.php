@@ -10,14 +10,6 @@
                     </div>
                     <input type="hidden" id='daterangepiutang'>
                 </div>
-                <div class="form-group">
-                    <select class="form-control" name="StatusPaid" id="StatusPaid" required>
-                        <option value="">:: status order ::</option>
-                        <option value="0">UNPAID</option>
-                        <option value="1">PAID</option>
-                        <option value="2">ALL</option>
-                    </select>
-                </div>
                 <div class="col-12 col-sm-3 col-lg-3">
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="submit"><span class="fa fa-search"></span> filter</button>

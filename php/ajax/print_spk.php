@@ -25,7 +25,7 @@ $stmt->execute(array(':id' => $transactionID));
 $dataproduct = [];
 while($row = $stmt->fetch(PDO::FETCH_LAZY)) {
     $deliverytime = 'unset';
-    if($row['delivery_time']) { $deliverytime = $arrtime[$row['delivery_time']]; }
+    if($row['delivery_time'] != '') { $deliverytime = $arrtime[$row['delivery_time']]; }
     $dataproduct[] = '
     <div class="title">
     '. $row['transactionID'] .'

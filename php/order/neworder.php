@@ -342,7 +342,7 @@
                       </div>
                       <div class=" col-md-6 mb-3 form-group">
                          <label for="time_slot">time_slot</label>
-                         <select class="form-control" id="time_slot" onchange="timeslotcharge('<?=$_GET['trx']?>')" name="time_slot" required disabled>
+                         <select class="form-control" id="time_slot" onchange="timeslotcharge('<?=$_GET['trx']?>')" name="time_slot" required>
                             <option value="">Choose...</option>
                             <?php if(isset($trx[0]['delivery_time']) && $trx[0]['delivery_time'] !=''){ foreach($arrtime as $key => $val){ ?>
                               <option value="<?=$key?>" <?=$trx[0]['delivery_time'] == $key ? 'selected' : '' ?>><?=$val?></option>

@@ -272,12 +272,12 @@ if($_GET['type'] == 'piutang')
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
         $status_paid = 'AND transaction.statusPaid = '.$statuspaid;
-        $DataQuery .=" AND transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ". $orderby. ' '. $limit;
+        $DataQuery .=" AND transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' GROUP BY transaction.transactionID ". $orderby. ' '. $limit;
 
-        $QueryTotal .=" AND transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ". $orderby;
+        $QueryTotal .=" AND transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' GROUP BY transaction.transactionID ". $orderby;
         
 
-        $price .="  AND transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ". $status_paid;
+        $price .="  AND transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ";
         $submitprice = $config->runQuery($price);
         $submitprice->execute();
 

@@ -108,10 +108,9 @@ $(document).ready(function() {
         e.preventDefault();
 
         var range = $('#daterangepiutang').val();
-        var statuspaid = $('#StatusPaid option:selected').val();
 
         $('#TablePiutang').DataTable().destroy();
-        getpiutang('yes', range, statuspaid);
+        getpiutang('yes', range);
     });
 });
 
@@ -412,8 +411,7 @@ function getpiutang(is_date_search, date_range, statuspaid) {
             type: "post", // method  , by default get
             data: {
                 is_date_search: is_date_search,
-                date_range: date_range,
-                status_paid: statuspaid
+                date_range: date_range
             },
             error: function() { // error handling
                 $(".employee-grid-error").html("");

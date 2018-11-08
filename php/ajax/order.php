@@ -663,7 +663,7 @@ if($_GET['type'] == 'tableSearch'){
             // echo $row['product'];
             $dataproduct = [];
             foreach($product as $key => $val) {
-                $dataproduct[] = '<span class="badge badge-info">'.$val.'</span></br>';
+                $dataproduct[] = '<span class="badge badge-info">'.$config->_parsingproductname($val).'</span></br>';
             }
             $dataprice = [];
             foreach($price as $key => $val) {
@@ -702,7 +702,7 @@ if($_GET['type'] == 'tableSearch'){
             $statuspaid = $row['statusPaid'] == 1 ? 'success' : 'warning';
             
             $delivarydatess = $row['delivery_date'];
-            $datenow = Date('Y-m-d');
+            $datenow = Date('Y-m-d'.'23:59:59');
             if($delivarydatess <= $datenow) {
                 $color = $delivarydatess.' = '.$datenow;
             } else {
@@ -710,7 +710,7 @@ if($_GET['type'] == 'tableSearch'){
             }
 
             $deliverytime = 'unset';
-            if($row['delivery_time']) $deliverytime = $arrtime[$row['delivery_time']];
+            if($row['delivery_time'] != '') $deliverytime = $arrtime[$row['delivery_time']];
 
             // echo $delivarydatess .' '. $datenow . '    -' .$row['delivery_date'];
             $btnchangestatus = '<button class="btn btn-sm btn-primary" onclick="chagestatusordermodal(\''. $row['transactionID'] .'\')" style="font-size: 12px;">'. $arrstatusorder[$row['statusOrder']] .'</button>';
@@ -887,7 +887,7 @@ if($_GET['type'] == 'tableNewOrder'){
             // echo $row['product'];
             $dataproduct = [];
             foreach($product as $key => $val) {
-                $dataproduct[] = '<span class="badge badge-info">'.$config->_parsingproductname($val).'</span></br>';
+                $dataproduct[] = '<span class="badge badge-info">'.str_replace('_', ' ', $config->_parsingproductname($val)).'</span></br>';
             }
             $dataprice = [];
             foreach($price as $key => $val) {
@@ -926,7 +926,7 @@ if($_GET['type'] == 'tableNewOrder'){
             $statuspaid = $row['statusPaid'] == 1 ? 'success' : 'warning';
             
             $delivarydatess = $row['delivery_date'];
-            $datenow = Date('Y-m-d');
+            $datenow = Date('Y-m-d'.'23:59:59');
             if($delivarydatess <= $datenow) {
                 $color = $delivarydatess.' = '.$datenow;
             } else {
@@ -934,9 +934,8 @@ if($_GET['type'] == 'tableNewOrder'){
             }
 
             $deliverytime = 'unset';
-            if($row['delivery_time']) $deliverytime = $arrtime[$row['delivery_time']];
+            if($row['delivery_time'] != '') $deliverytime = $arrtime[$row['delivery_time']];
 
-            // echo $delivarydatess .' '. $datenow . '    -' .$row['delivery_date'];
             $btnchangestatus = '<button class="btn btn-sm btn-primary" onclick="chagestatusordermodal(\''. $row['transactionID'] .'\')" style="font-size: 12px;">'. $arrstatusorder[$row['statusOrder']] .'</button>';
 
             $statuspaidflag = '<span class="badge badge-sm badge-warning">UNPAID</span>';
@@ -960,9 +959,6 @@ if($_GET['type'] == 'tableNewOrder'){
             $subdata[]  = $dataquantity;
             $subdata[]  = $config->formatprice($row['grandTotal']);
             $subdata[]  = $deliverydate . '<span class="small" style="color: red;"> '.$deliverytime.'</span>';
-            // $subdata[]  = $row['kelurahan'];
-            // $subdata[]  = '<span class="badge badge-sm badge-info">'.$arrstatusorder[$row['statusOrder']].'</span>';
-            // $subdata[]  = '<span class="badge badge-sm badge-'.$statuspaid.'">'.$arrstatuspaid[$row['statusPaid']].'</span> arfan azhari';
             $subdata[]  = $statuspaidflag;
             $subdata[]  = $created_date;
             $subdata[]  = $row['admin'];
@@ -1185,14 +1181,14 @@ if($_GET['type'] == 'tableOnProccess'){
             
             $delivarydatess = strtotime(Date('Y-m-d', strtotime($row['delivery_date'])));
             
-            $datenow = strtotime($config->getdate('Y-m-d'));
+            $datenow = strtotime($config->getdate('Y-m-d'.'23:59:59'));
             if($delivarydatess <= $datenow) {
                 $color = $delivarydatess.' = '.$datenow;
             } else {
                 $color =   '';
             }
             $deliverytime = 'unset';
-            if($row['delivery_time']) $deliverytime = $arrtime[$row['delivery_time']];
+            if($row['delivery_time'] != '') $deliverytime = $arrtime[$row['delivery_time']];
             // var_dump(strtotime(Date('Y-m-d', strtotime($row['delivery_date']))));
             // var_dump(strtotime($config->getdate('Y-m-d')));
             $statuspaidflag = '<span class="badge badge-sm badge-warning">UNPAID</span>';
@@ -1270,7 +1266,7 @@ if($_GET['type'] == 'tableOnDelivery'){
         12   => 'Color',
     );
 
-    $orderby = 'ORDER BY transaction.delivery_date ASC';
+    $orderby = 'ORDER BY transaction.delivery_date DESC';
     if(isset($_POST['order'][0]['column'])) {
         $column     = $_POST['order'][0]['column'];
         $typesort   = $_POST['order'][0]['dir'];
@@ -1442,10 +1438,10 @@ if($_GET['type'] == 'tableOnDelivery'){
             $statuspaid = $row['statusPaid'] == 1 ? 'success' : 'warning';
             
             $deliverytime = 'unset';
-            if($row['delivery_time']) $deliverytime = $arrtime[$row['delivery_time']];
+            if($row['delivery_time'] != '') $deliverytime = $arrtime[$row['delivery_time']];
 
             $delivarydatess = $row['delivery_date'];
-            $datenow = Date('Y-m-d');
+            $datenow = Date('Y-m-d'.'23:59:59');
             if($delivarydatess <= $datenow) {
                 $color = $delivarydatess.' = '.$datenow;
             } else {
@@ -1508,7 +1504,7 @@ if($_GET['type'] == 'tableHistory'){
     $databox = '';
     if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
         // echo $_POST['search']['value'];
-        $databox = ' AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" ';
+        $databox = ' AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR kurirs.nama_kurir LIKE "%'. $_POST['search']['value'] . '%" )';
     }
 
      $colom = array(
@@ -1700,7 +1696,7 @@ if($_GET['type'] == 'tableHistory'){
             $statuspaid = $row['statusPaid'] == 1 ? 'PAID' : 'UNPAID';
             
             $delivarydatess = strtotime(Date('Y-m-d', strtotime($row['delivery_date'])));
-            $datenow = strtotime($config->getdate('Y-m-d'));
+            $datenow = strtotime($config->getdate('Y-m-d'.'23:59:59'));
             if($delivarydatess <= $datenow) {
                 $color = '';
             } else {
@@ -1955,7 +1951,7 @@ if($_GET['type'] == 'tableCancelOrder'){
             $statuspaid = $row['statusPaid'] == 1 ? 'PAID' : 'UNPAID';
             
             $delivarydatess = strtotime(Date('Y-m-d', strtotime($row['delivery_date'])));
-            $datenow = strtotime($config->getdate('Y-m-d'));
+            $datenow = strtotime($config->getdate('Y-m-d'.'23:59:59'));
             if($delivarydatess <= $datenow) {
                 $color ='';
             } else {
@@ -2001,14 +1997,14 @@ if($_GET['type'] == 'generate'){
         $field = 'id_trx';
         $table = 'detail_trxs';
         $kode = 'BD_CP';
-        $tgl = $config->getDate('Ydmhms');
+        $tgl = $config->getDate('ymdhis');
 
         $new_code = $kode. $tgl;
     }else{
         $field = 'id_trx';
         $table = 'detail_trxs';
         $kode = 'BD_OG';
-        $tgl = $config->getDate('Ydmhms');
+        $tgl = $config->getDate('ymdhis');
 
         $new_code = $kode. $tgl;
     }
@@ -2410,9 +2406,20 @@ if($_GET['type'] == 'deleteProduct'){
 }
 if($_GET['type'] == 'step1'){
     $Types = $_POST['Types'];
+    $a = $_POST['TransactionID'];
+    $tmpa = substr($a, 5, 12); //180611081141
+    $splita = str_split($tmpa, 2);
+
+    $tahun = '20'.$splita[0];
+    $bulan = $splita[1];
+    $tanggal = $splita[2];
+    $jam = $splita[3];
+    $menit = $splita[4];
+    $second = $splita[5];
+    
+    $CreatedDate = $tahun.'-'.$bulan.'-'.$tanggal.' '.$jam.':'.$menit.':'.$second;
 
     if($Types == 'organic') {
-        $a = $_POST['TransactionID'];
         $b = $_POST['OrganicFirstName'];
         $c = $_POST['OrganicLastName'];
         $d = $_POST['OrganicEmail'];
@@ -2465,13 +2472,14 @@ if($_GET['type'] == 'step1'){
                     //new
                     $namecustomer = $b. ' ' . $c;
 
-                    $input = $config->runQuery("INSERT INTO transaction (transactionID, type, CustomerID, CustomerName, statusOrder) VALUES (:a, :b, :c, :d, :e)");
+                    $input = $config->runQuery("INSERT INTO transaction (transactionID, type, CustomerID, CustomerName, statusOrder, created_date) VALUES (:a, :b, :c, :d, :e, :f)");
                     $input->execute(array(
                         ':a'    => $a,
                         ':b'    => 'BD_OG',
                         ':c'    => $new_code,
                         ':d'    => $namecustomer,
-                        ':e'    => 99
+                        ':e'    => 99,
+                        ':f'    => $CreatedDate
                     ));
                     $reff = $config->lastInsertId();
                     $logs = $config->saveLogs($reff, $admin, 'c', 'add transactionID');
@@ -2487,7 +2495,6 @@ if($_GET['type'] == 'step1'){
             }
         }
     } else {
-        $a = $_POST['TransactionID'];
         $b = $_POST['CustomerID'];
         $c = $_POST['picID'];
         $d = $_POST['namePic'];
@@ -2503,26 +2510,27 @@ if($_GET['type'] == 'step1'){
             if($update) {
                 
                 $logs = $config->saveLogs($a, $admin, 'u', 'Customer');
-                die(json_encode(['response' => 'OK', 'msg' => $config->actionMsg('u', 'transaction')]));
+                die(json_encode(['response' => 'OK', 'msg' => $config->actionMsg('u', 'transaction').' created date: '. json_encode($splita)]));
             } else {
                 die(json_encode(['response' => 'ERROR', 'msg' => 'Failed!']));
             }
         }else{
             //new
-            $input = $config->runQuery("INSERT INTO transaction (PIC, transactionID, type, CustomerID, CustomerName, statusOrder) VALUES (:pic, :a, :b, :c, :d, :e)");
+            $input = $config->runQuery("INSERT INTO transaction (PIC, transactionID, type, CustomerID, CustomerName, statusOrder, created_date) VALUES (:pic, :a, :b, :c, :d, :e, :f)");
             $input->execute(array(
                 ':pic'    => $c,
                 ':a'    => $a,
                 ':b'    => $type,
                 ':c'    => $b,
                 ':d'    => $d,
-                ':e'    => 99
+                ':e'    => 99,
+                ':f'    => $CreatedDate
             ));
             $reff = $config->lastInsertId();
             $logs = $config->saveLogs($reff, $admin, 'c', 'add transactionID');
             if($input)
             {
-                die(json_encode(['response' => 'OK', 'msg' => $config->actionMsg('c', 'transaction')]));
+                die(json_encode(['response' => 'OK', 'msg' => $config->actionMsg('c', 'transaction').' created date: '. $CreatedDate]));
             }else{
                 die(json_encode(['response' => 'ERROR', 'msg' => 'Failed!']));
             }
@@ -2689,25 +2697,69 @@ if($_GET['type'] == 'proccessOrder'){
     }
 
     $Point = 0;
-    if($grandTotal > 0 && $grandTotal <= 500000){ $Point = 2; }  
-    if($grandTotal > 500001 && $grandTotal <= 750000) { $Point = 3; }
-    if($grandTotal > 750001 && $grandTotal <= 1000000) { $Point = 4; }
-    if($grandTotal > 1000001 && $grandTotal <= 1250000) { $Point = 5; }
-    if($grandTotal > 1250001 && $grandTotal <= 1500000) { $Point = 6; }
-    if($grandTotal > 1500001 && $grandTotal <= 1750000) { $Point = 7; }
-    if($grandTotal > 1750001 && $grandTotal <= 2000000) { $Point = 10;} 
-    if($grandTotal > 2000001 && $grandTotal <= 2250000) { $Point = 11;} 
-    if($grandTotal > 2250001 && $grandTotal <= 2500000) { $Point = 12;} 
-    if($grandTotal > 2500001 && $grandTotal <= 2750000) { $Point = 13;} 
-    if($grandTotal > 2750001 && $grandTotal <= 3000000) { $Point = 20;} 
-    if($grandTotal > 3000001 && $grandTotal <= 3250000) { $Point = 21;} 
-    if($grandTotal > 3250001 && $grandTotal <= 3500000) { $Point = 22;} 
-    if($grandTotal > 3500001 && $grandTotal <= 3750000) { $Point = 23;} 
-    if($grandTotal > 3750001 && $grandTotal <= 4000000) { $Point = 26;} 
-    if($grandTotal > 4000001 && $grandTotal <= 4250000) { $Point = 27;} 
-    if($grandTotal > 4250001 && $grandTotal <= 4500000) { $Point = 28;} 
-    if($grandTotal > 4500001 && $grandTotal <= 4750000) { $Point = 29;} 
-    if($grandTotal > 4750001 && $grandTotal <= 5000000) { $Point = 30;} 
+    switch ($grandTotal) {
+        case $grandTotal > 0 && $grandTotal <= 500000:
+            $Point = 2;
+            break;
+        case $grandTotal > 500001 && $grandTotal <= 750000:
+            $Point = 3;
+            break;
+        case $grandTotal > 750001 && $grandTotal <= 1000000:
+            $Point = 4;
+            break;
+        case $grandTotal > 1000001 && $grandTotal <= 1250000:
+            $Point = 5;
+            break;
+        case $grandTotal > 1250001 && $grandTotal <= 1500000:
+            $Point = 6;
+            break;
+        case $grandTotal > 1500001 && $grandTotal <= 1750000:
+            $Point = 7;
+            break;
+        case $grandTotal > 1750001 && $grandTotal <= 2000000:
+            $Point = 10;
+            break;
+        case $grandTotal > 2000001 && $grandTotal <= 2250000:
+            $Point = 11;
+            break;
+        case $grandTotal > 2250001 && $grandTotal <= 2500000:
+            $Point = 12;
+            break;
+        case $grandTotal > 2500001 && $grandTotal <= 2750000:
+            $Point = 13;
+            break;
+        case $grandTotal > 2750001 && $grandTotal <= 3000000:
+            $Point = 20;
+            break;
+        case $grandTotal > 3000001 && $grandTotal <= 3250000:
+            $Point = 21;
+            break;
+        case $grandTotal > 3250001 && $grandTotal <= 3500000:
+            $Point = 22;
+            break;
+        case $grandTotal > 3500001 && $grandTotal <= 3750000:
+            $Point = 23;
+            break;
+        case $grandTotal > 3750001 && $grandTotal <= 4000000:
+            $Point = 26;
+            break;
+        case $grandTotal > 4000001 && $grandTotal <= 4250000:
+            $Point = 27;
+            break;
+        case $grandTotal > 4250001 && $grandTotal <= 4500000:
+            $Point = 28;
+            break;
+        case $grandTotal > 4500001 && $grandTotal <= 4750000:
+            $Point = 29;
+            break;
+        case $grandTotal > 4750001 && $grandTotal <= 5000000:
+            $Point = 30;
+            break;
+        default:
+            $Point = 0;
+            break;
+    }
+
     $customerID = $delivery['CustomerID'];
     if($type == 'BD_CP') {
         $oldpoint = $config->getData('Point', 'corporate_pics', "id = '".$delivery['PIC']."' AND corporate_id = '". $customerID ."' ");
@@ -3013,11 +3065,14 @@ if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
     }
     $dataproduct = implode(' ', $dataproduct);
     $total = ($subtotal['Subtotal'] + $data['delivery_charge'] + $data['delivery_charge_time']) - 0;
-    
-    $CustomerName = isset($data['CorporateName']) && $data['CorporateName'] == '' ? $data['OrganicName'] : $data['CorporateName'];
-    $CustomerEmail = isset($data['CorporateEmail']) && $data['CorporateEmail'] == '' ? $data['OrganicEmail'] : $data['CorporateEmail'];
-    $CustomerPhone = isset($data['CorporatePhone']) && $data['CorporatePhone'] == '' ? $data['OrganicPhone'] : $data['CorporatePhone'];
-    
+
+    $CustomerName   = !$data['CorporateName']   ? $data['OrganicName']  : $data['CorporateName'];
+    $CustomerEmail  = !$data['CorporateEmail']  ? $data['OrganicEmail'] : $data['CorporateEmail'];
+    $CustomerPhone  = !$data['CorporatePhone']  ? $data['OrganicPhone'] : $data['CorporatePhone'];
+    $timedelivery = 'unset';
+    if($data['delivery_time'] != '') $timedelivery = $arrtime[$data['delivery_time']];
+
+
     $arraypaid = 'UNPAID';
     if($data['statusPaid'] == 1) $arraypaid = 'PAID';
     $receivedEmail = $CustomerEmail;
@@ -3270,13 +3325,6 @@ if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
                                             <td style="border-bottom: 0.5px solid; font-weight: 600; font-size: 14px; padding: 8px 0px; text-align: center;" colspan="4">Grand Total</td>
                                             <td style="border-bottom: 0.5px solid; font-weight: 600; font-size: 14px; padding: 8px 0px; text-align: right; padding-right: 2px;" colspan="4">'. number_format($total, 2, '.', ',') .'</td>
                                         </tr>
-                                        <tr style="background-color: #ffffff;">
-                                            <td style="border-bottom: 0.5px solid; font-weight: 600; font-size: 14px; padding: 8px 0px; text-align: center;" colspan="5">
-                                            <div style="background-color: '.$color.'; width: 120px;padding: 8px;border: 1px solid '.$color.';border-radius: 5px; margin-left: 40%;">
-                                                <span>'.$arraypaid.'</span>
-                                            </div>
-                                            </td>
-                                        </tr>
                                     </tbody>
                                   </table>
                                </td>
@@ -3340,7 +3388,7 @@ if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
                                                                 </tr>
                                                                 <tr>
                                                                    <td width="110" class="w170" style="vertical-align: top;"><span class="content-body1" style="font-family:Arial;">Delivery Date :</span></td>
-                                                                   <td width="170" class="w170" style="vertical-align: top;"><span class="content-body" style="font-family:Arial;">'. $config->_formatdate($data['delivery_date']). '</span> <span style="color: red; font-size: 12px; font-weight: 600;">'.$arraypaid.'</span></td>
+                                                                   <td width="170" class="w170" style="vertical-align: top;"><span class="content-body" style="font-family:Arial;">'. $config->_formatdate($data['delivery_date']). '</span> <span style="color: red; font-size: 12px; font-weight: 600;">'.$timedelivery.'</span></td>
                                                                 </tr>
                                                                 <tr>
                                                                    <td width="110" class="w170" style="vertical-align: top;"><span class="content-body1" style="font-family:Arial;">Delivery Note :</span></td>

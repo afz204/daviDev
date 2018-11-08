@@ -45,6 +45,8 @@
     LEFT JOIN payment ON payment.ID = transaction.paymentID', "WHERE transaction.transactionID = '". $trx ."'");
     $product = [];
     $data = [];
+
+
     while($trx = $transaction->fetch(PDO::FETCH_LAZY)){
         $data = array(
             'transactionID' => $trx['transactionID'],
@@ -80,9 +82,10 @@
             'card_isi' => $trx['card_isi'],
             'hp_penerima' => $trx['hp_penerima'],
         );
-        
-        $prod = $config->Products('product_id, category_id, subcategory_id, name_product, cost_price, selling_price, available_on, sort_desc, full_desc, note, images', "products WHERE product_id = '". $trx['id_product'] ."' ");
-        
+
+        $prod = $config->Products('product_id, category_id, subcategory_id, name_product, cost_price, selling_price, available_on, sort_desc, full_desc, note, images', "products 
+        WHERE product_id = '". $trx['id_product'] ."' ");
+        // var_dump($prod);
         while($p = $prod->fetch(PDO::FETCH_LAZY)){
             $product[] = array(
                 'product_id'    => $p['product_id'],

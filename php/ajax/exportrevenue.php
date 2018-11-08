@@ -37,7 +37,7 @@ if($_GET['type'] == 'exportrevenue') {
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 
-    $DataQuery .=" transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.delivery_date ASC ";
+    $DataQuery .=" transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID ORDER BY transaction.id ASC ";
     // var_dump($DataQuery);
     $data = $config->runQuery($DataQuery);
     $data->execute();
@@ -69,7 +69,7 @@ if($_GET['type'] == 'exportrevenue') {
     ->getStyle("A1:K1")->applyFromArray($stylecenter);
 
     $Excel->setActiveSheetIndex(0)
-    ->setCellValue('A3', 'NO')
+    ->setCellValue('A3', 'No ID')
     ->setCellValue('B3', 'No Invoice')
     ->setCellValue('C3', 'Pengirim')
     ->setCellValue('D3', 'Dibuat Oleh')
@@ -118,7 +118,7 @@ if($_GET['type'] == 'exportrevenue') {
             $paydate = 'unset';
         }
         $Excel->getActiveSheet()
-        ->setCellValue('A'.$loop, $nomor++)
+        ->setCellValue('A'.$loop, $row['id'])
         ->setCellValue('B'.$loop, $row['transactionID'])
         ->setCellValue('C'.$loop, $row['CustomerName'])
         ->setCellValue('D'.$loop, $row['AdminName'])
@@ -163,7 +163,7 @@ if($_GET['type'] == 'exportpiutang') {
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 
-    $DataQuery .=" (transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid.") GROUP BY transaction.transactionID ORDER BY transaction.created_date DESC";
+    $DataQuery .=" (transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ) GROUP BY transaction.transactionID ORDER BY transaction.id ASC";
     // $DataQuery .=" (transaction.created_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid.") GROUP BY transaction.transactionID";
     // var_dump($DataQuery);
     $data = $config->runQuery($DataQuery);
@@ -196,7 +196,7 @@ if($_GET['type'] == 'exportpiutang') {
     ->getStyle("A1:L1")->applyFromArray($stylecenter);
 
     $Excel->setActiveSheetIndex(0)
-    ->setCellValue('A3', 'NO')
+    ->setCellValue('A3', 'No ID')
     ->setCellValue('B3', 'No Invoice')
     ->setCellValue('C3', 'Nama Pemesan')
     ->setCellValue('D3', 'Dibuat Oleh')
@@ -250,7 +250,7 @@ if($_GET['type'] == 'exportpiutang') {
         $product = explode(',', $row['product']);
         
         $Excel->getActiveSheet()
-        ->setCellValue('A'.$loop, $nomor++)
+        ->setCellValue('A'.$loop, $row['id'])
         ->setCellValue('B'.$loop, $row['transactionID'])
         ->setCellValue('C'.$loop, $row['CustomerName'])
         ->setCellValue('D'.$loop, $row['AdminName'])
@@ -305,7 +305,7 @@ if($_GET['type'] == 'exportbonus') {
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 
-    $DataQuery .=" transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID AND transaction.statusPaid = 1 ORDER BY transaction.delivery_date ASC ";
+    $DataQuery .=" transaction.delivery_date BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." GROUP BY transaction.transactionID AND transaction.statusPaid = 1 ORDER BY transaction.id ASC ";
     $data = $config->runQuery($DataQuery);
     $data->execute();
     // var_dump($DataQuery);
@@ -341,7 +341,7 @@ if($_GET['type'] == 'exportbonus') {
     ->getStyle("A1:K1")->applyFromArray($stylecenter);
 
     $Excel->setActiveSheetIndex(0)
-    ->setCellValue('A3', 'NO')
+    ->setCellValue('A3', 'No ID')
     ->setCellValue('B3', 'No Invoice')
     ->setCellValue('C3', 'Pengirim')
     ->setCellValue('D3', 'Dibuat Oleh')
@@ -390,7 +390,7 @@ if($_GET['type'] == 'exportbonus') {
             $paydate = 'unset';
         }
         $Excel->getActiveSheet()
-        ->setCellValue('A'.$loop, $nomor++)
+        ->setCellValue('A'.$loop, $row['id'])
         ->setCellValue('B'.$loop, $row['transactionID'])
         ->setCellValue('C'.$loop, $row['CustomerName'])
         ->setCellValue('D'.$loop, $row['AdminName'])

@@ -25,7 +25,7 @@ $dataproduct = [];
     while($row = $product->fetch(PDO::FETCH_LAZY)) {
         $dataproduct[] = '<tr>
                         <td text-align="top" align="left" >'. $row['id_product'] .'</td>
-                        <td style="text-transform: capitalize;">'. $row['product_name'] .'</td>
+                        <td style="text-transform: capitalize;">'. str_replace('_', ' ', $row['product_name']) .'</td>
                         <td text-valign="top" align="center" >'. $row['product_qty'] .'</td>
                     </tr>';
     }
@@ -34,7 +34,7 @@ $dataproduct = implode(' ', $dataproduct);
 $cardmsg = substr($data['card_isi'], 0, 47);
 $cardmsg = $config->capitalize($cardmsg).'...';
 $deliverytime = 'unset';
-    if($data['delivery_time']) { $deliverytime = $arrtime[$data['delivery_time']]; }
+    if($data['delivery_time'] !='') { $deliverytime = $arrtime[$data['delivery_time']]; }
 
 $content = '
 <html>

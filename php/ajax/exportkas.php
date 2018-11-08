@@ -16,7 +16,7 @@ if($_GET['type'] == 'kasout') {
     $adminid = $_GET['status_paid'];
     $rangeArray = explode("_",$daterange); 
 
-    $status_paid = 'kas.admin_id = '.$adminid;
+    $status_paid = ' AND kas.admin_id = '.$adminid;
     if($adminid == 99) {
         $status_paid = '';
     }
@@ -27,7 +27,7 @@ if($_GET['type'] == 'kasout') {
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 
-    $DataQuery .= $status_paid." kas.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." ORDER BY kas.created_at DESC ";
+    $DataQuery .=" kas.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." ORDER BY kas.created_at ASC ";
     // var_dump($DataQuery);
     $data = $config->runQuery($DataQuery);
     $data->execute();

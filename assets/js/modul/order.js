@@ -1014,6 +1014,7 @@ $(document).ready(function() {
     // console.log(settanggal);
     $('#delivery_dates').datetimepicker({
         format: 'YYYY/MM/DD',
+        defaultDate: '',
     }).on('dp.change', function(e) {
         var times = e.date.format("YYYY-MM-DD");
         $.ajax({
@@ -1023,6 +1024,7 @@ $(document).ready(function() {
 
             success: function(msg) {
                 var data = JSON.parse(msg);
+                console.log(data);
                 if (data['response'] == 'OK') {
                     var timeslot = '';
                     $.each(data['msg'], function(key, val) {
