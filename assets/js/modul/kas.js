@@ -253,11 +253,12 @@ function fetch_payKurir(is_date_search, date_range, kurir) {
             { "data": "0", "orderable": false },
             { "data": "1", "orderable": false },
             { "data": "2", "orderable": false },
-            { "data": "3", "orderable": false },
+            { "data": "3", "orderable": true },
             { "data": "4", "orderable": false },
             { "data": "5", "orderable": false },
             { "data": "6", "orderable": false },
-            { "data": "7", "orderable": false }
+            { "data": "7", "orderable": false },
+            { "data": "8", "orderable": false }
         ],
 
     });

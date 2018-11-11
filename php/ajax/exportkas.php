@@ -27,7 +27,7 @@ if($_GET['type'] == 'kasout') {
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 
-    $DataQuery .=" kas.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." ORDER BY kas.created_at ASC ";
+    $DataQuery .=" kas.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." ORDER BY kas.id ASC ";
     // var_dump($DataQuery);
     $data = $config->runQuery($DataQuery);
     $data->execute();

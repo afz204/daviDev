@@ -103,6 +103,7 @@
                                 <th scope="col" width="8%">kurir</th>
                                 <th scope="col" width="8%">Transaksi</th>
                                 <th scope="col" width="20%">Kirim ke</th>
+                                <th scope="col" width="18%">Delivery Date</th>
                                 <th scope="col" width="18%">Remarks</th>
                                 <th scope="col" width="10%">charge</th>
                                 <th scope="col" width="10%">Delivery</th>

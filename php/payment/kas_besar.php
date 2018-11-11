@@ -24,19 +24,19 @@ if($total > 0 ){
             <div class="card">
                 <div class="card-header">
                     Kas Besar <div class="pull-right">
-                        <button <?=$access['create']?> class="btn btn-sm btn-success" onclick="addKasBesar(<?=$admin[0]['user_id']?>, 'debit')"  type="button"><span class="fa fa-fw fa-plus"></span> debit</button>
-                        <button <?=$access['create']?> class="btn btn-sm btn-danger" onclick="addKasBesar(<?=$admin[0]['user_id']?>, 'kredit')" type="button"><span class="fa fa-fw fa-plus"></span> kredit</button>
+                        <button <?=$access['create']?> class="btn btn-sm btn-success" onclick="addKasBesar(<?=$admin[0]['user_id']?>, 'debit')"  type="button"><span class="fa fa-fw fa-plus"></span> pemasukan</button>
+                        <button <?=$access['create']?> class="btn btn-sm btn-danger" onclick="addKasBesar(<?=$admin[0]['user_id']?>, 'kredit')" type="button"><span class="fa fa-fw fa-minus"></span> pengeluaran</button>
                     </div>
                 </div>
                 <div class="card-body">
                     <div id="form_kas_Besar" class="hidden">
                         <div class="card border-dark mb-3">
-                            <div class="card-header bg-transparent border-dark">Form Tambah Dana Kas</div>
+                            <div class="card-header bg-transparent border-dark">Form Kas Besar</div>
                             <div class="card-body">
                                 <form id="kas_besar_form" method="post" data-parsley-validate="" autocomplete="off">
                                     <div class="form-group hidden" id="kasStatus">
                                         <select name="statusKas" id="statusKas" class="form-control">
-                                            <option value="">:: type kredit ::</option>
+                                            <option value="">:: type pengeluaran ::</option>
                                             <option value="1">produksi</option>
                                             <option value="2">kurir</option>
                                             <option value="3">dll</option>
@@ -59,7 +59,7 @@ if($total > 0 ){
                                     <div class="form-group">
                                         <textarea class="form-control" rows="5" id="ketKasB" required placeholder="keterangan kas"></textarea>
                                     </div>
-                                    <button type="submit" id="btnKas_besar" class="btn btn-sm btn-block btn-primary">submit pemasukan</button>
+                                    <button type="submit" id="btnKas_besar" class="btn btn-sm btn-block btn-primary">submit</button>
                                 </form>
                             </div>
                         </div>

@@ -19,11 +19,13 @@ if($_GET['type'] == 'kasbesar') {
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 
-    $DataQuery .= " kas_besar.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ORDER BY kas_besar.created_at DESC ";
+    $DataQuery .= " kas_besar.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ORDER BY kas_besar.id ASC ";
     // var_dump($DataQuery);
     $data = $config->runQuery($DataQuery);
     $data->execute();
-
+    $TotalData = $config->getData("COUNT(*) AS TotalData", 'kas_besar', " kas_besar.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ");
+    $SumDebit = $config->getData("SUM(total) as TotalDebit", 'kas_besar', " kas_besar.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' AND type LIKE '%debit%' ");
+    $SumKredit = $config->getData("SUM(total) as TotalKredit", 'kas_besar', " kas_besar.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' AND type LIKE '%kredit%' ");
     $stylecenter = array(
         'alignment' => array(
             'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
@@ -46,37 +48,37 @@ if($_GET['type'] == 'kasbesar') {
     );
 
     $Excel->setActiveSheetIndex(0)
-    ->setCellValue('A1', 'LAPORAN KAS BESAR BUNGA DAVI')
-    ->mergeCells('A1:H1')
-    ->getStyle("A1:H1")->applyFromArray($stylecenter);
+        ->setCellValue('A1', 'LAPORAN KAS BESAR BUNGA DAVI')
+        ->mergeCells('A1:H1')
+        ->getStyle("A1:H1")->applyFromArray($stylecenter);
 
     $Excel->setActiveSheetIndex(0)
-    ->setCellValue('A3', 'NO')
-    ->setCellValue('B3', 'Status')
-    ->setCellValue('C3', 'Nama Kegiatan')
-    ->setCellValue('D3', 'Keterangan')
-    ->setCellValue('E3', 'Type')
-    ->setCellValue('F3', 'Total Biaya')
-    ->setCellValue('G3', 'Admin')
-    ->setCellValue('H3', 'Created Date')
-    ->getStyle("A3:H3")->applyFromArray($header);
+        ->setCellValue('A3', 'NO')
+        ->setCellValue('B3', 'Status')
+        ->setCellValue('C3', 'Nama Kegiatan')
+        ->setCellValue('D3', 'Keterangan')
+        ->setCellValue('E3', 'Type')
+        ->setCellValue('F3', 'Total Biaya')
+        ->setCellValue('G3', 'Admin')
+        ->setCellValue('H3', 'Created Date')
+        ->getStyle("A3:H3")->applyFromArray($header);
 
     $Excel->setActiveSheetIndex(0)
-    ->getColumnDimension('A')->setAutoSize(true);
-    $Excel->setActiveSheetIndex(0)
-    ->getColumnDimension('B')->setAutoSize(true);
-    $Excel->setActiveSheetIndex(0)
-    ->getColumnDimension('C')->setAutoSize(true);
-    $Excel->setActiveSheetIndex(0)
-    ->getColumnDimension('D')->setAutoSize(true);
-    $Excel->setActiveSheetIndex(0)
-    ->getColumnDimension('E')->setAutoSize(true);
-    $Excel->setActiveSheetIndex(0)
-    ->getColumnDimension('F')->setAutoSize(true);
-    $Excel->setActiveSheetIndex(0)
-    ->getColumnDimension('G')->setAutoSize(true);
-    $Excel->setActiveSheetIndex(0)
-    ->getColumnDimension('H')->setAutoSize(true);
+        ->getColumnDimension('A')->setAutoSize(true);
+        $Excel->setActiveSheetIndex(0)
+        ->getColumnDimension('B')->setAutoSize(true);
+        $Excel->setActiveSheetIndex(0)
+        ->getColumnDimension('C')->setAutoSize(true);
+        $Excel->setActiveSheetIndex(0)
+        ->getColumnDimension('D')->setAutoSize(true);
+        $Excel->setActiveSheetIndex(0)
+        ->getColumnDimension('E')->setAutoSize(true);
+        $Excel->setActiveSheetIndex(0)
+        ->getColumnDimension('F')->setAutoSize(true);
+        $Excel->setActiveSheetIndex(0)
+        ->getColumnDimension('G')->setAutoSize(true);
+        $Excel->setActiveSheetIndex(0)
+        ->getColumnDimension('H')->setAutoSize(true);
 
     $Excel->getActiveSheet()->freezePane('A4');
     $nomor = 1;
@@ -110,6 +112,19 @@ if($_GET['type'] == 'kasbesar') {
 
         $loop++;
     }
+
+    $page = $TotalData['TotalData'] + 5;
+    $Excel->setActiveSheetIndex(0)
+    ->setCellValue('D'.$page, 'TOTAL DEBIT :')
+    ->setCellValue('E'.($page), '=')
+    ->setCellValue('F'.($page), $SumDebit['TotalDebit'])
+    ->setCellValue('D'.($page + 1) , 'TOTAL KREDIT :')
+    ->setCellValue('E'.($page + 1), '=')
+    ->setCellValue('F'.($page  + 1 ), $SumKredit['TotalKredit'])
+    ->setCellValue('D'.($page + 2 ), 'SELISIH :')
+    ->setCellValue('E'.($page + 2), '=')
+    ->setCellValue('F'.($page + 2 ), $SumDebit['TotalDebit'] - $SumKredit['TotalKredit'])
+    ;
    
     $filename = str_replace(' ', '_', 'Laporan Kas Besar '.$daterange);
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

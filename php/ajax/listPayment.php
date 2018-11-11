@@ -34,15 +34,39 @@ if($_GET['type'] == 'pay-kurir')
         $databox = 'AND (pay_kurirs.no_trx LIKE "%'. $_POST['search']['value'] . '%" OR kurirs.nama_kurir LIKE "%'. $_POST['search']['value'] . '%" OR delivery_charges.price LIKE "%'. $_POST['search']['value'] . '%")  OR (villages.name LIKE "%'.$_POST['search']['value'].'%") ';
     }
 
-    $payCharge = " SELECT pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.name, users.name as admin FROM pay_kurirs INNER JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
+    $payCharge = " SELECT pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.name, users.name as admin, transaction.delivery_date FROM pay_kurirs INNER JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
     INNER JOIN delivery_charges ON delivery_charges.id = pay_kurirs.charge_id
     INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan
-    INNER JOIN users ON users.id = delivery_charges.admin_id WHERE pay_kurirs.status != '2' ";
-
+    INNER JOIN users ON users.id = delivery_charges.admin_id 
+    LEFT JOIN transaction ON transaction.transactionID = pay_kurirs.no_trx
+    WHERE pay_kurirs.status != '2' ";
+    
     // $totalPembayaran = $config->runQuery()
     $totalPembayaran = $config->getData('SUM(total) as TOTAL', 'pay_kurirs', "pay_kurirs.status != '2' ");
     $totalPembayaran = $totalPembayaran['TOTAL'];
     //print_r($request);
+    $colom = array(
+        0   => 'nama_kurir',
+        1   => 'no_trx',
+        2   => 'name',
+        3   => 'delivery_date',
+        4   => 'remarks',
+        5   => 'total',
+        6   => 'weight',
+        7   => 'status',
+        8   => 'created_at',
+        9   => 'nama_kurir',
+        10   => 'price',
+        11   => 'name',
+        12   => 'admin'
+    );
+    $orderby = 'ORDER BY pay_kurirs.created_at DESC';
+    if(isset($_POST['order'][0]['column'])) {
+        $column     = $_POST['order'][0]['column'];
+        $typesort   = $_POST['order'][0]['dir'];
+
+        $orderby = 'ORDER BY '.$colom[$column].' '. $typesort;
+    }
     $payCharge .=$databox;
     $colom = array(
         0   => 'payChargeID',
@@ -78,7 +102,7 @@ if($_GET['type'] == 'pay-kurir')
         $rangeArray = explode("_",$daterange); 
         $startDate = $rangeArray[0]. ' 00:00:00';
         $endsDate = $rangeArray[1]. ' 23:59:59';
-        $payCharge.= $kurir." AND ( pay_kurirs.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ) ";
+        $payCharge.= $kurir." AND ( pay_kurirs.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ) ". $orderby;
         $stmt = $config->runQuery($payCharge);
         $stmt->execute(); 
         $totalFilter = $stmt->rowCount();
@@ -89,11 +113,11 @@ if($_GET['type'] == 'pay-kurir')
         $totalPerKurir = $totalPerKurir['TOTAL'];
 
     }
-        $payCharge.=" ORDER BY pay_kurirs.created_at DESC LIMIT ".$request['start']." ,".$request['length']." ";
+        $payCharge.= " LIMIT ".$request['start']." ,".$request['length']." ";
+        // var_dump($payCharge);
         $stmt = $config->runQuery($payCharge);
         $stmt->execute(); 
    
-//    var_dump($stmt);
     $data = array();
     // 9 1 11 4 10 12 7
     while ($row = $stmt->fetch(PDO::FETCH_LAZY)){
@@ -153,6 +177,7 @@ if($_GET['type'] == 'pay-kurir')
         // $subdata[]  = $row[2];
         // $subdata[]  = $row[3];
         $subdata[]  = $row['name'];
+        $subdata[]  = $row['delivery_date'];
         $subdata[]  = $remarks;
         // $subdata[]  = $row[5];
         // $subdata[]  = $row[6];
