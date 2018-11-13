@@ -5,6 +5,8 @@
     $kurirss = $config->Products('id, nama_kurir', 'kurirs where status = 1');
     $charge = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, villages.name', 'delivery_charges',
     'INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan', '');
+    $charges = $config->ProductsJoin('delivery_charges.id, delivery_charges.price, villages.name', 'delivery_charges',
+    'INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan', '');
 
     $payCharge = $config->ProductsJoin('pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.name, users.name as admin', 'pay_kurirs',
     'INNER JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
@@ -196,6 +198,39 @@
               <button type="submit" class="btn btn-block btn-primary">save remarks</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalKelurahan" role="dialog" aria-labelledby="modalProductAdd" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalProductAdd">List Kelurahan </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <form id="addProductCheckout" data-parsley-validate="">
+                <div class="form-group">
+                    <input type="hidden" class="form-control" id="noTransaction">
+                </div>
+                <div class="form-group">
+                  <select class="form-control" name="codeSearch" id="codeSearch" required>
+                      <option value="">Choose...</option>
+                      <?php while ($p = $charges->fetch(PDO::FETCH_LAZY)){ ?>
+                      <option value="<?=$p->id?>" data-price="<?=$p->price?>"><?=$p->name?>_(<?=$config->formatPrice($p->price)?>)</option>
+                      <?php } ?>
+                  </select>
+                  <div class="help-block with-errors"></div>
+                </div>
+                <div id="feedback-check"></div>
+                <div id="checkProduct">
+                    <button type="submit"  class="btn btn-block btn-primary ">submit</button>
+                </div>
+            </form>
       </div>
     </div>
   </div>

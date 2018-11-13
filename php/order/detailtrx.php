@@ -335,11 +335,11 @@
                </div>
                <div class="row">
                   <div class="col-md-6 mb-3">
-                     <label for="firstName">time slot</label>
-                        <select class="form-control" id="time_slot" name="time_slot" readonly>
+                     <label for="firstName">time slot <?=$data['delivery_time']?></label>
+                        <select class="form-control" id="time_slott" name="time_slott" readonly>
                         <option value="100">select</option>
                         <?php foreach($arrtime as $key => $val) { ?>
-                            <option value="<?=$key?>" <?=$data['delivery_time'] != '' && $key == $data['delivery_time'] ? 'selected' : '' ?> ><?=$val?></option>
+                            <option value="<?=$key?>" <?=$key == $data['delivery_time'] ? 'selected' : '' ?> ><?=$val?></option>
                         <?php } ?>
                         </select>
                   </div>

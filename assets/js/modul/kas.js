@@ -1,3 +1,8 @@
+function changekelurahan(id) {
+    $('#modalKelurahan').modal({ backdrop: 'static', keyboard: false });
+    $('#noTransaction').val(id);
+}
+
 function exportkas(type) {
     var range = '';
     var statuspaid = '';
@@ -313,6 +318,7 @@ $(document).ready(function() {
     $('#namaKurir').select2({ width: '100%', theme: "bootstrap4" });
     $('#reportPayChargeAdmin').select2({ width: '100%', theme: "bootstrap4" });
     $('#selectKurirPay').select2({ width: '100%', theme: "bootstrap4" });
+    $('#codeSearch').select2({ width: '100%', theme: "bootstrap4" });
 
     fetch_payKurir('no');
     kasMasuk('no');

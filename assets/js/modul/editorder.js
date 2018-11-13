@@ -52,7 +52,7 @@ function alamatempat() {
     var kelurahan_id = $('#kelurahan_id option:selected').val();
     var delivery_date = $('#delivery_date').val();
     var delivery_charge = $('#kelurahan_id option:selected').data('price');
-    var time_slot = $('#time_slot option:selected').val();
+    var time_slot = $('#time_slott option:selected').val();
 
     $.ajax({
         url: '../php/ajax/updatetrx.php?type=alamatempat',

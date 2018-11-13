@@ -34,7 +34,7 @@ if($_GET['type'] == 'pay-kurir')
         $databox = 'AND (pay_kurirs.no_trx LIKE "%'. $_POST['search']['value'] . '%" OR kurirs.nama_kurir LIKE "%'. $_POST['search']['value'] . '%" OR delivery_charges.price LIKE "%'. $_POST['search']['value'] . '%")  OR (villages.name LIKE "%'.$_POST['search']['value'].'%") ';
     }
 
-    $payCharge = " SELECT pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.name, users.name as admin, transaction.delivery_date FROM pay_kurirs INNER JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
+    $payCharge = " SELECT pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.id as villagesid, villages.name, users.name as admin, transaction.delivery_date FROM pay_kurirs INNER JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
     INNER JOIN delivery_charges ON delivery_charges.id = pay_kurirs.charge_id
     INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan
     INNER JOIN users ON users.id = delivery_charges.admin_id 
@@ -42,8 +42,10 @@ if($_GET['type'] == 'pay-kurir')
     WHERE pay_kurirs.status != '2' ";
     
     // $totalPembayaran = $config->runQuery()
-    $totalPembayaran = $config->getData('SUM(total) as TOTAL', 'pay_kurirs', "pay_kurirs.status != '2' ");
-    $totalPembayaran = $totalPembayaran['TOTAL'];
+    $Pembayaran = "SELECT SUM(total) AS TOTAL FROM pay_kurirs WHERE pay_kurirs.status != '2' ";
+    $SUM = "SELECT SUM(total) AS TOTAL FROM pay_kurirs WHERE pay_kurirs.status != '2' ";
+    // $totalPembayaran = $config->getData('SUM(total) as TOTAL', 'pay_kurirs', "pay_kurirs.status != '2' ");
+    // $totalPembayaran = $totalPembayaran['TOTAL'];
     //print_r($request);
     $colom = array(
         0   => 'nama_kurir',
@@ -68,6 +70,8 @@ if($_GET['type'] == 'pay-kurir')
         $orderby = 'ORDER BY '.$colom[$column].' '. $typesort;
     }
     $payCharge .=$databox;
+    $Pembayaran .=$databox;
+    $SUM .=$databox;
     $colom = array(
         0   => 'payChargeID',
         1   => 'no_trx',
@@ -106,6 +110,14 @@ if($_GET['type'] == 'pay-kurir')
         $stmt = $config->runQuery($payCharge);
         $stmt->execute(); 
         $totalFilter = $stmt->rowCount();
+
+        $Pembayaran.= $kurir." AND ( pay_kurirs.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' )";
+        $stmt2 = $config->runQuery($Pembayaran);
+        $stmt2->execute();
+        
+        $SUM.= " AND ( pay_kurirs.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' )";
+        $stmt3 = $config->runQuery($SUM);
+        $stmt3->execute();
         
         $totalPerKurir = $config->getData('SUM(total) as TOTAL', 'pay_kurirs', "pay_kurirs.status != '2' ". $month . $kurir ." AND ( pay_kurirs.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ) ");
         
@@ -113,6 +125,11 @@ if($_GET['type'] == 'pay-kurir')
         $totalPerKurir = $totalPerKurir['TOTAL'];
 
     }
+        $stmt2 = $config->runQuery($Pembayaran);
+        $stmt2->execute();
+        $stmt3 = $config->runQuery($SUM);
+        $stmt3->execute();
+
         $payCharge.= " LIMIT ".$request['start']." ,".$request['length']." ";
         // var_dump($payCharge);
         $stmt = $config->runQuery($payCharge);
@@ -170,13 +187,21 @@ if($_GET['type'] == 'pay-kurir')
         ';
         $button = $remk . $pay . $del;
 
+
+        $Kelurahan = $row['name'];
+        if($row['villagesid'] == 9415073004) {
+            $Kelurahan = '
+        <button type="button"  class="btn btn-sm btn-danger" onclick="changekelurahan(\''. $row['no_trx'] .'\')" style="text-transform: uppercase; font-size: 10px; font-weight: 500;" data-toggle="tooltip" data-placement="top" title="Change Kelurahan ?"> '.$row['name'].' </button>
+        ';
+        }
+        
         $subdata = array();
         // $subdata[]  = $row[0];
         $subdata[]  = $row['nama_kurir'];
-        $subdata[]  = $row['no_trx'];
+        $subdata[]  = '<a href="'.$config->url().'order/?p=detailtrx&trx='. $row['no_trx'] .'" target="_blank">'.$row['no_trx'].'</a>';
         // $subdata[]  = $row[2];
         // $subdata[]  = $row[3];
-        $subdata[]  = $row['name'];
+        $subdata[]  = $Kelurahan;
         $subdata[]  = $row['delivery_date'];
         $subdata[]  = $remarks;
         // $subdata[]  = $row[5];
@@ -191,15 +216,16 @@ if($_GET['type'] == 'pay-kurir')
         array_push($data, $subdata);
         //$data = $subdata;
     }
-
-    $selisihPembayaran = $totalPembayaran - $totalPerKurir;
+    $datapembayaran = $stmt2->fetch(PDO::FETCH_LAZY);
+    $SUM = $stmt3->fetch(PDO::FETCH_LAZY);
+    $selisihPembayaran = $SUM['TOTAL'] - $datapembayaran['TOTAL'];
     $json_data = array(
         'draw'              => intval($request['draw']),
         'recordsTotal'      => intval($totalData),
         'recordsFiltered'   => intval($totalFilter),
         'data'              => $data,
-        'totalData'         => $config->formatPrice($totalPembayaran),
-        'totalKurir'        => $config->formatPrice($totalPerKurir),
+        'totalData'        => $config->formatPrice($SUM['TOTAL']),
+        'totalKurir'         => $config->formatPrice($datapembayaran['TOTAL']),
         'subtotal'          => $config->formatPrice($selisihPembayaran)
     );
     echo json_encode($json_data);
