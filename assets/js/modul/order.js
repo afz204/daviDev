@@ -308,6 +308,32 @@ function formValidate(id) {
 $(window).load(function() {
     // Run code
     $('#SmartWizard').hide().fadeIn(1000);
+    var newdate = new Date();
+    var tmpdate = newdate.getFullYear() + "-" + (newdate.getMonth()) + "-" + newdate.getDate();
+    console.log(tmpdate);
+    $.ajax({
+        url: '../php/ajax/order.php?type=getTime',
+        type: 'post',
+        data: { 'Tanggal': tmpdate },
+
+        success: function(msg) {
+            var data = JSON.parse(msg);
+            console.log(data);
+            if (data['response'] == 'OK') {
+                var timeslot = '';
+                $.each(data['msg'], function(key, val) {
+                    timeslot += '<option value="' + key + '" >' + val + '</option>';
+                });
+                $('[name="time_slot"]').removeAttr("disabled");
+                $('[name="time_slot"]').html(timeslot);
+
+            } else {
+                $('[name="time_slot"]').val('');
+                alert(data['msg']);
+            }
+        }
+    });
+
 });
 
 function tableSearch(is_date_search, invoicenomor, sendername, address, typeReport) {

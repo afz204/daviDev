@@ -54,7 +54,7 @@ $shortDesc = empty($_POST['shortDesc']) ? '' : $_POST['shortDesc'];
 $remkarsfloris = empty($_POST['remkarsfloris']) ? '' : $_POST['remkarsfloris'];
 $transactionID = empty($_POST['transactionID']) ? '' : $_POST['transactionID'];
 
-$title = strtolower(str_replace(" ", "_", $imagesid.'_'.$imagesName));
+$title =$imagesName;
 // $title = strtolower(str_replace(" ", "_", $imagesName));
 // a flag to see if everything is ok
 $success = null;
@@ -70,7 +70,7 @@ for($i=0; $i < count($filenames); $i++){
     $string = str_replace(" ", "_", $filenames[$i]);
     //$ext = explode('.', basename($filenames[$i]));
     //$target = "../../assets/images/product" . DIRECTORY_SEPARATOR . md5(uniqid()) . "." . array_pop($ext);
-    $target = "../../assets/images/product/". $title . '.jpg';
+    $target = "../../assets/images/product/". $imagesid . '.jpg';
     if(move_uploaded_file($images['tmp_name'][$i], $target)) {
         $success = true;
         $paths[] = $target;
@@ -95,7 +95,7 @@ if ($success === true) {
     // $output = ['uploaded' => $paths];
     $output = "OK";
     $nameproduct = $imagesid.''.$imagesName;
-    $images = $title.'.jpg';
+    $images = $imagesid.'.jpg';
     $permalink = str_replace(' ', '_', strtolower($nameproduct));
     $created_at = $config->getDate('Y-m-d H:m:s');
 

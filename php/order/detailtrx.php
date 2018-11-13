@@ -99,6 +99,7 @@
                 'note'    => $p['note'],
                 'images'    => $p['images'],
                 'florist_remarks'    => $trx['florist_remarks'],
+                'delivery_marks'    => $trx['delivery_marks'],
                 'product_qty'    => $trx['product_qty'],
                 'product_price'    => $trx['product_price'],
                 'product_cost'    => $trx['product_cost'] != '' ? $trx['product_cost'] : $p['cost_price'],
@@ -179,7 +180,14 @@
             <div class="desc" style="padding: 1%; background-color: #dc3545; border-radius: 4px; margin-bottom: 5%; color: #fff;
     font-weight: 500;
     font-size: 14px;">
-               <span style="text-align: center; font-size: 14px; text-transform: capitalize;"><?=$prod['florist_remarks']?> </span>
+               <span style="text-align: center; font-size: 14px; text-transform: capitalize;">Remarks Produksi: <?=$prod['florist_remarks']?> </span>
+            </div>
+            <?php } ?>
+            <?php if($prod['delivery_marks'] != '') { ?>
+            <div class="desc" style="padding: 1%; background-color: #dc3545; border-radius: 4px; margin-bottom: 5%; color: #fff;
+    font-weight: 500;
+    font-size: 14px;">
+               <span style="text-align: center; font-size: 14px; text-transform: capitalize;">Remarks Kurir: <?=$prod['delivery_marks']?> </span>
             </div>
             <?php } } ?>
          </div>

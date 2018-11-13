@@ -640,8 +640,7 @@ class Admin
         if($val >= 3) {
             $price = number_format($val, 2, ',', '.');
             $price = 'Rp. ' . $price;
-        } else {
-           
+        }else {
             $price = '$ ' . $val;
         }
 

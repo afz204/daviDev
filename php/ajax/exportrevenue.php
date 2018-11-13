@@ -159,7 +159,7 @@ if($_GET['type'] == 'exportpiutang') {
     $DataQuery = " SELECT transaction.*, users.name as AdminName, florist.FloristName, (select GROUP_CONCAT(transaction_details.product_name SEPARATOR ',') from transaction_details where transaction_details.id_trx = transaction.transactionID) as product FROM transaction 
     LEFT JOIN transaction_details on transaction_details.id_trx = transaction.transactionID
     LEFT JOIN users on users.id = transaction.created_by LEFT JOIN florist on florist.ID = transaction.id_florist
-    WHERE transaction.statusOrder NOT IN (6, 99) AND ";
+    WHERE transaction.statusOrder NOT IN (6, 99) AND transaction.statusPaid = 0 AND ";
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 

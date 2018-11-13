@@ -531,10 +531,10 @@ if($_GET['type'] == 'tableSearch'){
         $daterange = $_POST['date_range'];
     }
 
-    $databox = '';
+    $databox = 'WHERE transaction.statusOrder NOT IN (99)';
     if(isset($_POST['search']['value']) ) {
         // echo $_POST['search']['value'];
-        $databox = 'WHERE (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") OR (transaction_details.product_name LIKE "%'.$_POST['search']['value'].'%") ';
+        $databox = 'WHERE transaction.statusOrder NOT IN (99) AND (transaction.transactionID LIKE "%'. $_POST['search']['value'] . '%" OR transaction.CustomerName LIKE "%'. $_POST['search']['value'] . '%" OR users.name LIKE "%'. $_POST['search']['value'] . '%") OR (transaction_details.product_name LIKE "%'.$_POST['search']['value'].'%") ';
     }
 
     $colom = array(
