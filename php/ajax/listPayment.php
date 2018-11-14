@@ -34,10 +34,10 @@ if($_GET['type'] == 'pay-kurir')
         $databox = 'AND (pay_kurirs.no_trx LIKE "%'. $_POST['search']['value'] . '%" OR kurirs.nama_kurir LIKE "%'. $_POST['search']['value'] . '%" OR delivery_charges.price LIKE "%'. $_POST['search']['value'] . '%")  OR (villages.name LIKE "%'.$_POST['search']['value'].'%") ';
     }
 
-    $payCharge = " SELECT pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.id as villagesid, villages.name, users.name as admin, transaction.delivery_date FROM pay_kurirs INNER JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
-    INNER JOIN delivery_charges ON delivery_charges.id = pay_kurirs.charge_id
-    INNER JOIN villages ON villages.id = delivery_charges.id_kelurahan
-    INNER JOIN users ON users.id = delivery_charges.admin_id 
+    $payCharge = " SELECT pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.id as villagesid, villages.name, users.name as admin, transaction.delivery_date FROM pay_kurirs LEFT JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
+    LEFT JOIN delivery_charges ON delivery_charges.id = pay_kurirs.charge_id
+    LEFT JOIN villages ON villages.id = delivery_charges.id_kelurahan
+    LEFT JOIN users ON users.id = delivery_charges.admin_id 
     LEFT JOIN transaction ON transaction.transactionID = pay_kurirs.no_trx
     WHERE pay_kurirs.status != '2' ";
     
@@ -121,7 +121,7 @@ if($_GET['type'] == 'pay-kurir')
         
         $totalPerKurir = $config->getData('SUM(total) as TOTAL', 'pay_kurirs', "pay_kurirs.status != '2' ". $month . $kurir ." AND ( pay_kurirs.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ) ");
         
-        // var_dump($totalPerKurir);
+        // var_dump($Pembayaran);
         $totalPerKurir = $totalPerKurir['TOTAL'];
 
     }
@@ -209,7 +209,7 @@ if($_GET['type'] == 'pay-kurir')
         $subdata[]  = $total;
         // $subdata[]  = $row[8];
         
-        $subdata[]  = $config->formatPrice($row['price']);
+        $subdata[]  = $config->formatPrice($row['weight']+$row['total']);
         
         $subdata[]  = $config->formatPrice($subtotal);
         $subdata[]  = $button;
