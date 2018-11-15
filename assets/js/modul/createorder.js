@@ -71,6 +71,7 @@ $(document).ready(function() {
             toolbarPosition: 'bottom'
                 // toolbarExtraButtons: [btnFinish, btnCancel]
         },
+        keyNavigation: false,
         anchorSettings: {
             markDoneStep: true, // add done css
             markAllPreviousStepsAsDone: true, // When a step selected by url hash, all previous steps are marked done

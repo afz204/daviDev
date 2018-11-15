@@ -388,12 +388,12 @@
                    <div class="row">
                       <div class="col-md-6 mb-3  form-group">
                          <label for="lastName">from</label>
-                         <input type="text" class="form-control" id="from" value="<?=isset($trx[0]['card_from']) ? $trx[0]['card_from'] : '' ?>" required>
+                         <input type="text" class="form-control" id="from" value="<?=isset($trx[0]['card_from']) ? $trx[0]['card_from'] : '' ?>" >
                          <div class="help-block with-errors"></div>
                       </div>
                       <div class="col-md-6 mb-3  form-group">
                          <label for="lastName">to</label>
-                         <input type="text" class="form-control" id="to" value="<?=isset($trx[0]['card_to']) ? $trx[0]['card_to'] : '' ?>" required>
+                         <input type="text" class="form-control" id="to" value="<?=isset($trx[0]['card_to']) ? $trx[0]['card_to'] : '' ?>" >
                          <div class="help-block with-errors"></div>
                       </div>
                    </div>

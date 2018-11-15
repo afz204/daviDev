@@ -194,7 +194,7 @@
       </div>
       <div id="detailProduct" class="col-12 col-md-8 col-lg-8">
          <div class="card-header">
-            <h5 class="card-title">Detail Transaction</h5>
+            <h5 class="card-title">Detail Transaction #<?=$_GET['trx']?></h5>
          </div>
          <div class="card-body">
             <div class="btn-group" role="group" aria-label="Basic example">
