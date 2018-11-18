@@ -337,8 +337,8 @@ if($_GET['type'] == 'exportbonus') {
 
     $Excel->setActiveSheetIndex(0)
     ->setCellValue('A1', 'LAPORAN PEMBUKUAN (KOMISI) BUNGA DAVI')
-    ->mergeCells('A1:K1')
-    ->getStyle("A1:K1")->applyFromArray($stylecenter);
+    ->mergeCells('A1:L1')
+    ->getStyle("A1:L1")->applyFromArray($stylecenter);
 
     $Excel->setActiveSheetIndex(0)
     ->setCellValue('A3', 'No ID')
@@ -352,7 +352,8 @@ if($_GET['type'] == 'exportbonus') {
     ->setCellValue('I3', 'Cost Price')
     ->setCellValue('J3', 'Selling Price')
     ->setCellValue('K3', 'MP %')
-    ->getStyle("A3:K3")->applyFromArray($header);
+    ->setCellValue('L3', 'Nama Invoice')
+    ->getStyle("A3:L3")->applyFromArray($header);
 
     $Excel->setActiveSheetIndex(0)
     ->getColumnDimension('A')->setAutoSize(true);
@@ -376,6 +377,8 @@ if($_GET['type'] == 'exportbonus') {
     ->getColumnDimension('J')->setAutoSize(true);
     $Excel->setActiveSheetIndex(0)
     ->getColumnDimension('K')->setAutoSize(true);
+    $Excel->setActiveSheetIndex(0)
+    ->getColumnDimension('L')->setAutoSize(true);
 
     $Excel->getActiveSheet()->freezePane('A4');
     $nomor = 1;
@@ -400,7 +403,8 @@ if($_GET['type'] == 'exportbonus') {
         ->setCellValue('H'.$loop, $paydate)
         ->setCellValue('I'.$loop, $row['TotalCostPrice'])
         ->setCellValue('J'.$loop, $row['grandTotal'])
-        ->setCellValue('K'.$loop, ceil($row['MP'] * 100));
+        ->setCellValue('K'.$loop, ceil($row['MP'] * 100))
+        ->setCellValue('L'.$loop, $row['invoice_name']);
 
         $loop++;
     }

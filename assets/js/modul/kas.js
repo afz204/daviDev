@@ -329,6 +329,23 @@ $(document).ready(function() {
 
     var monitoringKas = $('#monitoringKasIn').show();
 
+    $('#ChangeDeliveryCharge').on('submit', function(e) {
+        e.preventDefault();
+        var transactionID = $('#noTransaction').val();
+        var charges = $('#delivery_charges').val();
+
+        $.ajax({
+            url: '../php/ajax/listPayment.php?type=changecharges',
+            method: 'post',
+            data: { 'transactionID': transactionID, 'charges': charges },
+
+            success: function(msg) {
+                location.reload();
+                alert(msg);
+            }
+        });
+    });
+
     $('#FilterPayKurir').on('submit', function(e) {
         e.preventDefault();
 

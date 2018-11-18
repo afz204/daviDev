@@ -27,7 +27,7 @@ if($_GET['type'] == 'kasout') {
     $startDate = $rangeArray[0]. ' 00:00:00';
     $endsDate = $rangeArray[1]. ' 23:59:59';
 
-    $DataQuery .=" kas.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." ORDER BY kas.id ASC ";
+    $DataQuery .=" kas.created_at BETWEEN '". $startDate ."' AND '". $endsDate ."' ".$status_paid." ORDER BY kas.created_at ASC ";
     // var_dump($DataQuery);
     $data = $config->runQuery($DataQuery);
     $data->execute();
@@ -55,8 +55,8 @@ if($_GET['type'] == 'kasout') {
 
     $Excel->setActiveSheetIndex(0)
     ->setCellValue('A1', 'LAPORAN BELANJA PRODUKSI BUNGA DAVI')
-    ->mergeCells('A1:K1')
-    ->getStyle("A1:K1")->applyFromArray($stylecenter);
+    ->mergeCells('A1:L1')
+    ->getStyle("A1:L1")->applyFromArray($stylecenter);
 
     $Excel->setActiveSheetIndex(0)
     ->setCellValue('A3', 'NO')
@@ -67,10 +67,11 @@ if($_GET['type'] == 'kasout') {
     ->setCellValue('F3', 'Quantity')
     ->setCellValue('G3', 'Satuan')
     ->setCellValue('H3', 'Harga')
-    ->setCellValue('I3', 'Total')
-    ->setCellValue('J3', 'Admin')
-    ->setCellValue('K3', 'Created Date')
-    ->getStyle("A3:K3")->applyFromArray($header);
+    ->setCellValue('I3', 'Currency')
+    ->setCellValue('J3', 'Total')
+    ->setCellValue('K3', 'Admin')
+    ->setCellValue('L3', 'Created Date')
+    ->getStyle("A3:L3")->applyFromArray($header);
 
     $Excel->setActiveSheetIndex(0)
     ->getColumnDimension('A')->setAutoSize(true);
@@ -94,12 +95,15 @@ if($_GET['type'] == 'kasout') {
     ->getColumnDimension('J')->setAutoSize(true);
     $Excel->setActiveSheetIndex(0)
     ->getColumnDimension('K')->setAutoSize(true);
+    $Excel->setActiveSheetIndex(0)
+    ->getColumnDimension('L')->setAutoSize(true);
 
     $Excel->getActiveSheet()->freezePane('A4');
     $nomor = 1;
     $loop = 4;
+    $totaldata = [];
     while($row = $data->fetch(PDO::FETCH_LAZY)) {
-
+        $totaldata[] = $row['nama'];
         $Excel->getActiveSheet()
         ->setCellValue('A'.$loop, $nomor++)
         ->setCellValue('B'.$loop, $row['category'])
@@ -109,12 +113,18 @@ if($_GET['type'] == 'kasout') {
         ->setCellValue('F'.$loop, $row['qty'])
         ->setCellValue('G'.$loop, $row['satuan'])
         ->setCellValue('H'.$loop, $row['harga'])
-        ->setCellValue('I'.$loop, $row['qty'] * $row['harga'])
-        ->setCellValue('J'.$loop, $row['name'])
-        ->setCellValue('K'.$loop, $row['created_at']);
+        ->setCellValue('I'.$loop, 'Rp.')
+        ->setCellValue('J'.$loop, $row['qty'] * $row['harga'])
+        ->setCellValue('K'.$loop, $row['name'])
+        ->setCellValue('L'.$loop, $row['created_at']);
 
         $loop++;
     }
+
+    $heightfooter = count($totaldata) + 5;
+    $Excel->setActiveSheetIndex(0)->setCellValue('H'.$heightfooter, 'Total');
+    $Excel->setActiveSheetIndex(0)->setCellValue('I'.$heightfooter, 'Rp.');
+    $Excel->setActiveSheetIndex(0)->setCellValue('J'.$heightfooter, '=SUM(J4:J'.count($totaldata).')');
    
     $filename = str_replace(' ', '_', 'Laporan Belanja Produksi '.$daterange);
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

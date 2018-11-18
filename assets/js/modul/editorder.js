@@ -16,6 +16,8 @@ function editalamatempat() {
     $('#alamat_penerima').attr('readonly', false);
     $('#delivery_date').attr('readonly', false);
     $('#time_slot').attr('readonly', false);
+    $('#delivery_charge').attr('readonly', false);
+    $('#delivery_marks').attr('readonly', false);
     $('.btn-alamatempat').removeClass('hidden');
 }
 
@@ -51,13 +53,14 @@ function alamatempat() {
     var alamat_penerima = $('#alamat_penerima').val();
     var kelurahan_id = $('#kelurahan_id option:selected').val();
     var delivery_date = $('#delivery_date').val();
-    var delivery_charge = $('#kelurahan_id option:selected').data('price');
+    var delivery_charge = $('#delivery_charge').val();
+    var delivery_marks = $('#delivery_marks').val();
     var time_slot = $('#time_slott option:selected').val();
 
     $.ajax({
         url: '../php/ajax/updatetrx.php?type=alamatempat',
         method: 'post',
-        data: { 'TransactionID': trx, 'alamat_penerima': alamat_penerima, 'kelurahan_id': kelurahan_id, 'delivery_date': delivery_date, 'time_slot': time_slot, 'delivery_charge': delivery_charge },
+        data: { 'TransactionID': trx, 'alamat_penerima': alamat_penerima, 'kelurahan_id': kelurahan_id, 'delivery_date': delivery_date, 'time_slot': time_slot, 'delivery_charge': delivery_charge, 'delivery_marks': delivery_marks },
 
         success: function(msg) {
             alert(msg);

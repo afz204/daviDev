@@ -83,7 +83,7 @@ if($_GET['type'] == 'formresonbox'){
                 } elseif($data['statusOrder'] == 4) {
                     $SendStatus = '<tr>
                     <td width="600" align="center" class="w640">
-                    <span class="article-content" style="font-family:Arial; font-size:24px;color:#333333; font-weight:bold; line-height:26px; color: orange;">Has Return! <br> Reason: '.$data['notes'].'.</span>
+                    <span class="article-content" style="font-family:Arial; font-size:24px;color:#333333; font-weight:bold; line-height:26px; color: orange;">Has Been Returned! <br> Reason: '.$data['notes'].'.</span>
                     <br /><br />
                     </td>
                 </tr>';
@@ -488,7 +488,8 @@ if($_GET['type'] == 'formresonbox'){
                 
                 $cc = 'fiki@bungadavi.co.id';
                 $config = new Mail();
-                $email = $config->Mailler('ardinirianti@gmail.com', $receivedName, $cc, $subject, $content);
+                $email = $config->Mailler($CustomerEmail, $receivedName, $cc, $subject, $content);
+                // $email = $config->Mailler('ardinirianti@gmail.com', $receivedName, $cc, $subject, $content);
             } else {
                 echo 'Failed Transaction!';
             }
@@ -3469,7 +3470,8 @@ if($_GET['type'] == 'sendInvoiceEmail' || $_GET['type'] == 'proccessOrder'){
    
     $cc = 'fiki@bungadavi.co.id';
     $config = new Mail();
-    $email = $config->Mailler($receivedEmail, $receivedName, $cc, $subject, $content);
+    $email = $config->Mailler('afz60.30@gmail.com', $receivedName, $cc, $subject, $content);
+    // $email = $config->Mailler($receivedEmail, $receivedName, $cc, $subject, $content);
 
         die(json_encode(['response' => $email['response'], 'msg' => $email['msg']]));
         $logs = $config->saveLogs($a, $admin, 'f', 'send email!');

@@ -14,7 +14,7 @@ if($data['card_to'] != '') {
 }
 $cardfrom = '';
 if($data['card_from'] != '') {
-    $cardfrom = 'From: '.$data['card_from'];
+    $cardfrom = $data['card_from'];
 }
 $content = '
 <html>

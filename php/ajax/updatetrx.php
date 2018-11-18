@@ -44,6 +44,7 @@ if($_GET['type'] == 'alamatempat') {
     $delivery_date = $_POST['delivery_date'];
     $delivery_time = $_POST['time_slot'];
     $delivery_charge = $_POST['delivery_charge'];
+    $delivery_marks = $_POST['delivery_marks'];
 
     $arrtimecharge = [
         1 => 0,
@@ -59,7 +60,7 @@ if($_GET['type'] == 'alamatempat') {
     $newGrandTotal = $tmpgrandtotal + $delivery_charge + $arrtimecharge[$delivery_time];
 
 
-    $query = "UPDATE transaction SET alamat_penerima = :alamat_penerima, kelurahan_id = :kelurahan_id, delivery_date = :delivery_date, delivery_time = :delivery_time, delivery_charge = :delivery_charge, delivery_charge_time = :delivery_charge_time, grandTotal = :grandTotal, updated_by = :updated_by WHERE transactionID = :transactionID ";
+    $query = "UPDATE transaction SET alamat_penerima = :alamat_penerima, kelurahan_id = :kelurahan_id, delivery_date = :delivery_date, delivery_time = :delivery_time, delivery_charge = :delivery_charge, delivery_charge_time = :delivery_charge_time, grandTotal = :grandTotal, updated_by = :updated_by, delivery_marks = :delivery_marks WHERE transactionID = :transactionID ";
     $update = $config->runQuery($query);
     $update->execute([
         ':alamat_penerima'    => $alamat_penerima,
@@ -67,6 +68,7 @@ if($_GET['type'] == 'alamatempat') {
         ':delivery_date'    => $delivery_date,
         ':delivery_time'    => $delivery_time,
         ':delivery_charge'    => $delivery_charge,
+        ':delivery_marks'    => $delivery_marks,
         ':delivery_charge_time'    => $arrtimecharge[$delivery_time],
         ':grandTotal'    => $newGrandTotal,
         ':updated_by'    => $admin,

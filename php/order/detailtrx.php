@@ -311,6 +311,12 @@
             <div class="card-body">
                 <div class="row">
                   <div class="col-md-12 mb-3">
+                     <label for="firstName">remarks kurir</label>
+                     <textarea type="text" class="form-control" id="delivery_marks" autocomplete="text" placeholder="" value="" readonly><?=$data['delivery_marks']?></textarea>
+                  </div>
+               </div>
+                <div class="row">
+                  <div class="col-md-12 mb-3">
                      <label for="firstName">alamat lengkap</label>
                      <textarea type="text" class="form-control" id="alamat_penerima" autocomplete="text" placeholder="" value="" readonly><?=$data['alamat_penerima']?></textarea>
                   </div>
@@ -343,7 +349,15 @@
                         <?php } ?>
                         </select>
                   </div>
+                  <div class="col-md-6 mb-3">
+                     <label for="lastName">delivery charge</label>
+                     <input type="text" class="form-control" id="delivery_charge" value="<?=$data['delivery_charge']?>" autocomplete="text" placeholder="" readonly data-parsley-type="number">
+                     <div class="invalid-feedback">
+                        Valid last name is required.
+                     </div>
+                  </div>
                </div>
+               
                <div class="row">
                     <div class="col-md-12">
                         <button class="btn-block btn btn-success btn-alamatempat hidden" onclick="alamatempat()">UPDATE</button>

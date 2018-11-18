@@ -207,28 +207,25 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalProductAdd">List Kelurahan </h5>
+        <h5 class="modal-title" id="modalProductAdd">Delivery Charge </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-            <form id="addProductCheckout" data-parsley-validate="">
+            <form id="ChangeDeliveryCharge" data-parsley-validate="">
                 <div class="form-group">
                     <input type="hidden" class="form-control" id="noTransaction">
                 </div>
                 <div class="form-group">
-                  <select class="form-control" name="codeSearch" id="codeSearch" required>
-                      <option value="">Choose...</option>
-                      <?php while ($p = $charges->fetch(PDO::FETCH_LAZY)){ ?>
-                      <option value="<?=$p->id?>" data-price="<?=$p->price?>"><?=$p->name?>_(<?=$config->formatPrice($p->price)?>)</option>
-                      <?php } ?>
-                  </select>
-                  <div class="help-block with-errors"></div>
+                    <label for="delivery_charges">delivery_charges</label>
+                    <input type="text" class="form-control" id="delivery_charges" data-parsley-type="number" autocomplete="text" placeholder="">
+                    <div class="invalid-feedback">
+                    Valid last name is required.
+                    </div>
                 </div>
-                <div id="feedback-check"></div>
-                <div id="checkProduct">
-                    <button type="submit"  class="btn btn-block btn-primary ">submit</button>
+                <div class="form-group">
+                <button type="submit" class="btn btn-block btn-primary">save deliverycharges</button>
                 </div>
             </form>
       </div>

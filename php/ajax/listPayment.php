@@ -31,10 +31,12 @@ if($_GET['type'] == 'pay-kurir')
     $databox = '';
     if(isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
         // echo $_POST['search']['value'];
-        $databox = 'AND (pay_kurirs.no_trx LIKE "%'. $_POST['search']['value'] . '%" OR kurirs.nama_kurir LIKE "%'. $_POST['search']['value'] . '%" OR delivery_charges.price LIKE "%'. $_POST['search']['value'] . '%")  OR (villages.name LIKE "%'.$_POST['search']['value'].'%") ';
+        $databox = "AND pay_kurirs.no_trx LIKE '%".$_POST['search']['value']."%' OR kurirs.nama_kurir LIKE '%".$_POST['search']['value']."%' OR delivery_charges.price LIKE '%".$_POST['search']['value']."%' OR villages.name LIKE '%".$_POST['search']['value']."%' ";
+        // $databox = 'AND (pay_kurirs.no_trx LIKE " %'. $_POST['search']['value'] . '% " OR kurirs.nama_kurir LIKE " %'. $_POST['search']['value'] . '% " OR delivery_charges.price LIKE " %'. $_POST['search']['value'] . '% ")  OR (villages.name LIKE " %'.$_POST['search']['value'].'% ") ';
     }
 
-    $payCharge = " SELECT pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.id as villagesid, villages.name, users.name as admin, transaction.delivery_date FROM pay_kurirs LEFT JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
+    $payCharge = " SELECT pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.id as villagesid, villages.name, users.name as admin, transaction.delivery_date FROM pay_kurirs 
+    LEFT JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id
     LEFT JOIN delivery_charges ON delivery_charges.id = pay_kurirs.charge_id
     LEFT JOIN villages ON villages.id = delivery_charges.id_kelurahan
     LEFT JOIN users ON users.id = delivery_charges.admin_id 
@@ -42,8 +44,12 @@ if($_GET['type'] == 'pay-kurir')
     WHERE pay_kurirs.status != '2' ";
     
     // $totalPembayaran = $config->runQuery()
-    $Pembayaran = "SELECT SUM(total) AS TOTAL FROM pay_kurirs WHERE pay_kurirs.status != '2' ";
-    $SUM = "SELECT SUM(total) AS TOTAL FROM pay_kurirs WHERE pay_kurirs.status != '2' ";
+    $Pembayaran = "SELECT SUM(total) AS TOTAL, pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.id as villagesid, villages.name, users.name as admin, transaction.delivery_date FROM pay_kurirs LEFT JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id  LEFT JOIN delivery_charges ON delivery_charges.id = pay_kurirs.charge_id LEFT JOIN villages ON villages.id = delivery_charges.id_kelurahan
+    LEFT JOIN users ON users.id = delivery_charges.admin_id 
+    LEFT JOIN transaction ON transaction.transactionID = pay_kurirs.no_trx WHERE pay_kurirs.status != '2' ";
+    $SUM = "SELECT SUM(total) AS TOTAL, pay_kurirs.id as payChargeID, pay_kurirs.no_trx, pay_kurirs.kurir_id, pay_kurirs.charge_id, pay_kurirs.remarks, pay_kurirs.total, pay_kurirs.weight, pay_kurirs.status, pay_kurirs.created_at, kurirs.nama_kurir, delivery_charges.price, villages.id as villagesid, villages.name, users.name as admin, transaction.delivery_date FROM pay_kurirs LEFT JOIN kurirs ON kurirs.id = pay_kurirs.kurir_id  LEFT JOIN delivery_charges ON delivery_charges.id = pay_kurirs.charge_id LEFT JOIN villages ON villages.id = delivery_charges.id_kelurahan
+    LEFT JOIN users ON users.id = delivery_charges.admin_id 
+    LEFT JOIN transaction ON transaction.transactionID = pay_kurirs.no_trx WHERE pay_kurirs.status != '2' ";
     // $totalPembayaran = $config->getData('SUM(total) as TOTAL', 'pay_kurirs', "pay_kurirs.status != '2' ");
     // $totalPembayaran = $totalPembayaran['TOTAL'];
     //print_r($request);
@@ -123,8 +129,9 @@ if($_GET['type'] == 'pay-kurir')
         
         // var_dump($Pembayaran);
         $totalPerKurir = $totalPerKurir['TOTAL'];
-
+        
     }
+    // var_dump($Pembayaran);
         $stmt2 = $config->runQuery($Pembayaran);
         $stmt2->execute();
         $stmt3 = $config->runQuery($SUM);
@@ -229,4 +236,15 @@ if($_GET['type'] == 'pay-kurir')
         'subtotal'          => $config->formatPrice($selisihPembayaran)
     );
     echo json_encode($json_data);
+}
+
+if($_GET['type'] == 'changecharges') {
+    $transactionID = $_POST['transactionID'];
+    $charges = $_POST['charges'];
+
+    $sql = "UPDATE pay_kurirs SET total = '".$charges."' WHERE no_trx = '".$transactionID."'";
+    $stmt = $config->runQuery($sql);
+    $stmt->execute();
+
+    echo $config->actionMsg('u', 'pay_kurirs');
 }
